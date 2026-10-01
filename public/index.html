@@ -150,25 +150,116 @@
       margin-bottom: 10px;
     }
 
-    .scope-row {
+    /* App Scope Selector Component */
+    .scope-selector-container {
+      margin-top: 10px;
+    }
+
+    .scope-quick-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .scope-presets-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .scope-pill-btn {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 11.5px;
+      color: #334155;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+
+    .scope-pill-btn:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+      color: #0f172a;
+    }
+
+    .scope-pill-btn.active {
+      background: #e0f2fe;
+      border-color: #7dd3fc;
+      color: #0369a1;
+      font-weight: 600;
+    }
+
+    .perm-toggle-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11.5px;
+      color: #475569;
+    }
+
+    .perm-radio-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .perm-radio-label input {
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .app-checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 6px;
+      margin-bottom: 10px;
+      background: #ffffff;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .app-checkbox-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #1e293b;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .app-checkbox-label input {
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .scope-output-row {
       display: flex;
       gap: 8px;
     }
 
-    .scope-select {
+    .scope-output-input {
       flex: 1;
       height: 36px;
       border: 1px solid var(--input-border);
       border-radius: 5px;
       padding: 0 10px;
-      font-size: 12.5px;
-      font-family: inherit;
-      color: var(--text);
+      font-size: 11.5px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #334155;
       background: #ffffff;
       outline: none;
     }
 
-    .scope-select:focus {
+    .scope-output-input:focus {
       border-color: var(--focus);
     }
 
@@ -733,28 +824,83 @@
     <!-- Main Card -->
     <div class="card">
       
-      <!-- Guide Helper -->
+      <!-- Guide Helper & Application Scope Selector -->
       <div class="guide-box">
         <div class="guide-top">
-          <span class="guide-title">How to get your Zoho Code</span>
+          <span class="guide-title">1. Select Zoho Applications &amp; Copy Scope</span>
           <a href="https://api-console.zoho.com" target="_blank" class="guide-link">
             Zoho API Console
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
           </a>
         </div>
-        <p class="guide-desc">In Zoho API Console, go to <strong>Self Client</strong> &rarr; <strong>Generate Code</strong>, select your scope preset, copy permissions, and set duration to 10 minutes.</p>
-        <div class="scope-row">
-          <select id="scopePresetSelect" class="scope-select" onchange="onPresetSelectChange(this.value)">
-            <option value="full" selected>Full Ecosystem (CRM, Desk, Books, Inventory, Drive, Projects) &mdash; Recommended</option>
-            <option value="nodesk">Standard Suite (Without Desk)</option>
-            <option value="crmonly">CRM &amp; WorkDrive Only</option>
-          </select>
-          <button type="button" class="copy-btn" id="btnCopyScopes" onclick="copyScopes()">
-            <span id="copyIcon">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-            </span>
-            <span id="copyText">Copy Scopes</span>
-          </button>
+        <p class="guide-desc">Select which Zoho applications your client uses. Copy the generated scope and paste it into Zoho API Console (<strong>Self Client &rarr; Generate Code</strong>).</p>
+
+        <div class="scope-selector-container">
+          <div class="scope-quick-bar">
+            <div class="scope-presets-pills">
+              <button type="button" class="scope-pill-btn active" id="preset_full" onclick="setAppPreset('full')">Full Ecosystem</button>
+              <button type="button" class="scope-pill-btn" id="preset_nodesk" onclick="setAppPreset('nodesk')">No Desk</button>
+              <button type="button" class="scope-pill-btn" id="preset_crmonly" onclick="setAppPreset('crmonly')">CRM Only</button>
+              <button type="button" class="scope-pill-btn" id="preset_finance" onclick="setAppPreset('finance')">Books &amp; Inventory</button>
+            </div>
+            <div class="perm-toggle-group">
+              <label class="perm-radio-label">
+                <input type="radio" name="permLevel" value="read" checked onchange="updateScopeString()">
+                <span>Read-Only (.READ)</span>
+              </label>
+              <label class="perm-radio-label">
+                <input type="radio" name="permLevel" value="all" onchange="updateScopeString()">
+                <span>Full Access (.ALL)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Apps Checkbox Grid -->
+          <div class="app-checkbox-grid">
+            <label class="app-checkbox-label">
+              <input type="checkbox" class="app-chk" value="crm" checked onchange="updateScopeString()">
+              <span>Zoho CRM</span>
+            </label>
+            <label class="app-checkbox-label">
+              <input type="checkbox" class="app-chk" value="desk" checked onchange="updateScopeString()">
+              <span>Zoho Desk</span>
+            </label>
+            <label class="app-checkbox-label">
+              <input type="checkbox" class="app-chk" value="books" checked onchange="updateScopeString()">
+              <span>Zoho Books</span>
+            </label>
+            <label class="app-checkbox-label">
+              <input type="checkbox" class="app-chk" value="inventory" checked onchange="updateScopeString()">
+              <span>Zoho Inventory</span>
+            </label>
+            <label class="app-checkbox-label">
+              <input type="checkbox" class="app-chk" value="workdrive" checked onchange="updateScopeString()">
+              <span>Zoho WorkDrive</span>
+            </label>
+            <label class="app-checkbox-label">
+              <input type="checkbox" class="app-chk" value="projects" checked onchange="updateScopeString()">
+              <span>Zoho Projects</span>
+            </label>
+            <label class="app-checkbox-label">
+              <input type="checkbox" class="app-chk" value="analytics" checked onchange="updateScopeString()">
+              <span>Zoho Analytics</span>
+            </label>
+            <label class="app-checkbox-label">
+              <input type="checkbox" class="app-chk" value="flow" checked onchange="updateScopeString()">
+              <span>Zoho Flow</span>
+            </label>
+          </div>
+
+          <!-- Generated Scope Output & Copy Button -->
+          <div class="scope-output-row">
+            <input type="text" id="scopeOutputInput" class="scope-output-input" readonly placeholder="Select apps to generate scope">
+            <button type="button" class="copy-btn" id="btnCopyScopes" onclick="copyScopes()">
+              <span id="copyIcon">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              </span>
+              <span id="copyText">Copy Scopes</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -922,56 +1068,103 @@
   <script>
     let selectedFormat = 'pdf';
 
-    const SCOPE_PRESETS = {
-      full: "ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,Desk.tickets.ALL,Desk.contacts.ALL,Desk.settings.ALL,Desk.basic.ALL,ZohoBooks.fullaccess.ALL,ZohoInventory.fullaccess.ALL,WorkDrive.files.ALL,ZohoProjects.projects.ALL",
-      nodesk: "ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,ZohoBooks.fullaccess.ALL,ZohoInventory.fullaccess.ALL,WorkDrive.files.ALL,ZohoProjects.projects.ALL",
-      crmonly: "ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,WorkDrive.files.ALL"
+    const APP_SCOPES = {
+      crm: {
+        read: "ZohoCRM.modules.READ,ZohoCRM.settings.READ,ZohoCRM.users.READ,ZohoCRM.org.READ",
+        all: "ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ"
+      },
+      desk: {
+        read: "Desk.tickets.READ,Desk.contacts.READ,Desk.settings.READ,Desk.basic.READ",
+        all: "Desk.tickets.ALL,Desk.contacts.ALL,Desk.settings.ALL,Desk.basic.ALL"
+      },
+      books: {
+        read: "ZohoBooks.fullaccess.READ",
+        all: "ZohoBooks.fullaccess.ALL"
+      },
+      inventory: {
+        read: "ZohoInventory.fullaccess.READ",
+        all: "ZohoInventory.fullaccess.ALL"
+      },
+      workdrive: {
+        read: "WorkDrive.files.READ,WorkDrive.workspace.READ",
+        all: "WorkDrive.files.ALL"
+      },
+      projects: {
+        read: "ZohoProjects.projects.READ",
+        all: "ZohoProjects.projects.ALL"
+      },
+      analytics: {
+        read: "ZohoAnalytics.data.READ",
+        all: "ZohoAnalytics.data.ALL"
+      },
+      flow: {
+        read: "ZohoFlow.flows.READ",
+        all: "ZohoFlow.flows.ALL"
+      }
     };
 
-    let activeScopePreset = 'full';
+    function updateScopeString() {
+      const permRadio = document.querySelector('input[name="permLevel"]:checked');
+      const isReadOnly = permRadio ? permRadio.value === 'read' : true;
+      const checkboxes = document.querySelectorAll('.app-chk:checked');
+      const scopes = [];
+      checkboxes.forEach(cb => {
+        const appKey = cb.value;
+        if (APP_SCOPES[appKey]) {
+          scopes.push(isReadOnly ? APP_SCOPES[appKey].read : APP_SCOPES[appKey].all);
+        }
+      });
+      const scopeStr = scopes.join(',');
+      const outputInput = document.getElementById('scopeOutputInput');
+      if (outputInput) outputInput.value = scopeStr;
+      return scopeStr;
+    }
 
-    function onPresetSelectChange(val) {
-      activeScopePreset = val;
-      copyScopes();
+    function setAppPreset(presetKey) {
+      document.querySelectorAll('.scope-pill-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`preset_${presetKey}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const appChecks = {
+        full: ['crm', 'desk', 'books', 'inventory', 'workdrive', 'projects', 'analytics', 'flow'],
+        nodesk: ['crm', 'books', 'inventory', 'workdrive', 'projects', 'analytics', 'flow'],
+        crmonly: ['crm', 'workdrive'],
+        finance: ['books', 'inventory']
+      };
+
+      const selected = appChecks[presetKey] || appChecks.full;
+      document.querySelectorAll('.app-chk').forEach(cb => {
+        cb.checked = selected.includes(cb.value);
+      });
+      updateScopeString();
     }
 
     function copyScopes() {
-      const select = document.getElementById('scopePresetSelect');
-      const presetKey = select ? select.value : activeScopePreset;
-      const text = SCOPE_PRESETS[presetKey] || SCOPE_PRESETS['nodesk'];
-
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(() => {
-          showCopied();
-        }).catch(() => fallbackCopy(text));
-      } else {
-        fallbackCopy(text);
-      }
-    }
-
-    function fallbackCopy(text) {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      ta.remove();
-      showCopied();
+      const input = document.getElementById('scopeOutputInput');
+      if (!input || !input.value) return;
+      navigator.clipboard.writeText(input.value).then(() => {
+        showCopied();
+      }).catch(() => {
+        input.select();
+        document.execCommand('copy');
+        showCopied();
+      });
     }
 
     function showCopied() {
       const icon = document.getElementById('copyIcon');
       const txt = document.getElementById('copyText');
       const btn = document.getElementById('btnCopyScopes');
+      if (!btn) return;
 
       btn.classList.add('copied');
-      icon.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-      txt.textContent = 'Copied!';
+      if (icon) icon.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+      if (txt) txt.textContent = 'Copied!';
 
       setTimeout(() => {
         btn.classList.remove('copied');
-        icon.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
-        txt.textContent = 'Copy Scopes';
+        if (icon) icon.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+        if (txt) txt.textContent = 'Copy Scopes';
       }, 2500);
     }
 
@@ -1128,7 +1321,7 @@
     }
 
     // Call loadSavedCredentials on document ready
-    document.addEventListener('DOMContentLoaded', loadSavedCredentials);
+    document.addEventListener('DOMContentLoaded', () => { loadSavedCredentials(); updateScopeString(); });
 
     // Test credentials
     function fillTestAccount() {
