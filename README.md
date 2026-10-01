@@ -136,3 +136,57 @@ Content-Type: multipart/form-data
 - `use_demo` *(boolean, optional)*: If `true`, runs simulation telemetry.
 
 **Format options**: `?format=pdf`, `?format=docx`, or `?format=zip`.
+
+---
+
+## Deploying to Vercel (Step-by-Step)
+
+The repository is already configured with [`vercel.json`](file:///Users/ankitapandey/Downloads/audit%20report%20zoho/vercel.json), serverless Python entrypoint ([`api/index.py`](file:///Users/ankitapandey/Downloads/audit%20report%20zoho/api/index.py)), and serverless PHP Dompdf renderer ([`api/pdf.php`](file:///Users/ankitapandey/Downloads/audit%20report%20zoho/api/pdf.php)).
+
+### Step 1: Connect Your GitHub Repository in Vercel
+1. Log into your [Vercel Dashboard](https://vercel.com/dashboard).
+2. Click **Add New...** → **Project**.
+3. Select and import your GitHub repository:
+   `https://github.com/wooplix15-debug/audit-report-zoho`
+
+### Step 2: Configure Environment Variables in Vercel
+In the **Configure Project** screen under **Environment Variables**, add:
+- `GROQ_API_KEY`: *(Your Groq API Key, e.g. `gsk_...`)*
+- `GROQ_MODEL`: `openai/gpt-oss-120b` *(optional)*
+- `PDF_RENDER_TOKEN`: `wooplix-zoho-audit-render-secret-2026` *(optional)*
+
+*(Optional Server Defaults for Zoho if you want pre-configured fallback)*:
+- `ZOHO_CLIENT_ID`: `1000.YOUR_CLIENT_ID`
+- `ZOHO_CLIENT_SECRET`: `your_client_secret`
+- `ZOHO_REFRESH_TOKEN`: `1000.your_refresh_token`
+- `ZOHO_ACCOUNTS_URL`: `https://accounts.zoho.in`
+
+### Step 3: Deploy
+1. Click **Deploy**.
+2. Vercel will build the project and assign a production URL (e.g. `https://audit-report-zoho.vercel.app`).
+3. Your live portal is immediately ready for audits!
+
+---
+
+## How to Generate & Change Zoho Credentials
+
+### Option A: Using the Intake Web Portal (Recommended for Audits)
+In the web interface:
+1. Under **Section 2 (Zoho Cloud Authentication)**, select the client's **Data Center Domain** (India, Global/US, Europe, or Australia).
+2. Paste the client's **Client ID**, **Client Secret**, and **Refresh Token**.
+3. Check **"Remember credentials in this browser"** if you want your browser to save them locally.
+4. Click **"Run Diagnostic Audit"**.
+5. To test or clear, click **"🧹 Clear"** or **"⚡ Load Test Credentials"**.
+
+### Option B: Generating Zoho API Credentials via Zoho Developer Console
+If auditing a new client or organization:
+1. Log in to the [Zoho API Console](https://api-console.zoho.com).
+2. Click **Add Client** → select **Self Client**.
+3. Under **Generate Code**, enter the following scopes:
+   ```text
+   ZohoCRM.modules.READ,ZohoCRM.settings.READ,Desk.tickets.READ,Desk.settings.READ,ZohoBooks.fullaccess.READ
+   ```
+4. Set Time Duration to **10 minutes** and enter a Scope Description (e.g. `Audit Diagnostic Probe`).
+5. Copy the generated authorization code.
+6. Under **Self Client** → **Generate Access/Refresh Token**, paste the authorization code to obtain the persistent **Refresh Token**.
+

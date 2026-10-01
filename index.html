@@ -502,12 +502,22 @@
           </div>
         </div>
 
-        <!-- SECTION 2: Zoho OAuth Credentials -->
-        <div class="section-title" style="justify-content: space-between;">
+        <!-- SECTION 2: Zoho Cloud Authentication -->
+        <div class="section-title" style="justify-content: space-between; flex-wrap: wrap; gap: 8px;">
           <div style="display:flex; align-items:center; gap:8px;">
             <span class="step-num">2</span> Zoho Cloud Authentication
           </div>
-          <button type="button" class="quick-btn" id="demoBtn">⚡ Load Pre-configured Credentials</button>
+          <div style="display:flex; gap:6px; flex-wrap: wrap;">
+            <button type="button" class="quick-btn" id="demoBtn">⚡ Load Test Credentials</button>
+            <button type="button" class="quick-btn" id="clearCredsBtn" style="border-color:#94a3b8; color:#64748b;">🧹 Clear</button>
+          </div>
+        </div>
+
+        <div style="background:#f1f5f9; border:1px solid #e2e8f0; border-radius:10px; padding:10px 14px; margin-bottom:14px; font-size:12px; color:#475569; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <strong>Active Mode:</strong> <span id="authModeBadge" style="font-weight:700; color:#1a365d;">Live API Audit (Custom Client Credentials)</span>
+          </div>
+          <span style="font-size:11px; color:#64748b;">Leave fields blank to run Simulated Diagnostic Probe</span>
         </div>
 
         <div class="form-grid single">
@@ -544,6 +554,13 @@
               <button type="button" class="toggle-pwd" onclick="toggleVisibility('refreshToken')">👁</button>
             </div>
           </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin:-8px 0 16px; font-size:11.5px; color:#64748b;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+            <input type="checkbox" id="rememberCreds" style="accent-color:var(--teal);"> Remember credentials in this browser
+          </label>
+          <a href="https://api-console.zoho.com" target="_blank" style="color:var(--teal); text-decoration:none; font-weight:600;">Open Zoho API Console ↗</a>
         </div>
 
         <!-- SECTION 3: Target Suites -->
@@ -685,14 +702,92 @@
       }
     }
 
+    const clientIdInput = document.getElementById('clientId');
+    const clientSecretInput = document.getElementById('clientSecret');
+    const refreshTokenInput = document.getElementById('refreshToken');
+    const accountsUrlSelect = document.getElementById('accountsUrl');
+    const authModeBadge = document.getElementById('authModeBadge');
+    const rememberCreds = document.getElementById('rememberCreds');
+
+    function updateAuthBadge() {
+      const hasCreds = refreshTokenInput.value.trim() && clientIdInput.value.trim();
+      if (hasCreds) {
+        authModeBadge.textContent = 'Live API Audit (Custom Client Credentials)';
+        authModeBadge.style.color = '#1a365d';
+      } else {
+        authModeBadge.textContent = 'Simulated Diagnostic Probe (Enriched Baseline)';
+        authModeBadge.style.color = '#008080';
+      }
+    }
+
+    [clientIdInput, clientSecretInput, refreshTokenInput].forEach(inp => {
+      inp.oninput = () => {
+        updateAuthBadge();
+        if (rememberCreds.checked) saveCredsToStorage();
+      };
+    });
+
+    function saveCredsToStorage() {
+      localStorage.setItem('wooplix_zoho_cid', clientIdInput.value.trim());
+      localStorage.setItem('wooplix_zoho_csec', clientSecretInput.value.trim());
+      localStorage.setItem('wooplix_zoho_tok', refreshTokenInput.value.trim());
+      localStorage.setItem('wooplix_zoho_url', accountsUrlSelect.value);
+    }
+
+    function loadCredsFromStorage() {
+      const cid = localStorage.getItem('wooplix_zoho_cid');
+      const csec = localStorage.getItem('wooplix_zoho_csec');
+      const tok = localStorage.getItem('wooplix_zoho_tok');
+      const url = localStorage.getItem('wooplix_zoho_url');
+      if (tok && cid) {
+        clientIdInput.value = cid;
+        clientSecretInput.value = csec || '';
+        refreshTokenInput.value = tok;
+        if (url) accountsUrlSelect.value = url;
+        rememberCreds.checked = true;
+      }
+      updateAuthBadge();
+    }
+
     // Demo Fill button
     document.getElementById('demoBtn').onclick = () => {
-      document.getElementById('clientId').value = '1000.Q8BYX2ZJY8O4212XQ744NMRTZEWU2K';
-      document.getElementById('clientSecret').value = 'c85f73afcef57c343986e1088939378347a46def3d';
-      document.getElementById('refreshToken').value = '1000.dcf12f848682366cb1fab382ec0dbb1d.14dc2a1dea8dbfd8a9079bab5aa43037';
-      document.getElementById('statusAlert').textContent = 'Pre-configured credentials loaded. Telemetry will probe available endpoints with sample fallback.';
+      clientIdInput.value = '1000.Q8BYX2ZJY8O4212XQ744NMRTZEWU2K';
+      clientSecretInput.value = 'c85f73afcef57c343986e1088939378347a46def3d';
+      refreshTokenInput.value = '1000.dcf12f848682366cb1fab382ec0dbb1d.14dc2a1dea8dbfd8a9079bab5aa43037';
+      accountsUrlSelect.value = 'https://accounts.zoho.in';
+      updateAuthBadge();
+      if (rememberCreds.checked) saveCredsToStorage();
+      document.getElementById('statusAlert').textContent = 'Test credentials loaded. You can replace these with any client credentials at any time.';
       document.getElementById('statusAlert').className = 'status-alert';
     };
+
+    // Clear Credentials button
+    document.getElementById('clearCredsBtn').onclick = () => {
+      clientIdInput.value = '';
+      clientSecretInput.value = '';
+      refreshTokenInput.value = '';
+      localStorage.removeItem('wooplix_zoho_cid');
+      localStorage.removeItem('wooplix_zoho_csec');
+      localStorage.removeItem('wooplix_zoho_tok');
+      localStorage.removeItem('wooplix_zoho_url');
+      rememberCreds.checked = false;
+      updateAuthBadge();
+      document.getElementById('statusAlert').textContent = 'Credentials cleared. System will run in Simulated Diagnostic Probe mode with enriched baseline.';
+      document.getElementById('statusAlert').className = 'status-alert';
+    };
+
+    rememberCreds.onchange = () => {
+      if (rememberCreds.checked) {
+        saveCredsToStorage();
+      } else {
+        localStorage.removeItem('wooplix_zoho_cid');
+        localStorage.removeItem('wooplix_zoho_csec');
+        localStorage.removeItem('wooplix_zoho_tok');
+      }
+    };
+
+    // Initialize credentials
+    loadCredsFromStorage();
 
     // Audit Run Handler
     const runBtn = document.getElementById('runAuditBtn');
