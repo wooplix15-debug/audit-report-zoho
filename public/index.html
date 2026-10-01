@@ -101,174 +101,104 @@
       color: var(--muted);
       line-height: 1.5;
     }
-    /* 60-Second Quick Connection Guide & Scopes Box */
-    .guide-box {
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
-      border-radius: 16px;
-      padding: 20px 22px;
-      margin-bottom: 24px;
-      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+    /* Integrated Step 1 Scope Helper inside Card */
+    .step-section {
+      margin-bottom: 22px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
     }
-    .guide-top {
+    .step-header {
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      align-items: center;
+      margin-bottom: 10px;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 14px;
+      gap: 8px;
     }
-    .guide-badge {
-      display: inline-flex;
+    .step-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--navy);
+      display: flex;
       align-items: center;
-      gap: 6px;
-      background: #e0f2fe;
-      color: #0369a1;
-      font-size: 11px;
+      gap: 8px;
+    }
+    .step-badge {
+      background: var(--navy);
+      color: #ffffff;
+      font-size: 10px;
       font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 6px;
+      padding: 2px 7px;
+      border-radius: 4px;
       letter-spacing: 0.5px;
       text-transform: uppercase;
     }
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    .step-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 12px 14px;
+    .console-link {
       font-size: 12px;
-      line-height: 1.45;
-      color: #334155;
-    }
-    .step-card-num {
+      font-weight: 700;
+      color: var(--teal);
+      text-decoration: none;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: var(--teal);
-      color: #ffffff;
-      font-size: 11px;
-      font-weight: 800;
-      margin-right: 6px;
-    }
-    .scope-panel {
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-      border-radius: 12px;
-      padding: 14px 16px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-    }
-    .scope-panel-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .scope-tabs {
-      display: flex;
-      background: #f1f5f9;
-      border-radius: 8px;
-      padding: 3px;
-      gap: 3px;
-    }
-    .scope-tab {
-      padding: 5px 12px;
-      font-size: 11.5px;
-      font-weight: 600;
-      color: #64748b;
-      background: transparent;
-      border: none;
+      gap: 4px;
+      background: #f0fdfa;
+      border: 1px solid #ccfbf1;
+      padding: 4px 10px;
       border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.15s;
     }
-    .scope-tab.active {
+    .console-link:hover {
+      background: #ccfbf1;
+    }
+    .scope-action-bar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      background: #f8fafc;
+      padding: 10px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      flex-wrap: wrap;
+    }
+    .scope-preset-select {
+      flex: 1;
+      min-width: 220px;
+      padding: 9px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1e293b;
       background: #ffffff;
-      color: var(--navy);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      font-weight: 700;
+      outline: none;
+      cursor: pointer;
     }
     .btn-copy-scopes {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: linear-gradient(135deg, var(--teal), #006666);
+      gap: 6px;
+      background: var(--teal);
       color: #ffffff;
       border: none;
       border-radius: 8px;
-      padding: 8px 18px;
+      padding: 9px 18px;
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0, 128, 128, 0.25);
-      transition: transform 0.15s, box-shadow 0.15s;
+      white-space: nowrap;
+      transition: background 0.15s, transform 0.1s;
     }
     .btn-copy-scopes:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0, 128, 128, 0.35);
+      background: #006666;
     }
     .btn-copy-scopes:active {
-      transform: translateY(0);
+      transform: scale(0.98);
     }
-    .scopes-code-box {
-      position: relative;
-      background: #0f172a;
-      color: #38bdf8;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      line-height: 1.55;
-      padding: 12px 14px;
-      padding-right: 120px;
-      border-radius: 8px;
-      cursor: pointer;
-      word-break: break-all;
-      border: 1px solid #1e293b;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .scopes-code-box:hover {
-      background: #131d35;
-      border-color: #38bdf8;
-    }
-    .copy-hint {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid #334155;
-      color: #94a3b8;
-      font-size: 10px;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 6px;
-      pointer-events: none;
-    }
-    .scope-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 10px;
-    }
-    .scope-pill {
-      font-size: 10.5px;
-      font-weight: 600;
-      background: #f0fdf4;
-      color: #166534;
-      border: 1px solid #bbf7d0;
-      padding: 2px 8px;
-      border-radius: 20px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
+    .step-help-text {
+      font-size: 11.5px;
+      color: #64748b;
+      margin-top: 8px;
+      line-height: 1.45;
     }
     .card {
       background: var(--paper);
@@ -577,78 +507,41 @@
       <p>Connect any client Zoho environment to automatically detect installed applications, diagnose configuration gaps, and generate branded audit deliverables.</p>
     </div>
 
-    <!-- 60-Second Quick Connection Guide & Scopes Box -->
-    <div class="guide-box">
-      <div class="guide-top">
-        <div>
-          <span class="guide-badge">⚡ 60-Second Client Onboarding</span>
-          <strong style="color:var(--navy); font-size:15px; display:block; margin-top:2px;">How to Connect Any Client's Zoho Environment</strong>
-          <span style="font-size:12.5px; color:#475569;">Grant full ecosystem access across all connected applications (CRM, Desk, Books, Inventory, WorkDrive, Projects) with a single 10-minute Self-Client code.</span>
-        </div>
-        <a href="https://api-console.zoho.com" target="_blank" class="btn-secondary" style="display:inline-flex; align-items:center; gap:6px; padding:7px 14px; font-size:12px; font-weight:700; text-decoration:none;">
-          <span>Zoho API Console</span> <span>↗</span>
-        </a>
-      </div>
-
-      <div class="steps-grid">
-        <div class="step-card">
-          <div style="font-weight:700; color:var(--navy); margin-bottom:4px; display:flex; align-items:center;">
-            <span class="step-card-num">1</span> Open Self Client
+    <div class="card">
+      <!-- Step 1: Integrated Scope Copy Helper -->
+      <div class="step-section">
+        <div class="step-header">
+          <div class="step-title">
+            <span class="step-badge">Step 1</span>
+            <span>Generate Client Token in Zoho Console</span>
           </div>
-          Go to <a href="https://api-console.zoho.com" target="_blank" style="color:var(--teal); font-weight:700;">Zoho API Console ↗</a> and click on <strong>Self Client</strong>.
+          <a href="https://api-console.zoho.com" target="_blank" class="console-link">
+            <span>Open Zoho Console</span> <span>↗</span>
+          </a>
         </div>
-        <div class="step-card">
-          <div style="font-weight:700; color:var(--navy); margin-bottom:4px; display:flex; align-items:center;">
-            <span class="step-card-num">2</span> Copy Client Keys
-          </div>
-          Under <strong>Client Secret</strong>, copy the <strong>Client ID</strong> &amp; <strong>Client Secret</strong> into the inputs below.
-        </div>
-        <div class="step-card">
-          <div style="font-weight:700; color:var(--navy); margin-bottom:4px; display:flex; align-items:center;">
-            <span class="step-card-num">3</span> Paste Full Scopes
-          </div>
-          Click <strong>Generate Code</strong>. Click the copy button below, paste into <strong>Scope</strong>, set Duration to <strong>10 minutes</strong> &amp; click <strong>Create</strong>.
-        </div>
-        <div class="step-card">
-          <div style="font-weight:700; color:var(--navy); margin-bottom:4px; display:flex; align-items:center;">
-            <span class="step-card-num">4</span> Paste &amp; Audit
-          </div>
-          Paste the generated <strong>Code</strong> below. <em>(The auditor automatically converts the code and detects all connected tools!)</em>
-        </div>
-      </div>
-
-      <!-- Scope Panel -->
-      <div class="scope-panel">
-        <div class="scope-panel-header">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-weight:700; font-size:13px; color:var(--navy);">Full-Access Ecosystem Scopes:</span>
-            <div class="scope-tabs">
-              <button type="button" class="scope-tab active" id="tabFullSuite" onclick="selectPreset('full')">★ Full Ecosystem (All Apps)</button>
-              <button type="button" class="scope-tab" id="tabCoreSuite" onclick="selectPreset('core')">Core Suite (CRM, Desk, Books)</button>
-            </div>
-          </div>
+        <div class="scope-action-bar">
+          <select id="scopePresetSelect" class="scope-preset-select" onchange="onPresetSelectChange(this.value)">
+            <option value="nodesk" selected>★ Full Suite (CRM, Books, Drive, Projects - Recommended)</option>
+            <option value="crmonly">CRM &amp; WorkDrive Only</option>
+            <option value="full">All Apps (Including Zoho Desk)</option>
+          </select>
           <button type="button" class="btn-copy-scopes" id="btnCopyScopes" onclick="copyScopes()">
-            <span id="copyIcon">📋</span> <span id="copyText">Copy Full-Access Scopes</span>
+            <span id="copyIcon">📋</span> <span id="copyText">Copy Scopes</span>
           </button>
         </div>
-
-        <div class="scopes-code-box" id="scopesContainer" onclick="copyScopes()" title="Click anywhere to copy scopes">ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,Desk.tickets.ALL,Desk.contacts.ALL,Desk.settings.ALL,Desk.basic.ALL,ZohoBooks.fullaccess.ALL,ZohoInventory.fullaccess.ALL,WorkDrive.files.ALL,ZohoProjects.projects.ALL <span class="copy-hint" id="copyHint">Click box to copy</span></div>
-
-        <div class="scope-badges" id="scopeBadges">
-          <span class="scope-pill">✓ CRM (Sales &amp; Modules)</span>
-          <span class="scope-pill">✓ Desk (Support &amp; SLAs)</span>
-          <span class="scope-pill">✓ Books (Invoicing &amp; Finance)</span>
-          <span class="scope-pill">✓ Inventory (Warehouses &amp; Orders)</span>
-          <span class="scope-pill">✓ WorkDrive (Files &amp; Governance)</span>
-          <span class="scope-pill">✓ Projects (Tasks &amp; Portals)</span>
+        <div class="step-help-text">
+          In Zoho Console &rarr; <strong>Self Client</strong> &rarr; <strong>Generate Code</strong>, paste the copied scopes, set Duration to <strong>10 minutes</strong>, click <strong>Create</strong>, and paste credentials below.
         </div>
-        <p style="margin-top:8px; font-size:11.5px; color:#64748b; line-height:1.4;">
-          💡 <strong>Full Access Advantage:</strong> Granting full suite scopes allows the AI auditor to discover every tool connected in your client's Zoho workspace without needing to configure permissions individually.
-        </p>
       </div>
-    </div>
 
-    <div class="card">
+      <!-- Step 2: Form Intake -->
+      <div class="step-header" style="margin-bottom: 14px;">
+        <div class="step-title">
+          <span class="step-badge">Step 2</span>
+          <span>Paste Client Credentials &amp; Run Audit</span>
+        </div>
+      </div>
+
       <form id="auditForm" onsubmit="return false;">
         
         <div class="form-group">
@@ -764,43 +657,23 @@
     let selectedFormat = 'pdf';
 
     const SCOPE_PRESETS = {
-      full: 'ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,Desk.tickets.ALL,Desk.contacts.ALL,Desk.settings.ALL,Desk.basic.ALL,ZohoBooks.fullaccess.ALL,ZohoInventory.fullaccess.ALL,WorkDrive.files.ALL,ZohoProjects.projects.ALL',
-      core: 'ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,Desk.tickets.ALL,Desk.contacts.ALL,Desk.settings.ALL,Desk.basic.ALL,ZohoBooks.fullaccess.ALL'
+      nodesk: "ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,ZohoBooks.fullaccess.ALL,ZohoInventory.fullaccess.ALL,WorkDrive.files.ALL,ZohoProjects.projects.ALL",
+      crmonly: "ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,WorkDrive.files.ALL",
+      full: "ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,Desk.tickets.ALL,Desk.contacts.ALL,Desk.settings.ALL,Desk.basic.ALL,ZohoBooks.fullaccess.ALL,ZohoInventory.fullaccess.ALL,WorkDrive.files.ALL,ZohoProjects.projects.ALL"
     };
 
-    let activeScopePreset = 'full';
+    let activeScopePreset = 'nodesk';
 
-    function selectPreset(preset) {
-      activeScopePreset = preset;
-      document.getElementById('tabFullSuite').classList.toggle('active', preset === 'full');
-      document.getElementById('tabCoreSuite').classList.toggle('active', preset === 'core');
-      
-      const box = document.getElementById('scopesContainer');
-      box.childNodes[0].textContent = SCOPE_PRESETS[preset] + ' ';
-      
-      const copyBtnTxt = document.getElementById('copyText');
-      if (preset === 'full') {
-        copyBtnTxt.textContent = 'Copy Full-Access Scopes';
-        document.getElementById('scopeBadges').innerHTML = `
-          <span class="scope-pill">✓ CRM (Sales &amp; Modules)</span>
-          <span class="scope-pill">✓ Desk (Support &amp; SLAs)</span>
-          <span class="scope-pill">✓ Books (Invoicing &amp; Finance)</span>
-          <span class="scope-pill">✓ Inventory (Warehouses &amp; Orders)</span>
-          <span class="scope-pill">✓ WorkDrive (Files &amp; Governance)</span>
-          <span class="scope-pill">✓ Projects (Tasks &amp; Portals)</span>
-        `;
-      } else {
-        copyBtnTxt.textContent = 'Copy Core-Suite Scopes';
-        document.getElementById('scopeBadges').innerHTML = `
-          <span class="scope-pill">✓ CRM (Sales &amp; Modules)</span>
-          <span class="scope-pill">✓ Desk (Support &amp; SLAs)</span>
-          <span class="scope-pill">✓ Books (Invoicing &amp; Finance)</span>
-        `;
-      }
+    function onPresetSelectChange(val) {
+      activeScopePreset = val;
+      copyScopes();
     }
 
     function copyScopes() {
-      const text = SCOPE_PRESETS[activeScopePreset];
+      const select = document.getElementById('scopePresetSelect');
+      const presetKey = select ? select.value : activeScopePreset;
+      const text = SCOPE_PRESETS[presetKey] || SCOPE_PRESETS['nodesk'];
+
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(() => {
           showCopied();
@@ -823,21 +696,16 @@
     function showCopied() {
       const icon = document.getElementById('copyIcon');
       const txt = document.getElementById('copyText');
-      const hint = document.getElementById('copyHint');
-      const box = document.getElementById('scopesContainer');
-      
+      const btn = document.getElementById('btnCopyScopes');
+
       icon.textContent = '✓';
-      txt.textContent = 'Copied to Clipboard!';
-      hint.textContent = '✓ Copied!';
-      hint.style.color = '#4ade80';
-      box.style.borderColor = '#4ade80';
+      txt.textContent = 'Copied!';
+      btn.style.background = '#16a34a';
 
       setTimeout(() => {
         icon.textContent = '📋';
-        txt.textContent = activeScopePreset === 'full' ? 'Copy Full-Access Scopes' : 'Copy Core-Suite Scopes';
-        hint.textContent = 'Click box to copy';
-        hint.style.color = '#94a3b8';
-        box.style.borderColor = '#1e293b';
+        txt.textContent = 'Copy Scopes';
+        btn.style.background = 'var(--teal)';
       }, 2500);
     }
 
