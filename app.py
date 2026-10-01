@@ -169,12 +169,8 @@ async def zoho_oauth_login(
     acc = (accounts_url or "").strip() or os.environ.get("ZOHO_ACCOUNTS_URL", "https://accounts.zoho.in")
     scopes = (scope or "").strip() or DEFAULT_OAUTH_SCOPES
 
-    # Derive dynamic callback URL from request if not explicitly supplied
-    red_uri = (redirect_uri or "").strip() or os.environ.get("ZOHO_REDIRECT_URI", "")
-    if not red_uri:
-        proto = request.headers.get("x-forwarded-proto") or request.url.scheme
-        host = request.headers.get("x-forwarded-host") or request.headers.get("host") or request.url.netloc
-        red_uri = f"{proto}://{host}/api/auth/zoho/callback"
+    # Use registered Zoho production callback URL by default
+    red_uri = (redirect_uri or "").strip() or os.environ.get("ZOHO_REDIRECT_URI", "https://audit-report-zoho.vercel.app/api/auth/zoho/callback")
 
     if not cid:
         return HTMLResponse(
@@ -239,9 +235,7 @@ async def zoho_oauth_callback(
             print(f"State decode note: {e}")
 
     if not red_uri:
-        proto = request.headers.get("x-forwarded-proto") or request.url.scheme
-        host = request.headers.get("x-forwarded-host") or request.headers.get("host") or request.url.netloc
-        red_uri = f"{proto}://{host}/api/auth/zoho/callback"
+        red_uri = os.environ.get("ZOHO_REDIRECT_URI", "https://audit-report-zoho.vercel.app/api/auth/zoho/callback")
 
     if error:
         err_msg = error_description or error or "Access Denied by Zoho user"

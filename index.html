@@ -810,47 +810,13 @@
         <!-- Unconnected State -->
         <div id="oauthUnconnected" class="oauth-box">
           <div class="oauth-info-text">
-            Connect your Zoho organization to audit all 8 cloud applications (CRM, Desk, Books, Inventory, Projects, WorkDrive, Flow, and Analytics) with zero manual copy-pasting.
+            Connect your live Zoho organization in one click. Authorizes read-only diagnostic telemetry across all 8 applications (CRM, Desk, Books, Inventory, Projects, WorkDrive, Flow, and Analytics) with zero manual copy-pasting.
           </div>
 
-          <div style="display:flex; flex-direction:column; gap:10px; align-items:center; margin-bottom:16px;">
-            <!-- Instant Test Connect -->
-            <button type="button" class="btn-zoho-connect" onclick="testSimulatedOAuth()" style="background:#008080;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
-              1-Click Connect (Instant Test Demo)
-            </button>
-
-            <!-- Live Zoho OAuth Redirect -->
-            <button type="button" class="btn-zoho-connect" onclick="connectWithZoho()" style="background:#1a365d;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-              Connect with Live Zoho Account
-            </button>
-          </div>
-
-          <!-- Redirect URI helper box -->
-          <div style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; padding:10px 12px; margin-top:14px; text-align:left; max-width:480px; margin-left:auto; margin-right:auto;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-              <span style="font-size:11.5px; font-weight:600; color:#334155;">Authorized Redirect URI for Zoho Console:</span>
-              <button type="button" class="sample-link" id="btnCopyUri" onclick="copyRedirectUri()" style="font-size:11.5px;">Copy URI</button>
-            </div>
-            <code id="currentRedirectUri" style="font-family:monospace; font-size:11px; color:#1e293b; word-break:break-all; display:block; background:#ffffff; padding:4px 6px; border:1px solid #e2e8f0; border-radius:4px;">http://127.0.0.1:8000/api/auth/zoho/callback</code>
-            <span style="display:block; font-size:11px; color:#64748b; margin-top:5px; line-height:1.4;">
-              For live login, your client in <a href="https://api-console.zoho.com/" target="_blank" style="color:var(--link);">Zoho API Console</a> must be a <strong>Server-based Application</strong> with this exact Redirect URI configured. (Self Clients cannot use browser redirects).
-            </span>
-          </div>
-
-          <!-- Advanced Custom Credentials Accordion -->
-          <span class="custom-creds-toggle" onclick="toggleCustomCreds()">⚙️ Advanced: Use Custom Server-based Client Credentials (Optional)</span>
-          <div id="customCredsBox" class="custom-creds-box">
-            <div class="field" style="margin-bottom:8px;">
-              <label for="oauthCustomCid" style="font-size:11.5px;">Custom Client ID</label>
-              <input type="text" id="oauthCustomCid" class="input" style="height:32px;font-size:12px;" placeholder="1000.xxxxxxxxxxxx">
-            </div>
-            <div class="field" style="margin-bottom:0;">
-              <label for="oauthCustomCsec" style="font-size:11.5px;">Custom Client Secret</label>
-              <input type="password" id="oauthCustomCsec" class="input" style="height:32px;font-size:12px;" placeholder="Server-based client secret">
-            </div>
-          </div>
+          <button type="button" class="btn-zoho-connect" onclick="connectWithZoho()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+            Connect with Zoho
+          </button>
         </div>
 
         <!-- Connected State -->
