@@ -345,23 +345,26 @@ async def trigger_audit(
             else:
                 suites_list.append(s.title())
 
-    # Auto-detect and include ONLY active tools configured for this Zoho organization
+    # Auto-detect tools only if user did not specify target_suites
+    has_explicit_selection = bool(suites_list)
     if cid and csec and reftok:
         try:
             disc = agent.discover_environment(cid, csec, reftok, acc_url)
             active_from_zoho = []
             for d in disc.get("discovered_apps", []):
-                # ONLY include if genuinely active with live verified data
                 if d.get("status") == "active":
                     name = d.get("name")
                     if name and name not in active_from_zoho:
                         active_from_zoho.append(name)
-            if not suites_list:
-                suites_list = active_from_zoho
+            if not has_explicit_selection:
+                suites_list = active_from_zoho if active_from_zoho else ["Zoho CRM"]
             else:
+                # User provided specific target suites; respect their explicit choices without expanding
                 if active_from_zoho:
                     filtered = [s for s in suites_list if s in active_from_zoho]
-                    suites_list = filtered if filtered else active_from_zoho
+                    if filtered:
+                        suites_list = filtered
+                    # If none matched active_from_zoho, retain user's requested suite(s) rather than expanding to all apps
         except Exception as e:
             print(f"Ecosystem discovery note: {e}")
 

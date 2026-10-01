@@ -169,8 +169,21 @@ def _get_service_root(api_domain: str, service: str) -> str:
     """Derive clean service base URL conforming to Zoho API documentation."""
     raw = (api_domain or "https://www.zohoapis.in").replace("https://", "").replace("http://", "").replace("www.", "").rstrip("/")
     tld = raw.split("zohoapis.")[-1] if "zohoapis." in raw else (raw.split("zoho.")[-1] if "zoho." in raw else "in")
-    if service.lower() == "books":
+    srv = service.lower()
+    if srv == "books":
         return f"https://www.zohoapis.{tld}/books/v3"
+    elif srv == "inventory":
+        return f"https://inventory.zoho.{tld}"
+    elif srv == "desk":
+        return f"https://desk.zoho.{tld}"
+    elif srv == "projects":
+        return f"https://projectsapi.zoho.{tld}"
+    elif srv == "workdrive":
+        return f"https://workdrive.zoho.{tld}"
+    elif srv == "flow":
+        return f"https://flow.zoho.{tld}"
+    elif srv == "analytics":
+        return f"https://analyticsapi.zoho.{tld}"
     return f"https://{service}.zoho.{tld}"
 
 
@@ -212,11 +225,15 @@ def discover_environment(client_id: str, client_secret: str, refresh_token: str,
                 if owner.get("email"):
                     contact_email = f"{owner.get('email')} (Inferred Lead Owner)"
             crm_details = f"Active ({deal_count}+ deals sampled)"
-        elif r_deals.status_code == 401:
-            crm_details = "Connected (Scopes Probed)"
-            crm_active = True
+        elif r_deals.status_code in (401, 403):
+            crm_details = f"Access Denied (HTTP {r_deals.status_code} Unauthorized)"
+            crm_active = False
+        else:
+            crm_details = f"API returned HTTP {r_deals.status_code}"
+            crm_active = False
     except Exception as e:
-        crm_details = f"Probe note: {str(e)[:40]}"
+        crm_details = f"Probe error: {str(e)[:40]}"
+        crm_active = False
 
     discovered_apps.append({
         "id": "zoho_crm",
@@ -816,23 +833,83 @@ def collect_books_telemetry(access_token: str, api_domain: str, granted_scopes: 
 
 
 def collect_cross_app_telemetry(crm: Dict[str, Any], desk: Dict[str, Any], books: Dict[str, Any]) -> Dict[str, Any]:
-    """Derive cross-application synchronization health from individual application telemetry."""
-    sync_data = {
-        "crm_books_integration": {
+    """Dynamically derive cross-application synchronization health by inspecting supplied live telemetry."""
+    sync_data = {}
+
+    crm_status = crm.get("status", "")
+    crm_deals = crm.get("operational_metrics", {}).get("deals_sampled", 0)
+    crm_leads = crm.get("operational_metrics", {}).get("leads_sampled", 0)
+    crm_active = crm_status in ("connected", "partial_access") and (crm_deals > 0 or crm_leads > 0 or bool(crm.get("installed_modules")))
+
+    desk_status = desk.get("status", "")
+    depts = [d for d in desk.get("departments", []) if isinstance(d, dict) and d.get("id")]
+    tix = desk.get("ticket_queues", {})
+    desk_active = desk_status in ("connected", "partial_access") and len(depts) > 0
+
+    books_status = books.get("status", "")
+    orgs = [o for o in books.get("organizations", []) if isinstance(o, dict) and o.get("organization_id")]
+    books_active = books_status in ("connected", "partial_access") and len(orgs) > 0
+
+    # 1. CRM <-> Books Dynamic Analysis (only if BOTH are verified active with live data)
+    if crm_active and books_active:
+        findings = []
+        overdue_data = books.get("overdue_invoices", {})
+        overdue_cnt = overdue_data.get("count", 0) if isinstance(overdue_data, dict) else 0
+
+        if crm_deals > 0 and overdue_cnt > 0:
+            findings.append(
+                f"Zoho CRM has {crm_deals} active pipeline deals sampled while Zoho Books reports {overdue_cnt} overdue customer invoices. "
+                "Invoice payment statuses and credit-hold flags are not synchronized back to CRM Deal records, exposing the sales team to quota slippage and bad debt risk."
+            )
+        else:
+            findings.append(
+                f"CRM Closed-Won deal workflows are not configured to trigger draft invoice or sales order generation in Zoho Books ({len(orgs)} active finance org{'s' if len(orgs) != 1 else ''}), requiring manual duplicate billing entry."
+            )
+
+        currencies = books.get("currency_setup", [])
+        if isinstance(currencies, list) and len(currencies) > 1:
+            cur_codes = ", ".join(c.get("currency_code", "") for c in currencies[:3] if isinstance(c, dict))
+            findings.append(
+                f"Zoho Books multi-currency exchange tables ({cur_codes}) do not sync exchange rates into CRM deal fields, distorting corporate revenue reporting."
+            )
+
+        sync_data["crm_books_integration"] = {
             "status": "partial_sync",
-            "findings": [
-                "Zoho CRM Accounts and Zoho Books Customers exhibit disparate naming keys and missing tax identifier synchronization.",
-                "Real-time deal-to-estimate conversion webhook lacks automated fallback retry mechanism."
-            ]
-        },
-        "crm_desk_integration": {
-            "status": "active_with_gaps",
-            "findings": [
-                "Desk tickets are not synchronized in real-time to CRM Deal milestones, preventing sales reps from viewing active customer escalations.",
-                "Contact record ownership in CRM does not map to preferred Desk agent routing rules."
-            ]
+            "source": "Zoho CRM",
+            "target": "Zoho Books",
+            "active_deals_sampled": crm_deals,
+            "books_organizations_count": len(orgs),
+            "overdue_invoices_detected": overdue_cnt,
+            "findings": findings
         }
-    }
+
+    # 2. CRM <-> Desk Dynamic Analysis (only if BOTH are verified active with live data)
+    if crm_active and desk_active:
+        findings = []
+        open_tix = tix.get("open_tickets_sampled", 0) if isinstance(tix, dict) else 0
+        unassigned_tix = tix.get("unassigned_tickets", 0) if isinstance(tix, dict) else 0
+
+        dept_names = ", ".join(d.get("name", "") for d in depts[:3] if d.get("name"))
+        findings.append(
+            f"Support queues across {len(depts)} Zoho Desk departments ({dept_names}) operate in isolation from CRM Accounts. "
+            "Customer support escalation history and open ticket sentiment are not visible to account executives during renewal or up-sell opportunities."
+        )
+
+        if open_tix > 0:
+            findings.append(
+                f"Active support queue ({open_tix} open tickets sampled, {unassigned_tix} unassigned) lacks automated CRM Deal lookup, preventing immediate cross-functional churn intervention."
+            )
+
+        sync_data["crm_desk_integration"] = {
+            "status": "active_with_gaps",
+            "source": "Zoho CRM",
+            "target": "Zoho Desk",
+            "departments_count": len(depts),
+            "open_tickets_sampled": open_tix,
+            "unassigned_tickets": unassigned_tix,
+            "findings": findings
+        }
+
     return sync_data
 
 
@@ -1085,37 +1162,122 @@ def collect_environment_telemetry(
                 inv_data["note"] = str(e)
             telemetry["zoho_inventory"] = inv_data
 
-        # WorkDrive
+        # WorkDrive (Live API probe)
         if any("workdrive" in s for s in suites_lower):
-            telemetry["zoho_workdrive"] = {
-                "status": "connected",
-                "scope": "WorkDrive.files.ALL",
-                "security_audit": "External document sharing links, encryption at rest, team folder governance"
-            }
+            wd_root = _get_service_root(api_domain, "workdrive")
+            wd_data = {"status": "not_connected"}
+            try:
+                r_wd = requests.get(f"{wd_root}/api/v1/users/me", headers=headers, timeout=10)
+                if r_wd.status_code == 200:
+                    u_attr = r_wd.json().get("data", {}).get("attributes", {})
+                    wd_data["status"] = "connected"
+                    wd_data["user_email"] = u_attr.get("email")
+                    wd_data["scope"] = "WorkDrive.files.ALL"
+                    r_teams = requests.get(f"{wd_root}/api/v1/teams", headers=headers, timeout=10)
+                    if r_teams.status_code == 200:
+                        teams = r_teams.json().get("data", []) or []
+                        wd_data["teams_count"] = len(teams)
+                        wd_data["teams_sample"] = [t.get("attributes", {}).get("name") for t in teams[:3]]
+                elif r_wd.status_code in (401, 403):
+                    wd_data["status"] = "unauthorized"
+                    wd_data["note"] = f"WorkDrive API returned HTTP {r_wd.status_code} Unauthorized"
+                else:
+                    wd_data["status"] = "connection_failed"
+                    wd_data["note"] = f"WorkDrive endpoint returned HTTP {r_wd.status_code}"
+            except Exception as e:
+                wd_data["status"] = "connection_failed"
+                wd_data["note"] = str(e)
 
-        # Projects
+            if wd_data.get("status") in ("connected", "partial_access"):
+                telemetry["zoho_workdrive"] = wd_data
+
+        # Projects (Live API probe)
         if any("projects" in s for s in suites_lower):
-            telemetry["zoho_projects"] = {
-                "status": "connected",
-                "scope": "ZohoProjects.projects.ALL",
-                "tracking": "Milestone delivery, task automation, and billable hour integrity"
-            }
+            proj_root = _get_service_root(api_domain, "projects")
+            proj_data = {"status": "not_connected"}
+            try:
+                r_proj = requests.get(f"{proj_root}/restapi/portals/", headers=headers, timeout=10)
+                if r_proj.status_code == 200:
+                    portals = r_proj.json().get("portals", []) or []
+                    if portals:
+                        pid = portals[0].get("id_string") or portals[0].get("id")
+                        proj_data["status"] = "connected"
+                        proj_data["portals_count"] = len(portals)
+                        proj_data["portal_name"] = portals[0].get("name")
+                        r_plist = requests.get(f"{proj_root}/restapi/portal/{pid}/projects/", headers=headers, timeout=10)
+                        if r_plist.status_code == 200:
+                            projs = r_plist.json().get("projects", []) or []
+                            proj_data["projects_count"] = len(projs)
+                            proj_data["active_projects_sample"] = [p.get("name") for p in projs[:3]]
+                    else:
+                        proj_data["status"] = "no_portals_found"
+                        proj_data["note"] = "No active Zoho Projects portals configured"
+                elif r_proj.status_code in (401, 403):
+                    proj_data["status"] = "unauthorized"
+                    proj_data["note"] = f"Projects API returned HTTP {r_proj.status_code} Unauthorized"
+                else:
+                    proj_data["status"] = "connection_failed"
+                    proj_data["note"] = f"Projects endpoint returned HTTP {r_proj.status_code}"
+            except Exception as e:
+                proj_data["status"] = "connection_failed"
+                proj_data["note"] = str(e)
 
-        # Flow
+            if proj_data.get("status") in ("connected", "partial_access") and proj_data.get("portals_count", 0) > 0:
+                telemetry["zoho_projects"] = proj_data
+
+        # Flow (Live API probe)
         if any("flow" in s for s in suites_lower):
-            telemetry["zoho_flow"] = {
-                "status": "connected",
-                "scope": "ZohoFlow.flows.ALL",
-                "workflow_health": "Cross-app triggers, webhook endpoint error rates, and failure notifications"
-            }
+            flow_root = _get_service_root(api_domain, "flow")
+            flow_data = {"status": "not_connected"}
+            try:
+                r_flow = requests.get(f"{flow_root}/api/v1/flows", headers=headers, timeout=10)
+                if r_flow.status_code == 200:
+                    flows = r_flow.json().get("flows", []) or []
+                    if flows:
+                        flow_data["status"] = "connected"
+                        flow_data["flows_count"] = len(flows)
+                        flow_data["active_flows_sample"] = [f.get("name") for f in flows[:3]]
+                    else:
+                        flow_data["status"] = "no_flows_found"
+                        flow_data["note"] = "No configured workflows found in Zoho Flow"
+                elif r_flow.status_code in (401, 403):
+                    flow_data["status"] = "unauthorized"
+                    flow_data["note"] = f"Flow API returned HTTP {r_flow.status_code} Unauthorized"
+                else:
+                    flow_data["status"] = "connection_failed"
+            except Exception as e:
+                flow_data["status"] = "connection_failed"
+                flow_data["note"] = str(e)
 
-        # Analytics
+            if flow_data.get("status") in ("connected", "partial_access") and flow_data.get("flows_count", 0) > 0:
+                telemetry["zoho_flow"] = flow_data
+
+        # Analytics (Live API probe)
         if any("analytic" in s for s in suites_lower):
-            telemetry["zoho_analytics"] = {
-                "status": "connected",
-                "scope": "ZohoAnalytics.data.ALL",
-                "bi_health": "Executive business intelligence synchronization, refresh schedules, and workspace governance"
-            }
+            analytics_root = _get_service_root(api_domain, "analytics")
+            ana_data = {"status": "not_connected"}
+            try:
+                r_ana = requests.get(f"{analytics_root}/restapi/v2/workspaces", headers=headers, timeout=10)
+                if r_ana.status_code == 200:
+                    ws = r_ana.json().get("workspaces", []) or []
+                    if ws:
+                        ana_data["status"] = "connected"
+                        ana_data["workspaces_count"] = len(ws)
+                        ana_data["workspaces_sample"] = [w.get("workspaceName") for w in ws[:3]]
+                    else:
+                        ana_data["status"] = "no_workspaces_found"
+                        ana_data["note"] = "No BI workspaces configured in Zoho Analytics"
+                elif r_ana.status_code in (401, 403):
+                    ana_data["status"] = "unauthorized"
+                    ana_data["note"] = f"Analytics API returned HTTP {r_ana.status_code} Unauthorized"
+                else:
+                    ana_data["status"] = "connection_failed"
+            except Exception as e:
+                ana_data["status"] = "connection_failed"
+                ana_data["note"] = str(e)
+
+            if ana_data.get("status") in ("connected", "partial_access") and ana_data.get("workspaces_count", 0) > 0:
+                telemetry["zoho_analytics"] = ana_data
 
         # Desk: only retain if genuine departments or tickets exist
         if "zoho_desk" in telemetry:
@@ -1140,14 +1302,34 @@ def collect_environment_telemetry(
             if not inv_orgs or i_tel.get("status") in ("unauthorized", "no_organizations_found", "connection_failed", "not_connected"):
                 del telemetry["zoho_inventory"]
 
-        # Cross-app sync: strictly require at least 2 distinct applications with verified data
-        active_tools = [k for k in telemetry if k.startswith("zoho_") and not telemetry[k].get("error")]
-        if len(active_tools) >= 2:
-            telemetry["cross_app_sync"] = collect_cross_app_telemetry(
+        # Cross-app sync: strictly require at least 2 distinct applications with verified connected data
+        verified_active = []
+        for k, v in telemetry.items():
+            if not k.startswith("zoho_") or not isinstance(v, dict):
+                continue
+            st = v.get("status")
+            if st not in ("connected", "partial_access") or v.get("error"):
+                continue
+            if k == "zoho_crm" and not (v.get("operational_metrics", {}).get("deals_sampled", 0) > 0 or v.get("installed_modules")):
+                continue
+            if k == "zoho_desk" and not any(isinstance(d, dict) and d.get("id") for d in v.get("departments", [])):
+                continue
+            if k == "zoho_books" and not any(isinstance(o, dict) and o.get("organization_id") for o in v.get("organizations", [])):
+                continue
+            if k == "zoho_inventory" and not any(isinstance(o, dict) and o.get("organization_id") for o in v.get("organizations", [])):
+                continue
+            verified_active.append(k)
+
+        if len(verified_active) >= 2:
+            sync_res = collect_cross_app_telemetry(
                 telemetry.get("zoho_crm", {}),
                 telemetry.get("zoho_desk", {}),
                 telemetry.get("zoho_books", {})
             )
+            if sync_res:
+                telemetry["cross_app_sync"] = sync_res
+            else:
+                telemetry.pop("cross_app_sync", None)
         else:
             telemetry.pop("cross_app_sync", None)
 
@@ -1163,7 +1345,7 @@ def collect_environment_telemetry(
             "zoho_analytics": "Zoho Analytics",
         }
         telemetry.setdefault("client_metadata", {})
-        telemetry["client_metadata"]["probed_suites"] = [name_map.get(k, k.replace("zoho_", "").title()) for k in active_tools]
+        telemetry["client_metadata"]["probed_suites"] = [name_map.get(k, k.replace("zoho_", "").title()) for k in verified_active]
 
         return telemetry
 
