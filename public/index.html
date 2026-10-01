@@ -3,654 +3,667 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#1a365d">
-  <title>Wooplix | Zoho System Audit Agent</title>
+  <title>Zoho Organization Audit | Wooplix Technologies</title>
   <link rel="icon" type="image/png" href="/wooplix_logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --navy: #1a365d;
-      --navy-dark: #0f233d;
-      --navy-light: #2a4365;
-      --teal: #008080;
-      --teal-hover: #006666;
-      --teal-light: #e6f3f3;
-      --ink: #1e293b;
-      --muted: #64748b;
-      --line: #e2e8f0;
-      --paper: #ffffff;
+      --font: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       --bg: #f8fafc;
-      --critical: #b91c1c;
-      --critical-bg: #fee2e2;
-      --success: #15803d;
-      --success-bg: #dcfce7;
-      --card-shadow: 0 12px 36px rgba(26, 54, 93, 0.08);
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --input-border: #cbd5e1;
+      --focus: #2563eb;
+      --primary: #0f172a;
+      --primary-hover: #1e293b;
+      --link: #2563eb;
+      --radius: 8px;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       background: var(--bg);
-      color: var(--ink);
-      font-family: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 32px 18px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 14px;
+      line-height: 1.5;
+      padding: 36px 16px 60px;
+      -webkit-font-smoothing: antialiased;
     }
+
     .container {
-      width: 100%;
-      max-width: 680px;
-      margin: auto;
+      max-width: 580px;
+      margin: 0 auto;
     }
-    .header {
+
+    /* Top Brand Nav */
+    .nav {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
       margin-bottom: 24px;
-      background: #ffffff;
-      padding: 12px 20px;
-      border-radius: 14px;
-      border: 1px solid var(--line);
-      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.03);
     }
+
     .brand-logos {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
     }
+
     .main-logo {
-      height: 34px;
+      height: 28px;
       width: auto;
-      object-fit: contain;
     }
-    .partner-badge {
-      height: 25px;
+
+    .partner-logo {
+      height: 20px;
       width: auto;
-      object-fit: contain;
     }
-    .header-badge {
-      font-size: 10.5px;
-      font-weight: 700;
-      color: var(--navy);
-      background: #edf4fc;
-      border: 1px solid #d0e1f7;
-      padding: 5px 10px;
-      border-radius: 99px;
-      letter-spacing: 0.3px;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-    .intro {
-      text-align: center;
-      margin-bottom: 22px;
-    }
-    .intro h1 {
-      font-family: "Manrope", sans-serif;
-      font-weight: 800;
-      font-size: clamp(24px, 4vw, 30px);
-      letter-spacing: -0.6px;
-      color: var(--navy);
-      margin-bottom: 6px;
-      line-height: 1.25;
-    }
-    .intro p {
-      font-size: 13.5px;
+
+    .nav-label {
+      font-size: 12px;
       color: var(--muted);
+      font-weight: 500;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 16px;
+    }
+
+    /* Header */
+    .header {
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+    }
+
+    .header p {
+      color: var(--muted);
+      font-size: 13.5px;
       line-height: 1.5;
     }
-    /* Integrated Step 1 Scope Helper inside Card */
-    .step-section {
-      margin-bottom: 22px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid #e2e8f0;
+
+    /* Unified Card */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
-    .step-header {
+
+    /* Guide Box inside card */
+    .guide-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+    }
+
+    .guide-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
-      gap: 8px;
+      margin-bottom: 6px;
     }
-    .step-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--navy);
-      display: flex;
-      align-items: center;
-      gap: 8px;
+
+    .guide-title {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text);
     }
-    .step-badge {
-      background: var(--navy);
-      color: #ffffff;
-      font-size: 10px;
-      font-weight: 800;
-      padding: 2px 7px;
-      border-radius: 4px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-    .console-link {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--teal);
+
+    .guide-link {
+      font-size: 12.5px;
+      color: var(--link);
       text-decoration: none;
+      font-weight: 500;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      background: #f0fdfa;
-      border: 1px solid #ccfbf1;
-      padding: 4px 10px;
-      border-radius: 6px;
+      gap: 3px;
+    }
+
+    .guide-link:hover {
+      text-decoration: underline;
+    }
+
+    .guide-desc {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-bottom: 10px;
+    }
+
+    .scope-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .scope-select {
+      flex: 1;
+      height: 36px;
+      border: 1px solid var(--input-border);
+      border-radius: 5px;
+      padding: 0 10px;
+      font-size: 12.5px;
+      font-family: inherit;
+      color: var(--text);
+      background: #ffffff;
+      outline: none;
+    }
+
+    .scope-select:focus {
+      border-color: var(--focus);
+    }
+
+    .copy-btn {
+      height: 36px;
+      padding: 0 12px;
+      background: #ffffff;
+      border: 1px solid var(--input-border);
+      border-radius: 5px;
+      font-size: 12.5px;
+      font-weight: 500;
+      font-family: inherit;
+      color: var(--text);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
       transition: all 0.15s;
     }
-    .console-link:hover {
-      background: #ccfbf1;
+
+    .copy-btn:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
     }
-    .scope-action-bar {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      background: #f8fafc;
-      padding: 10px 12px;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      flex-wrap: wrap;
+
+    .copy-btn.copied {
+      background: #ecfdf5;
+      border-color: #86efac;
+      color: #15803d;
     }
-    .scope-preset-select {
-      flex: 1;
-      min-width: 220px;
-      padding: 9px 12px;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #1e293b;
-      background: #ffffff;
-      outline: none;
-      cursor: pointer;
+
+    /* Form Fields */
+    .field {
+      margin-bottom: 16px;
     }
-    .btn-copy-scopes {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--teal);
-      color: #ffffff;
-      border: none;
-      border-radius: 8px;
-      padding: 9px 18px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.15s, transform 0.1s;
-    }
-    .btn-copy-scopes:hover {
-      background: #006666;
-    }
-    .btn-copy-scopes:active {
-      transform: scale(0.98);
-    }
-    .step-help-text {
-      font-size: 11.5px;
-      color: #64748b;
-      margin-top: 8px;
-      line-height: 1.45;
-    }
-    .card {
-      background: var(--paper);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      box-shadow: var(--card-shadow);
-      padding: 28px 28px;
-    }
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 14px;
-    }
-    .form-group label {
-      font-size: 12px;
-      font-weight: 700;
-      color: #1e293b;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .form-group label span {
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--muted);
-    }
-    .form-group input, .form-group select {
-      padding: 11px 14px;
-      border: 1.5px solid var(--line);
-      border-radius: 10px;
+
+    .field label {
+      display: block;
       font-size: 13px;
-      font-family: "DM Sans", sans-serif;
-      color: var(--ink);
-      background: #fafbfd;
-      transition: all 0.2s;
-      outline: none;
+      font-weight: 500;
+      color: #334155;
+      margin-bottom: 5px;
     }
-    .form-group input:focus, .form-group select:focus {
-      border-color: var(--navy);
+
+    .input {
+      width: 100%;
+      height: 38px;
+      border: 1px solid var(--input-border);
+      border-radius: 5px;
+      padding: 0 12px;
+      font-size: 13.5px;
+      font-family: inherit;
+      color: var(--text);
       background: #ffffff;
-      box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.08);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
-    .password-wrap {
+
+    .input:focus {
+      border-color: var(--focus);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .input::placeholder {
+      color: #94a3b8;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .input-action {
       position: relative;
     }
-    .password-wrap input {
-      width: 100%;
-      padding-right: 40px;
+
+    .input-action .input {
+      padding-right: 36px;
     }
-    .toggle-pwd {
+
+    .action-icon {
       position: absolute;
-      right: 10px;
+      right: 4px;
       top: 50%;
       transform: translateY(-50%);
       background: none;
       border: none;
       color: var(--muted);
       cursor: pointer;
-      font-size: 12px;
-      padding: 4px;
-    }
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    .format-options {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin: 18px 0 20px;
-    }
-    .format-btn {
+      padding: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 10px 8px;
-      border: 1.5px solid var(--line);
-      border-radius: 10px;
-      background: #fafbfd;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-      color: #334155;
-      transition: all 0.2s;
-      user-select: none;
+      border-radius: 4px;
     }
-    .format-btn:hover {
-      border-color: var(--navy-light);
-      background: #f1f5f9;
+
+    .action-icon:hover {
+      color: var(--text);
     }
-    .format-btn.active {
-      border-color: var(--navy);
-      background: #edf4fc;
-      color: var(--navy);
-      font-weight: 700;
-    }
-    .submit-btn {
-      width: 100%;
-      background: linear-gradient(135deg, var(--navy) 0%, #1e4273 100%);
-      color: #ffffff;
-      border: 0;
-      border-radius: 12px;
-      padding: 14px 20px;
-      font-family: "Manrope", sans-serif;
-      font-weight: 700;
-      font-size: 14.5px;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 4px 16px rgba(26, 54, 93, 0.24);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    .submit-btn:hover:not(:disabled) {
-      background: linear-gradient(135deg, #132a4a 0%, #17365d 100%);
-      transform: translateY(-1px);
-    }
-    .submit-btn:disabled {
-      background: #94a3b8;
-      box-shadow: none;
-      cursor: not-allowed;
-      transform: none;
-    }
-    .demo-link-bar {
-      text-align: center;
-      margin-top: 14px;
+
+    .field-note {
       font-size: 12px;
       color: var(--muted);
+      margin-top: 4px;
+      display: block;
     }
-    .demo-link {
-      color: var(--teal);
-      text-decoration: none;
-      font-weight: 700;
+
+    /* Segmented Format Switcher */
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      background: #f1f5f9;
+      padding: 3px;
+      border-radius: 6px;
+      gap: 3px;
+    }
+
+    .segmented button {
+      border: none;
+      background: transparent;
+      padding: 8px 10px;
+      border-radius: 4px;
       cursor: pointer;
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--muted);
+      transition: all 0.15s;
+      text-align: center;
     }
-    .demo-link:hover {
+
+    .segmented button:hover {
+      color: var(--text);
+    }
+
+    .segmented button.active {
+      background: #ffffff;
+      color: var(--text);
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Main Submit Button */
+    .btn-submit {
+      width: 100%;
+      height: 42px;
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 18px;
+      transition: background 0.15s;
+    }
+
+    .btn-submit:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .sample-link-wrap {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .sample-link {
+      background: none;
+      border: none;
+      color: var(--link);
+      cursor: pointer;
+      font-size: 12.5px;
+      font-family: inherit;
       text-decoration: underline;
+      padding: 0 2px;
     }
+
+    .sample-link:hover {
+      color: #1d4ed8;
+    }
+
     /* Stepper */
     .stepper {
       margin-top: 20px;
-      padding: 14px 16px;
-      border-radius: 12px;
-      background: #f1f5f9;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
       display: none;
-      border: 1px solid var(--line);
     }
-    .stepper-header {
-      font-size: 11.5px;
-      font-weight: 700;
-      color: var(--navy);
-      margin-bottom: 10px;
+
+    .step {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
     }
-    .stepper-steps {
-      display: grid;
-      gap: 7px;
+
+    .step.active {
+      color: var(--text);
+      font-weight: 500;
     }
-    .step-item {
+
+    .step.done {
+      color: #16a34a;
+    }
+
+    .step-num {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: #ffffff;
       display: flex;
       align-items: center;
-      gap: 9px;
-      font-size: 11.5px;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .step.active .step-num {
+      border-color: var(--focus);
+      background: var(--focus);
+      color: #ffffff;
+    }
+
+    .step.done .step-num {
+      border-color: #16a34a;
+      background: #16a34a;
+      color: #ffffff;
+    }
+
+    /* Alert Message */
+    .alert {
+      margin-top: 12px;
+      font-size: 12.5px;
+      text-align: center;
       color: var(--muted);
     }
-    .step-item.active {
-      color: var(--navy);
-      font-weight: 600;
+
+    .alert.error {
+      color: #dc2626;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      padding: 8px 12px;
+      border-radius: 5px;
     }
-    .step-item.done {
-      color: var(--success);
-    }
-    .step-icon {
-      width: 17px;
-      height: 17px;
-      border-radius: 50%;
-      background: #cbd5e1;
-      display: grid;
-      place-items: center;
-      font-size: 9.5px;
-      color: #fff;
-    }
-    .step-item.active .step-icon {
-      background: var(--navy);
-      animation: pulse 1.2s infinite;
-    }
-    .step-item.done .step-icon {
-      background: var(--success);
-    }
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.15); opacity: 0.8; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    /* Results */
-    .result-card {
+
+    /* Result Box */
+    .result-box {
       margin-top: 20px;
-      padding: 20px;
-      border-radius: 14px;
-      border: 1.5px solid #86efac;
+      padding: 16px;
+      border-radius: 6px;
+      border: 1px solid #bbf7d0;
       background: #f0fdf4;
       display: none;
-      animation: fadeIn 0.3s ease-out;
     }
+
     .result-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 10px;
+      margin-bottom: 4px;
     }
-    .health-pill {
-      font-family: "Manrope", sans-serif;
-      font-size: 17px;
-      font-weight: 800;
-      color: var(--navy);
-      background: #ffffff;
-      padding: 5px 14px;
-      border-radius: 99px;
-      border: 1px solid #bbf7d0;
-    }
-    .health-pill span {
-      font-size: 11px;
+
+    .result-client {
+      font-size: 13.5px;
       font-weight: 600;
-      color: var(--muted);
-    }
-    .result-details strong {
-      display: block;
-      font-size: 14.5px;
       color: #14532d;
-      margin-bottom: 2px;
     }
-    .result-details span {
-      font-size: 11.5px;
+
+    .result-score {
+      font-size: 12px;
+      font-weight: 600;
+      background: #ffffff;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    .result-file {
+      font-size: 12px;
       color: #166534;
-      font-family: "JetBrains Mono", monospace;
+      margin-bottom: 12px;
     }
-    .download-btn {
+
+    .btn-download {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: var(--navy);
-      color: #fff;
+      background: var(--primary);
+      color: #ffffff;
       text-decoration: none;
-      padding: 9px 18px;
-      border-radius: 10px;
+      padding: 8px 14px;
+      border-radius: 5px;
       font-size: 12.5px;
-      font-weight: 700;
-      transition: 0.2s;
-      margin-top: 14px;
+      font-weight: 500;
+      transition: background 0.15s;
     }
-    .download-btn:hover {
-      background: var(--navy-dark);
+
+    .btn-download:hover {
+      background: var(--primary-hover);
     }
-    .status-alert {
-      margin-top: 12px;
-      font-size: 12px;
-      text-align: center;
-      color: var(--muted);
-      min-height: 18px;
-    }
-    .status-alert.error {
-      color: var(--critical);
-      font-weight: 600;
-    }
+
+    /* Footer */
     .footer {
       text-align: center;
-      color: #94a3b8;
-      font-size: 11px;
       margin-top: 32px;
-      line-height: 1.5;
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.6;
     }
+
     .footer a {
-      color: var(--navy);
+      color: #64748b;
       text-decoration: none;
-      font-weight: 600;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: none; }
+
+    .footer a:hover {
+      text-decoration: underline;
     }
-    @media (max-width: 580px) {
-      .card { padding: 20px 16px; }
+
+    @media (max-width: 540px) {
+      body { padding: 20px 12px 40px; }
+      .card { padding: 18px; }
       .grid-2 { grid-template-columns: 1fr; }
-      .format-options { grid-template-columns: 1fr; }
-      .header { flex-direction: column; align-items: flex-start; }
+      .scope-row { flex-direction: column; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <header class="header">
+
+    <!-- Top Brand Header -->
+    <div class="nav">
       <div class="brand-logos">
         <img class="main-logo" src="/wooplix_main_logo.png" alt="Wooplix Technologies">
-        <img class="partner-badge" src="/wooplix_partner_badge.png" alt="Zoho Authorized Partner">
+        <img class="partner-logo" src="/wooplix_partner_badge.png" alt="Authorized Zoho Partner">
       </div>
-      <span class="header-badge">Zoho Audit Agent</span>
-    </header>
-
-    <div class="intro">
-      <h1>Zoho System Audit &amp; Architecture Assessment</h1>
-      <p>Connect any client Zoho environment to automatically detect installed applications, diagnose configuration gaps, and generate branded audit deliverables.</p>
+      <span class="nav-label">Audit Portal</span>
     </div>
 
+    <!-- Page Title -->
+    <div class="header">
+      <h1>Zoho Organization Audit</h1>
+      <p>Analyze organization settings, user roles, active modules, and workflows to generate an audit report.</p>
+    </div>
+
+    <!-- Main Card -->
     <div class="card">
-      <!-- Step 1: Integrated Scope Copy Helper -->
-      <div class="step-section">
-        <div class="step-header">
-          <div class="step-title">
-            <span class="step-badge">Step 1</span>
-            <span>Generate Client Token in Zoho Console</span>
-          </div>
-          <a href="https://api-console.zoho.com" target="_blank" class="console-link">
-            <span>Open Zoho Console</span> <span>↗</span>
+      
+      <!-- Guide Helper -->
+      <div class="guide-box">
+        <div class="guide-top">
+          <span class="guide-title">How to get your Zoho Code</span>
+          <a href="https://api-console.zoho.com" target="_blank" class="guide-link">
+            Zoho API Console
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
           </a>
         </div>
-        <div class="scope-action-bar">
-          <select id="scopePresetSelect" class="scope-preset-select" onchange="onPresetSelectChange(this.value)">
-            <option value="nodesk" selected>★ Full Suite (CRM, Books, Drive, Projects - Recommended)</option>
+        <p class="guide-desc">In Zoho API Console, go to <strong>Self Client</strong> &rarr; <strong>Generate Code</strong>, select your scope preset, copy permissions, and set duration to 10 minutes.</p>
+        <div class="scope-row">
+          <select id="scopePresetSelect" class="scope-select" onchange="onPresetSelectChange(this.value)">
+            <option value="nodesk" selected>Standard Suite (CRM, Books, Drive, Projects)</option>
             <option value="crmonly">CRM &amp; WorkDrive Only</option>
-            <option value="full">All Apps (Including Zoho Desk)</option>
+            <option value="full">All Modules (with Zoho Desk)</option>
           </select>
-          <button type="button" class="btn-copy-scopes" id="btnCopyScopes" onclick="copyScopes()">
-            <span id="copyIcon">📋</span> <span id="copyText">Copy Scopes</span>
+          <button type="button" class="copy-btn" id="btnCopyScopes" onclick="copyScopes()">
+            <span id="copyIcon">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </span>
+            <span id="copyText">Copy Scopes</span>
           </button>
         </div>
-        <div class="step-help-text">
-          In Zoho Console &rarr; <strong>Self Client</strong> &rarr; <strong>Generate Code</strong>, paste the copied scopes, set Duration to <strong>10 minutes</strong>, click <strong>Create</strong>, and paste credentials below.
-        </div>
       </div>
 
-      <!-- Step 2: Form Intake -->
-      <div class="step-header" style="margin-bottom: 14px;">
-        <div class="step-title">
-          <span class="step-badge">Step 2</span>
-          <span>Paste Client Credentials &amp; Run Audit</span>
-        </div>
-      </div>
-
+      <!-- Form -->
       <form id="auditForm" onsubmit="return false;">
         
-        <div class="form-group">
-          <label for="accountsUrl">
-            Zoho Region Domain
-            <span>Match client's Zoho data center</span>
-          </label>
-          <select id="accountsUrl">
-            <option value="https://accounts.zoho.in" selected>Zoho India (.in) — https://accounts.zoho.in</option>
-            <option value="https://accounts.zoho.com">Zoho US / Global (.com) — https://accounts.zoho.com</option>
-            <option value="https://accounts.zoho.eu">Zoho Europe (.eu) — https://accounts.zoho.eu</option>
-            <option value="https://accounts.zoho.com.au">Zoho Australia (.com.au) — https://accounts.zoho.com.au</option>
+        <div class="field">
+          <label for="accountsUrl">Data Center Region</label>
+          <select id="accountsUrl" class="input">
+            <option value="https://accounts.zoho.in" selected>India (accounts.zoho.in)</option>
+            <option value="https://accounts.zoho.com">United States / Global (accounts.zoho.com)</option>
+            <option value="https://accounts.zoho.eu">Europe (accounts.zoho.eu)</option>
+            <option value="https://accounts.zoho.com.au">Australia (accounts.zoho.com.au)</option>
           </select>
         </div>
 
         <div class="grid-2">
-          <div class="form-group">
-            <label for="clientId">Client ID *</label>
-            <input type="text" id="clientId" placeholder="1000.XXXXXXXXXXXXXX" required>
+          <div class="field">
+            <label for="clientId">Client ID</label>
+            <input type="text" id="clientId" class="input" placeholder="1000.xxxxxxxxxxxx" required>
           </div>
-          <div class="form-group">
-            <label for="clientSecret">Client Secret *</label>
-            <div class="password-wrap">
-              <input type="password" id="clientSecret" placeholder="••••••••••••••••" required>
-              <button type="button" class="toggle-pwd" onclick="toggleVisibility('clientSecret')">👁</button>
+          <div class="field">
+            <label for="clientSecret">Client Secret</label>
+            <div class="input-action">
+              <input type="password" id="clientSecret" class="input" placeholder="Client secret" required>
+              <button type="button" class="action-icon" onclick="toggleVisibility('clientSecret')" aria-label="Toggle secret visibility">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </button>
             </div>
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="token">
-            Zoho Token *
-            <span>Paste 10-minute Self-Client Code OR Refresh Token</span>
-          </label>
-          <div class="password-wrap">
-            <input type="password" id="token" placeholder="1000.xxxxxxxxxxxxxxxxxxxxxxxxxxxx" required>
-            <button type="button" class="toggle-pwd" onclick="toggleVisibility('token')">👁</button>
+        <div class="field">
+          <label for="token">Access Code or Refresh Token</label>
+          <div class="input-action">
+            <input type="password" id="token" class="input" placeholder="Paste 10-minute code or refresh token" required>
+            <button type="button" class="action-icon" onclick="toggleVisibility('token')" aria-label="Toggle token visibility">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
+          <span class="field-note">Accepts a temporary 10-minute code from Zoho Console or an existing refresh token.</span>
+        </div>
+
+        <div class="field">
+          <label>Report Format</label>
+          <div class="segmented">
+            <button type="button" class="active" data-fmt="pdf">PDF Report</button>
+            <button type="button" data-fmt="docx">Word (.docx)</button>
+            <button type="button" data-fmt="zip">Full Package (.zip)</button>
           </div>
         </div>
 
-        <!-- Format picker -->
-        <label style="font-size:12px; font-weight:700; color:#1e293b; margin-top:8px; display:block;">Download Format</label>
-        <div class="format-options">
-          <div class="format-btn active" data-fmt="pdf">📄 Branded PDF</div>
-          <div class="format-btn" data-fmt="docx">📝 Word (DOCX)</div>
-          <div class="format-btn" data-fmt="zip">📦 All Files (ZIP)</div>
-        </div>
-
-        <!-- Submit Button -->
-        <button type="button" class="submit-btn" id="runAuditBtn">
-          <span>⚡ Inspect Environment &amp; Generate Audit Report</span> →
+        <button type="button" id="runAuditBtn" class="btn-submit">
+          Generate Audit Report
         </button>
 
-        <div class="demo-link-bar">
-          Want to test right now? <a class="demo-link" onclick="fillTestAccount()">Fill pre-configured test account credentials</a>
+        <div class="sample-link-wrap">
+          Need to test first?
+          <button type="button" class="sample-link" onclick="fillTestAccount()">Load sample credentials</button>
         </div>
 
-        <!-- Execution Stepper -->
+        <!-- Stepper -->
         <div class="stepper" id="stepper">
-          <div class="stepper-header">
-            <span>AUDIT EXECUTION PIPELINE</span>
-            <span id="stepperTime">In Progress...</span>
+          <div class="step active" id="step1">
+            <span class="step-num">1</span>
+            <span>Connecting to Zoho account...</span>
           </div>
-          <div class="stepper-steps">
-            <div class="step-item" id="step1">
-              <span class="step-icon">1</span>
-              <span>Authenticating Zoho environment &amp; discovering installed applications</span>
-            </div>
-            <div class="step-item" id="step2">
-              <span class="step-icon">2</span>
-              <span>Probing pipelines, assignment rules, SLAs, &amp; data decay telemetry</span>
-            </div>
-            <div class="step-item" id="step3">
-              <span class="step-icon">3</span>
-              <span>Running Groq LLM Diagnostic Engine (House Style Analysis)</span>
-            </div>
-            <div class="step-item" id="step4">
-              <span class="step-icon">4</span>
-              <span>Compiling branded deliverables (DOCX &amp; Dompdf PDF)</span>
-            </div>
+          <div class="step" id="step2">
+            <span class="step-num">2</span>
+            <span>Scanning active applications and user permissions...</span>
+          </div>
+          <div class="step" id="step3">
+            <span class="step-num">3</span>
+            <span>Auditing security configurations &amp; workflows...</span>
+          </div>
+          <div class="step" id="step4">
+            <span class="step-num">4</span>
+            <span>Generating final audit report deliverable...</span>
           </div>
         </div>
 
-        <div class="status-alert" id="statusAlert"></div>
+        <div id="statusAlert" class="alert"></div>
 
-        <!-- Results Card -->
-        <div class="result-card" id="resultCard">
+        <!-- Result Box -->
+        <div class="result-box" id="resultCard">
           <div class="result-top">
-            <div class="result-details">
-              <strong id="resultClient">Amandeep Kaur Enterprise</strong>
-              <span id="resultFile">Wooplix_Audit.pdf</span>
-            </div>
-            <div class="health-pill" id="healthScore">
-              45 <span>/ 100</span>
-            </div>
+            <span class="result-client" id="resultClient">Amandeep Kaur Enterprise</span>
+            <span class="result-score">Health Score: <span id="healthScore">45</span>/100</span>
           </div>
-          <p style="font-size:12px; color:#14532d; line-height:1.45;" id="resultSummary">
-            Audit complete. Discovered applications probed, architecture diagnosed, and phased roadmap generated.
-          </p>
-          <a id="downloadAgainBtn" class="download-btn" href="#" download>Download Deliverable</a>
+          <div class="result-file" id="resultFilename">Wooplix_Audit_Amandeep_Kaur_Enterprise.pdf</div>
+          <a id="downloadAgainBtn" class="btn-download" href="#" download>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Download Report Deliverable</span>
+          </a>
         </div>
 
       </form>
     </div>
 
+    <!-- Footer -->
     <footer class="footer">
       <strong>Wooplix Technologies Private Limited</strong> &bull; Authorized Zoho Partner<br>
       <a href="https://www.wooplix.com/" target="_blank">www.wooplix.com</a> &bull; <a href="mailto:enquiry@wooplix.com">enquiry@wooplix.com</a>
     </footer>
+
   </div>
 
   <script>
@@ -698,14 +711,14 @@
       const txt = document.getElementById('copyText');
       const btn = document.getElementById('btnCopyScopes');
 
-      icon.textContent = '✓';
+      btn.classList.add('copied');
+      icon.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
       txt.textContent = 'Copied!';
-      btn.style.background = '#16a34a';
 
       setTimeout(() => {
-        icon.textContent = '📋';
+        btn.classList.remove('copied');
+        icon.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
         txt.textContent = 'Copy Scopes';
-        btn.style.background = 'var(--teal)';
       }, 2500);
     }
 
@@ -714,43 +727,44 @@
       el.type = el.type === 'password' ? 'text' : 'password';
     }
 
-    // Format selection
-    document.querySelectorAll('.format-btn').forEach(btn => {
+    // Segmented switcher
+    document.querySelectorAll('.segmented button').forEach(btn => {
       btn.onclick = () => {
-        document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.segmented button').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         selectedFormat = btn.dataset.fmt;
       };
     });
 
-    // Fill test credentials
+    // Test credentials
     function fillTestAccount() {
       document.getElementById('accountsUrl').value = 'https://accounts.zoho.in';
       document.getElementById('clientId').value = '1000.Q8BYX2ZJY8O4212XQ744NMRTZEWU2K';
       document.getElementById('clientSecret').value = 'c85f73afcef57c343986e1088939378347a46def3d';
       document.getElementById('token').value = '1000.dcf12f848682366cb1fab382ec0dbb1d.14dc2a1dea8dbfd8a9079bab5aa43037';
-      document.getElementById('statusAlert').textContent = '✓ Pre-configured test credentials filled. Click "Inspect Environment & Generate Audit Report" to run!';
-      document.getElementById('statusAlert').className = 'status-alert';
+      const alert = document.getElementById('statusAlert');
+      alert.textContent = 'Sample credentials loaded. Click "Generate Audit Report" below.';
+      alert.className = 'alert';
     }
 
-    // Execution Stepper
+    // Stepper
     function setStep(stepNum) {
       for (let i = 1; i <= 4; i++) {
         const el = document.getElementById(`step${i}`);
         el.classList.remove('active', 'done');
         if (i < stepNum) {
           el.classList.add('done');
-          el.querySelector('.step-icon').textContent = '✓';
+          el.querySelector('.step-num').innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
         } else if (i === stepNum) {
           el.classList.add('active');
-          el.querySelector('.step-icon').textContent = i;
+          el.querySelector('.step-num').textContent = i;
         } else {
-          el.querySelector('.step-icon').textContent = i;
+          el.querySelector('.step-num').textContent = i;
         }
       }
     }
 
-    // Audit Run
+    // Submit handler
     const runBtn = document.getElementById('runAuditBtn');
     const stepper = document.getElementById('stepper');
     const resultCard = document.getElementById('resultCard');
@@ -763,17 +777,17 @@
       const token = document.getElementById('token').value.trim();
 
       if (!clientId || !clientSecret || !token) {
-        statusAlert.textContent = 'Please enter Client ID, Client Secret, and Token (or click the test link below).';
-        statusAlert.className = 'status-alert error';
+        statusAlert.textContent = 'Please enter your Client ID, Client Secret, and Token.';
+        statusAlert.className = 'alert error';
         return;
       }
 
-      runBtn.disabled = true;
-      runBtn.innerHTML = '<span>Inspecting &amp; Generating Audit…</span>';
-      stepper.style.display = 'block';
-      resultCard.style.display = 'none';
       statusAlert.textContent = '';
-      statusAlert.className = 'status-alert';
+      statusAlert.className = 'alert';
+      runBtn.disabled = true;
+      runBtn.innerHTML = '<span>Running Audit...</span>';
+      resultCard.style.display = 'none';
+      stepper.style.display = 'block';
 
       setStep(1);
       const stepTimer1 = setTimeout(() => setStep(2), 1500);
@@ -798,12 +812,12 @@
 
         if (!res.ok) {
           const errData = await res.json().catch(() => ({}));
-          throw new Error(errData.detail || `Audit failed with status ${res.status}`);
+          throw new Error(errData.detail || `Audit failed (status ${res.status})`);
         }
 
         setStep(5);
         document.getElementById('step4').classList.add('done');
-        document.getElementById('step4').querySelector('.step-icon').textContent = '✓';
+        document.getElementById('step4').querySelector('.step-num').innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
 
         let filename = res.headers.get('x-audit-filename');
         if (!filename) {
@@ -816,12 +830,21 @@
         }
 
         const score = res.headers.get('x-audit-score') || '60';
-        const client = res.headers.get('x-audit-client') || 'Client Organization';
+        const clientName = res.headers.get('x-audit-client') || 'Client Organization';
+
+        document.getElementById('resultClient').textContent = clientName;
+        document.getElementById('resultFilename').textContent = filename;
+        document.getElementById('healthScore').textContent = score;
 
         const blob = await res.blob();
         const blobUrl = URL.createObjectURL(blob);
+        const downloadBtn = document.getElementById('downloadAgainBtn');
+        downloadBtn.href = blobUrl;
+        downloadBtn.download = filename;
 
-        // Auto trigger download
+        resultCard.style.display = 'block';
+
+        // Trigger file download
         const a = document.createElement('a');
         a.href = blobUrl;
         a.download = filename;
@@ -829,23 +852,15 @@
         a.click();
         a.remove();
 
-        // Update Results UI
-        resultCard.style.display = 'block';
-        document.getElementById('resultClient').textContent = client;
-        document.getElementById('resultFile').textContent = `Downloaded: ${filename}`;
-        document.getElementById('healthScore').innerHTML = `${score} <span>/ 100</span>`;
-        document.getElementById('downloadAgainBtn').href = blobUrl;
-        document.getElementById('downloadAgainBtn').download = filename;
-
-        statusAlert.textContent = `✓ Audit completed successfully for ${client}! Deliverable downloaded.`;
-        statusAlert.className = 'status-alert';
-        resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       } catch (err) {
-        statusAlert.textContent = `Error: ${err.message}`;
-        statusAlert.className = 'status-alert error';
+        clearTimeout(stepTimer1);
+        clearTimeout(stepTimer2);
+        clearTimeout(stepTimer3);
+        statusAlert.textContent = `Audit error: ${err.message}`;
+        statusAlert.className = 'alert error';
       } finally {
         runBtn.disabled = false;
-        runBtn.innerHTML = '<span>⚡ Inspect Environment &amp; Generate Audit Report</span> →';
+        runBtn.innerHTML = '<span>Generate Audit Report</span>';
       }
     };
   </script>
