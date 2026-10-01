@@ -165,6 +165,13 @@ def exchange_zoho_grant_code(client_id: str, client_secret: str, code: str, acco
     return payload
 
 
+def _get_service_root(api_domain: str, service: str) -> str:
+    """Derive clean service base URL (e.g. desk.zoho.in, books.zoho.in) without erroneous www. prefix."""
+    raw = (api_domain or "https://www.zohoapis.in").replace("https://", "").replace("http://", "").replace("www.", "").rstrip("/")
+    tld = raw.split("zohoapis.")[-1] if "zohoapis." in raw else (raw.split("zoho.")[-1] if "zoho." in raw else "in")
+    return f"https://{service}.zoho.{tld}"
+
+
 def discover_environment(client_id: str, client_secret: str, refresh_token: str, accounts_url: str = "https://accounts.zoho.in") -> Dict[str, Any]:
     """Inspect connected Zoho environment to automatically detect organization profile and installed applications."""
     import requests
@@ -223,7 +230,7 @@ def discover_environment(client_id: str, client_secret: str, refresh_token: str,
     })
 
     # 2. Inspect Desk
-    desk_root = api_domain.replace("zohoapis", "desk.zoho") if "desk.zoho" not in api_domain else api_domain
+    desk_root = _get_service_root(api_domain, "desk")
     has_desk = any("desk" in s.lower() for s in scopes) or False
     desk_details = "Customer Support & SLA Tracking"
     desk_active = False
@@ -249,7 +256,7 @@ def discover_environment(client_id: str, client_secret: str, refresh_token: str,
     })
 
     # 3. Inspect Books
-    books_root = api_domain.replace("zohoapis", "books.zoho") if "books.zoho" not in api_domain else api_domain
+    books_root = _get_service_root(api_domain, "books")
     has_books = any("book" in s.lower() for s in scopes) or False
     books_details = "Finance, Invoicing, & Receivables"
     books_active = False
@@ -277,7 +284,7 @@ def discover_environment(client_id: str, client_secret: str, refresh_token: str,
     })
 
     # 4. Inspect Inventory
-    inventory_root = api_domain.replace("zohoapis", "inventory.zoho") if "inventory.zoho" not in api_domain else api_domain
+    inventory_root = _get_service_root(api_domain, "inventory")
     has_inventory = any("inventory" in s.lower() for s in scopes) or False
     inv_details = "Warehouse, Stock & Order Operations"
     inv_active = False
@@ -478,7 +485,7 @@ def collect_desk_telemetry(access_token: str, api_domain: str, granted_scopes: L
     """Collect read-only telemetry from Zoho Desk environment."""
     import requests
     headers = {"Authorization": f"Zoho-oauthtoken {access_token}"}
-    desk_root = api_domain.replace("zohoapis", "desk.zoho") if "desk.zoho" not in api_domain else api_domain
+    desk_root = _get_service_root(api_domain, "desk")
     desk_data: Dict[str, Any] = {
         "status": "connected",
         "departments": [],
@@ -544,7 +551,7 @@ def collect_books_telemetry(access_token: str, api_domain: str, granted_scopes: 
     """Collect read-only telemetry from Zoho Books / Billing environment."""
     import requests
     headers = {"Authorization": f"Zoho-oauthtoken {access_token}"}
-    books_root = api_domain.replace("zohoapis", "books.zoho") if "books.zoho" not in api_domain else api_domain
+    books_root = _get_service_root(api_domain, "books")
     books_data: Dict[str, Any] = {
         "status": "connected",
         "organizations": [],
@@ -768,7 +775,7 @@ def collect_environment_telemetry(
 
         # Inventory
         if any("inventory" in s for s in suites_lower) or any("inventory" in s.lower() for s in granted_scopes):
-            inv_root = api_domain.replace("zohoapis", "inventory.zoho") if "inventory.zoho" not in api_domain else api_domain
+            inv_root = _get_service_root(api_domain, "inventory")
             inv_data = {"status": "connected", "organizations": []}
             try:
                 r_inv = requests.get(f"{inv_root}/api/v1/organizations", headers=headers, timeout=10)
