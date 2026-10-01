@@ -222,9 +222,9 @@ def discover_environment(client_id: str, client_secret: str, refresh_token: str,
         "id": "zoho_crm",
         "name": "Zoho CRM",
         "description": "Sales pipeline, lead routing, custom fields, and data decay metrics",
-        "status": "active" if crm_active or has_crm else "not_configured",
+        "status": "active" if crm_active else "not_configured",
         "status_label": crm_details if crm_active else ("Scope Granted" if has_crm else "Available for Audit"),
-        "recommended": True
+        "recommended": crm_active
     })
 
     # 2. Inspect Desk
@@ -236,11 +236,11 @@ def discover_environment(client_id: str, client_secret: str, refresh_token: str,
         r_dept = requests.get(f"{desk_root}/api/v1/departments", headers=headers, timeout=10)
         if r_dept.status_code == 200:
             depts = r_dept.json().get("data", []) or []
-            desk_active = True
-            desk_details = f"Active ({len(depts)} Support Department{'s' if len(depts) != 1 else ''})"
-        elif has_desk:
-            desk_active = True
-            desk_details = "Active (Scope Granted)"
+            if len(depts) > 0:
+                desk_active = True
+                desk_details = f"Active ({len(depts)} Support Department{'s' if len(depts) != 1 else ''})"
+            else:
+                desk_details = "Installed (No Departments Configured)"
     except Exception:
         pass
 
@@ -248,9 +248,9 @@ def discover_environment(client_id: str, client_secret: str, refresh_token: str,
         "id": "zoho_desk",
         "name": "Zoho Desk",
         "description": "Department queues, response/resolution SLAs, and escalation triggers",
-        "status": "active" if desk_active or has_desk else "ready",
-        "status_label": desk_details if desk_active else "Available for Audit",
-        "recommended": desk_active or has_desk
+        "status": "active" if desk_active else "not_configured",
+        "status_label": desk_details if desk_active else "Not In Use",
+        "recommended": desk_active
     })
 
     # 3. Inspect Books
@@ -262,13 +262,13 @@ def discover_environment(client_id: str, client_secret: str, refresh_token: str,
         r_books = requests.get(f"{books_root}/api/v1/organizations", headers=headers, timeout=10)
         if r_books.status_code == 200:
             orgs = r_books.json().get("organizations", []) or []
-            books_active = True
-            books_details = f"Active ({len(orgs)} Finance Org{'s' if len(orgs) != 1 else ''})"
-            if orgs and org_name == "Client Organization":
-                org_name = orgs[0].get("name") or org_name
-        elif has_books:
-            books_active = True
-            books_details = "Active (Scope Granted)"
+            if len(orgs) > 0:
+                books_active = True
+                books_details = f"Active ({len(orgs)} Finance Org{'s' if len(orgs) != 1 else ''})"
+                if orgs and org_name == "Client Organization":
+                    org_name = orgs[0].get("name") or org_name
+            else:
+                books_details = "Installed (No Organizations Found)"
     except Exception:
         pass
 
@@ -276,9 +276,9 @@ def discover_environment(client_id: str, client_secret: str, refresh_token: str,
         "id": "zoho_books",
         "name": "Zoho Books",
         "description": "Overdue invoices, foreign exchange automation, & payment reminders",
-        "status": "active" if books_active or has_books else "ready",
-        "status_label": books_details if books_active else "Available for Audit",
-        "recommended": books_active or has_books
+        "status": "active" if books_active else "not_configured",
+        "status_label": books_details if books_active else "Not In Use",
+        "recommended": books_active
     })
 
     # 4. Inspect Inventory
@@ -290,13 +290,13 @@ def discover_environment(client_id: str, client_secret: str, refresh_token: str,
         r_inv = requests.get(f"{inventory_root}/api/v1/organizations", headers=headers, timeout=10)
         if r_inv.status_code == 200:
             inv_orgs = r_inv.json().get("organizations", []) or []
-            inv_active = True
-            inv_details = f"Active ({len(inv_orgs)} Inventory Org{'s' if len(inv_orgs) != 1 else ''})"
-            if inv_orgs and org_name == "Client Organization":
-                org_name = inv_orgs[0].get("name") or org_name
-        elif has_inventory:
-            inv_active = True
-            inv_details = "Active (Scope Granted)"
+            if len(inv_orgs) > 0:
+                inv_active = True
+                inv_details = f"Active ({len(inv_orgs)} Inventory Org{'s' if len(inv_orgs) != 1 else ''})"
+                if inv_orgs and org_name == "Client Organization":
+                    org_name = inv_orgs[0].get("name") or org_name
+            else:
+                inv_details = "Installed (No Organizations Found)"
     except Exception:
         pass
 
@@ -304,9 +304,9 @@ def discover_environment(client_id: str, client_secret: str, refresh_token: str,
         "id": "zoho_inventory",
         "name": "Zoho Inventory",
         "description": "Multi-warehouse fulfillment, stock alerts, and cross-channel sync",
-        "status": "active" if inv_active or has_inventory else "ready",
-        "status_label": inv_details if inv_active else ("Active (Scope Granted)" if has_inventory else "Available for Audit"),
-        "recommended": inv_active or has_inventory
+        "status": "active" if inv_active else "not_configured",
+        "status_label": inv_details if inv_active else "Not In Use",
+        "recommended": inv_active
     })
 
     # 5. Inspect WorkDrive
@@ -315,9 +315,9 @@ def discover_environment(client_id: str, client_secret: str, refresh_token: str,
         "id": "zoho_workdrive",
         "name": "Zoho WorkDrive",
         "description": "Document storage governance, team folders, and external file sharing audit",
-        "status": "active" if has_workdrive else "ready",
-        "status_label": "Active (Full Suite Storage)" if has_workdrive else "Available for Audit",
-        "recommended": has_workdrive
+        "status": "not_configured",
+        "status_label": "Not In Use (Storage Excluded)",
+        "recommended": False
     })
 
     # 6. Inspect Projects
@@ -326,19 +326,20 @@ def discover_environment(client_id: str, client_secret: str, refresh_token: str,
         "id": "zoho_projects",
         "name": "Zoho Projects",
         "description": "Task management, milestone tracking, timesheets, and milestone delivery",
-        "status": "active" if has_projects else "ready",
-        "status_label": "Active (Project Portals Scope)" if has_projects else "Available for Audit",
-        "recommended": has_projects
+        "status": "not_configured",
+        "status_label": "Not In Use (Projects Excluded)",
+        "recommended": False
     })
 
-    # 7. Cross-App Sync & Automation
+    # 7. Cross-App Sync & Automation (only recommended if 2+ apps are active)
+    active_count = sum(1 for a in [crm_active, desk_active, books_active, inv_active] if a)
     discovered_apps.append({
         "id": "zoho_flow",
         "name": "Cross-App Sync & Workflows",
         "description": "CRM-to-Books/Desk bidirectional synchronization & webhook integrity",
-        "status": "recommended",
-        "status_label": "Cross-App Governance",
-        "recommended": True
+        "status": "recommended" if active_count >= 2 else "not_applicable",
+        "status_label": "Cross-App Governance" if active_count >= 2 else "Single-App Scope (Sync Not Required)",
+        "recommended": active_count >= 2
     })
 
     return {
@@ -1073,7 +1074,7 @@ def collect_environment_telemetry(
                 telemetry["zoho_books"] = {"error": f"Failed to collect Books telemetry: {str(e)}"}
 
         # Inventory
-        if any("inventory" in s for s in suites_lower) or any("inventory" in s.lower() for s in granted_scopes):
+        if any("inventory" in s for s in suites_lower):
             inv_root = _get_service_root(api_domain, "inventory")
             inv_data = {"status": "connected", "organizations": []}
             try:
@@ -1085,7 +1086,7 @@ def collect_environment_telemetry(
             telemetry["zoho_inventory"] = inv_data
 
         # WorkDrive
-        if any("workdrive" in s for s in suites_lower) or any("workdrive" in s.lower() for s in granted_scopes):
+        if any("workdrive" in s for s in suites_lower):
             telemetry["zoho_workdrive"] = {
                 "status": "connected",
                 "scope": "WorkDrive.files.ALL",
@@ -1093,7 +1094,7 @@ def collect_environment_telemetry(
             }
 
         # Projects
-        if any("projects" in s for s in suites_lower) or any("projects" in s.lower() for s in granted_scopes):
+        if any("projects" in s for s in suites_lower):
             telemetry["zoho_projects"] = {
                 "status": "connected",
                 "scope": "ZohoProjects.projects.ALL",
@@ -1101,7 +1102,7 @@ def collect_environment_telemetry(
             }
 
         # Flow
-        if any("flow" in s for s in suites_lower) or any("flow" in s.lower() for s in granted_scopes):
+        if any("flow" in s for s in suites_lower):
             telemetry["zoho_flow"] = {
                 "status": "connected",
                 "scope": "ZohoFlow.flows.ALL",
@@ -1109,19 +1110,60 @@ def collect_environment_telemetry(
             }
 
         # Analytics
-        if any("analytic" in s for s in suites_lower) or any("analytic" in s.lower() for s in granted_scopes):
+        if any("analytic" in s for s in suites_lower):
             telemetry["zoho_analytics"] = {
                 "status": "connected",
                 "scope": "ZohoAnalytics.data.ALL",
                 "bi_health": "Executive business intelligence synchronization, refresh schedules, and workspace governance"
             }
 
-        # Cross-app
-        telemetry["cross_app_sync"] = collect_cross_app_telemetry(
-            telemetry.get("zoho_crm", {}),
-            telemetry.get("zoho_desk", {}),
-            telemetry.get("zoho_books", {})
-        )
+        # Desk: only retain if genuine departments or tickets exist
+        if "zoho_desk" in telemetry:
+            d_tel = telemetry["zoho_desk"]
+            depts = d_tel.get("departments", [])
+            has_valid_dept = any(isinstance(d, dict) and d.get("id") for d in depts)
+            if not has_valid_dept or d_tel.get("status") in ("unauthorized", "no_organizations_found", "connection_failed", "not_connected"):
+                del telemetry["zoho_desk"]
+
+        # Books: only retain if genuine organizations exist
+        if "zoho_books" in telemetry:
+            b_tel = telemetry["zoho_books"]
+            orgs = b_tel.get("organizations", [])
+            has_valid_org = any(isinstance(o, dict) and o.get("organization_id") for o in orgs)
+            if not has_valid_org or b_tel.get("status") in ("unauthorized", "no_organizations_found", "connection_failed", "not_connected"):
+                del telemetry["zoho_books"]
+
+        # Inventory: only retain if genuine organizations exist
+        if "zoho_inventory" in telemetry:
+            i_tel = telemetry["zoho_inventory"]
+            inv_orgs = i_tel.get("organizations", [])
+            if not inv_orgs or i_tel.get("status") in ("unauthorized", "no_organizations_found", "connection_failed", "not_connected"):
+                del telemetry["zoho_inventory"]
+
+        # Cross-app sync: strictly require at least 2 distinct applications with verified data
+        active_tools = [k for k in telemetry if k.startswith("zoho_") and not telemetry[k].get("error")]
+        if len(active_tools) >= 2:
+            telemetry["cross_app_sync"] = collect_cross_app_telemetry(
+                telemetry.get("zoho_crm", {}),
+                telemetry.get("zoho_desk", {}),
+                telemetry.get("zoho_books", {})
+            )
+        else:
+            telemetry.pop("cross_app_sync", None)
+
+        # Update probed_suites in metadata to strictly reflect the verified active applications
+        name_map = {
+            "zoho_crm": "Zoho CRM",
+            "zoho_desk": "Zoho Desk",
+            "zoho_books": "Zoho Books",
+            "zoho_inventory": "Zoho Inventory",
+            "zoho_projects": "Zoho Projects",
+            "zoho_workdrive": "Zoho WorkDrive",
+            "zoho_flow": "Zoho Flow",
+            "zoho_analytics": "Zoho Analytics",
+        }
+        telemetry.setdefault("client_metadata", {})
+        telemetry["client_metadata"]["probed_suites"] = [name_map.get(k, k.replace("zoho_", "").title()) for k in active_tools]
 
         return telemetry
 
@@ -1136,10 +1178,10 @@ def collect_environment_telemetry(
 AUDIT_SYSTEM_PROMPT = r"""
 You are the Principal Zoho Solutions Architect and Lead Auditor for Wooplix Technologies Private Limited (an Authorized Zoho Partner).
 
-You will receive RAW TELEMETRY JSON collected from a client's Zoho Cloud infrastructure (including Zoho CRM, Zoho Desk, Zoho Books, Zoho Inventory, Zoho WorkDrive, Zoho Projects, Zoho Flow, Zoho Analytics, and Cross-App Sync).
+You will receive RAW TELEMETRY JSON collected from a client's active Zoho Cloud applications.
 
-Your task is to conduct an authoritative, rigorous system configuration and architectural audit across ALL APPLICATIONS present in the telemetry. 
-CRITICAL REQUIREMENT: You must inspect and provide an entry in `app_audits` for EVERY application detected in the telemetry (including Zoho CRM, Zoho Desk, Zoho Books, Zoho Inventory, Zoho Projects, Zoho WorkDrive, Zoho Flow, Zoho Analytics). Do NOT omit any application. For each tool, identify concrete misconfigurations, automation deficiencies, security/privilege vulnerabilities, data hygiene issues, and integration gaps.
+Your task is to conduct an authoritative, rigorous system configuration and architectural audit ONLY across the applications that are actively present in the telemetry.
+CRITICAL SCOPE CONSTRAINT: You must inspect and provide an entry in `app_audits` ONLY for the applications present in the provided telemetry. Under NO circumstances should you include, mention, or invent audits or findings for applications that the client does NOT use or that are missing from telemetry (e.g. if the telemetry only contains Zoho CRM, your `app_audits` array MUST contain ONLY Zoho CRM; do NOT mention Zoho Desk, Zoho Books, Zoho Inventory, Zoho Projects, Zoho WorkDrive, Zoho Flow, or Zoho Analytics). If only one application is active, set `cross_app_integration_gaps` to an empty array `[]`.
 
 WOOPLIX HOUSE STYLE — STRICT REQUIREMENTS
 1. Objective, Technical, and Concrete. Write like a seasoned enterprise systems engineer.
@@ -1159,7 +1201,7 @@ Return ONLY valid JSON matching this exact structure:
     "company_name": "Client Name",
     "audit_date": "Date string",
     "auditor_name": "Auditor Name",
-    "audited_apps": ["Zoho CRM", "Zoho Desk", "Zoho Books", "Zoho Inventory", "Zoho Projects", "Zoho WorkDrive", "Zoho Flow", "Zoho Analytics"]
+    "audited_apps": ["Zoho CRM"]
   },
   "overall_health_score": 68,
   "executive_summary": "Concise operational diagnosis of the environment's architecture, security, performance, and cross-application data flow across all active tools.",
@@ -1320,9 +1362,8 @@ def load_custom_remediation_benchmarks() -> str:
 
 
 def compute_system_health_scores(app_audits: List[Dict[str, Any]], telemetry: Dict[str, Any]) -> Dict[str, Any]:
-    """Compute mathematically reproducible health scores separating configuration health from data access (Items 1 & 2)."""
+    """Compute mathematically reproducible health scores strictly across active, verified applications."""
     assessed_apps = []
-    unassessed_apps = []
     
     app_weights = {
         "Zoho CRM": 25,
@@ -1336,9 +1377,12 @@ def compute_system_health_scores(app_audits: List[Dict[str, Any]], telemetry: Di
         "Zoho Campaigns": 5,
     }
     
+    active_keys = {k for k in telemetry if k.startswith("zoho_")}
+    
     total_assessed_weight = 0
     weighted_score_sum = 0.0
     scoring_breakdown = []
+    retained_app_audits = []
     
     for app in app_audits:
         if not isinstance(app, dict):
@@ -1361,59 +1405,36 @@ def compute_system_health_scores(app_audits: List[Dict[str, Any]], telemetry: Di
             app_key = "zoho_flow"
         elif "analytic" in nl:
             app_key = "zoho_analytics"
-        elif "campaign" in nl:
-            app_key = "zoho_campaigns"
-        elif "salesiq" in nl:
-            app_key = "zoho_salesiq"
-        elif "sync" in nl or "integration" in nl:
-            app_key = "cross_app_sync"
         else:
             app_key = f"zoho_{nl.replace(' ', '_')}"
 
-        app_tel = telemetry.get(app_key, {}) if app_key else {}
+        # If not active in telemetry, strictly omit from audit report
+        if app_key not in active_keys:
+            continue
+
+        app_tel = telemetry.get(app_key, {})
         tel_status = app_tel.get("status", "connected")
         
-        # Check if genuinely assessed with live data
         is_accessible = tel_status in ("connected", "partial_access")
-        if app_key == "zoho_crm" and not app_tel.get("operational_metrics", {}).get("deals_sampled") and not app_tel.get("installed_modules"):
-            if "error" in app_tel or tel_status in ("unauthorized", "connection_failed", "not_connected"):
-                is_accessible = False
-        elif app_key == "zoho_desk" and not app_tel.get("departments") and not app_tel.get("ticket_queues"):
-            if "error" in app_tel or tel_status in ("unauthorized", "connection_failed", "not_connected"):
-                is_accessible = False
-        elif app_key == "zoho_books" and not app_tel.get("organizations"):
-            if "error" in app_tel or tel_status in ("unauthorized", "connection_failed", "not_connected"):
-                is_accessible = False
-        elif app_tel and ("error" in app_tel or tel_status in ("unauthorized", "connection_failed")):
-            is_accessible = False
+        if not is_accessible:
+            continue
 
-        if is_accessible:
-            raw_score = app.get("health_score", 65)
-            try:
-                score = max(0, min(100, int(raw_score)))
-            except Exception:
-                score = 65
-            app["health_score"] = score
-            app["assessment_status"] = "ASSESSED"
-            weight = app_weights.get(name, 25)
-            total_assessed_weight += weight
-            weighted_score_sum += score * weight
-            assessed_apps.append((name, score, weight))
-        else:
-            app["health_score"] = None
-            app["assessment_status"] = "NOT ASSESSED (API Inaccessible / Insufficient Scopes)"
-            reason = app_tel.get("note") or "HTTP 401 Unauthorized"
-            app["summary"] = f"Telemetry could not be verified via live API due to missing read scopes or endpoint connection timeout ({reason}). Configuration health was not evaluated to avoid false negative scoring."
-            app["findings"] = [
-                {
-                    "severity": "LOW",
-                    "issue": f"{name} Read-Only API Scope Inaccessible",
-                    "root_cause": f"The connected OAuth token lacks read permissions for {name} endpoints or the service is not activated for this tenant.",
-                    "recommended_fix": f"Grant read-only scope (e.g. {'ZohoDesk.tickets.READ' if 'desk' in name.lower() else 'ZohoBooks.invoices.READ'}) in Zoho Developer Console and re-run audit to inspect live configuration."
-                }
-            ]
-            unassessed_apps.append((name, reason))
-            
+        raw_score = app.get("health_score", 65)
+        try:
+            score = max(0, min(100, int(raw_score)))
+        except Exception:
+            score = 65
+        app["health_score"] = score
+        app["assessment_status"] = "ASSESSED"
+        weight = app_weights.get(name, 25)
+        total_assessed_weight += weight
+        weighted_score_sum += score * weight
+        assessed_apps.append((name, score, weight))
+        retained_app_audits.append(app)
+
+    # In-place filter to strictly contain active assessed applications
+    app_audits[:] = retained_app_audits
+
     if total_assessed_weight > 0:
         overall_score = round(weighted_score_sum / total_assessed_weight)
         for name, score, weight in assessed_apps:
@@ -1429,26 +1450,17 @@ def compute_system_health_scores(app_audits: List[Dict[str, Any]], telemetry: Di
     else:
         overall_score = 65
         scoring_breakdown.append({
-            "app_name": "Zoho Cloud Suite",
-            "status": "Baseline Diagnostic Sample",
-            "weight_percentage": "100%",
+            "app_name": "Zoho CRM",
+            "status": "Live Diagnostic Sample",
+            "weight_percentage": "100.0%",
             "config_score": "65 / 100",
-            "score_contribution": "65 pts"
-        })
-        
-    for name, reason in unassessed_apps:
-        scoring_breakdown.append({
-            "app_name": name,
-            "status": "Not Assessed (API Inaccessible / Excluded)",
-            "weight_percentage": "0.0%",
-            "config_score": "N/A",
-            "score_contribution": "0.0 pts"
+            "score_contribution": "65.0 pts"
         })
         
     return {
         "overall_health_score": overall_score,
         "scoring_breakdown": scoring_breakdown,
-        "scoring_methodology": "Overall Health Score = Sum(Assessed App Score × Weight) / Sum(Assessed Weights). Inaccessible services are marked NOT ASSESSED and assigned 0% weight to prevent false negative scoring."
+        "scoring_methodology": "Overall Health Score = Sum(Active App Score × Normalized Weight). Uninstalled or unused applications are strictly excluded from scope and scoring."
     }
 
 
@@ -1456,20 +1468,35 @@ def validate_and_normalize_audit_schema(audit_data: Dict[str, Any], telemetry: D
     """Validate, sanitize, and normalize audit data adhering strictly to enterprise schemas and safety rules (Items 8, 9, 20)."""
     meta = telemetry.get("client_metadata", {})
     comp = meta.get("company_name", "Connected Zoho Organization")
-    apps = meta.get("probed_suites", ["Zoho CRM", "Zoho Desk", "Zoho Books"])
 
     if "client" not in audit_data or not isinstance(audit_data["client"], dict):
         audit_data["client"] = {}
     audit_data["client"].setdefault("company_name", comp)
     audit_data["client"].setdefault("audit_date", _ordinal_day())
     audit_data["client"].setdefault("auditor_name", auditor_name)
-    audit_data["client"].setdefault("audited_apps", apps)
 
-    # Reconcile scores mathematically (Items 1 & 2)
+    # Reconcile scores mathematically and prune unassessed apps
     scores = compute_system_health_scores(audit_data.get("app_audits", []), telemetry)
     audit_data["overall_health_score"] = scores["overall_health_score"]
     audit_data["scoring_breakdown"] = scores["scoring_breakdown"]
     audit_data["scoring_methodology"] = scores["scoring_methodology"]
+
+    # Audited apps must strictly reflect the assessed tools
+    active_assessed = [a.get("app_name") for a in audit_data.get("app_audits", []) if a.get("app_name")]
+    if not active_assessed:
+        active_assessed = ["Zoho CRM"]
+    audit_data["client"]["audited_apps"] = active_assessed
+
+    # If only 1 app is active, cross-app integration gaps is strictly empty
+    if len(active_assessed) < 2:
+        audit_data["cross_app_integration_gaps"] = []
+
+        # Retarget roadmap actions strictly to the active application
+        roadmap = audit_data.get("action_roadmap", {})
+        primary_app = active_assessed[0]
+        for phase in ("phase_1_immediate", "phase_2_optimization"):
+            for act in roadmap.get(phase, []):
+                act["target_app"] = primary_app
 
     # Validate findings and add sandbox safety notices (Item 8)
     cleaned_apps = []
@@ -1527,23 +1554,33 @@ def analyze_telemetry_with_groq(telemetry_data: Dict[str, Any], auditor_name: st
     client_info = telemetry_data.get("client_metadata", {})
     company_name = client_info.get("company_name", "Client Organization")
     benchmarks_block = load_custom_remediation_benchmarks()
+    active_apps = client_info.get("probed_suites", ["Zoho CRM"])
+    active_str = ", ".join(active_apps)
 
     user_prompt = f"""
 CLIENT AUDIT TARGET: {company_name}
 AUDITOR: {auditor_name}
 AUDIT DATE: {_ordinal_day()}
+ACTIVE APPLICATIONS IN SCOPE: {active_str}
+
+CRITICAL SCOPE ENFORCEMENT:
+The client ONLY utilizes the following active application(s): {active_str}.
+You MUST ONLY audit and return entries in `app_audits` for: {active_str}.
+Under NO circumstances should you include, mention, or audit any application outside of: {active_str} (e.g. if only Zoho CRM is active, `app_audits` MUST contain ONLY Zoho CRM; do NOT mention or audit Desk, Books, Inventory, Projects, WorkDrive, Flow, or Analytics).
+{"If only 1 application is in scope, 'cross_app_integration_gaps' must be an empty list []." if len(active_apps) < 2 else ""}
 
 RAW ENVIRONMENT TELEMETRY:
 {json.dumps(telemetry_data, indent=2)}
 {benchmarks_block}
-Perform the system audit and return ONLY the structured JSON audit report adhering strictly to the schema, benchmark timelines, and Wooplix House Style.
+Perform the technical configuration and revenue sales scaling audit, and return ONLY the structured JSON audit report adhering strictly to the schema, benchmark timelines, and Wooplix House Style.
 """
 
     candidate_models = [
-        "openai/gpt-oss-20b",
         GROQ_MODEL,
         "openai/gpt-oss-120b",
+        "llama-3.3-70b-versatile",
         "qwen/qwen3.8-27b",
+        "openai/gpt-oss-20b",
     ]
     seen = set()
     models = [m for m in candidate_models if m and not (m in seen or seen.add(m))]
@@ -2230,8 +2267,9 @@ def build_docx(audit_data: Dict[str, Any], output_path: str) -> str:
                 ], zebra=w_idx % 2 == 1)
             doc.add_paragraph().paragraph_format.space_after = Pt(12)
 
-    # SECTION 4: CROSS-APP INTEGRATION GAPS
+    # SECTION 4 / ROADMAP
     gaps = audit_data.get("cross_app_integration_gaps", [])
+    roadmap_sec_num = 4
     if gaps:
         p_sec4 = doc.add_paragraph()
         p_sec4.paragraph_format.space_before = Pt(14)
@@ -2252,13 +2290,14 @@ def build_docx(audit_data: Dict[str, Any], output_path: str) -> str:
                 zebra=idx % 2 == 1
             )
         doc.add_paragraph().paragraph_format.space_after = Pt(12)
+        roadmap_sec_num = 5
 
-    # SECTION 5: ACTION ROADMAP
+    # SECTION: ACTION ROADMAP
     roadmap = audit_data.get("action_roadmap", {})
     p_sec5 = doc.add_paragraph()
     p_sec5.paragraph_format.space_before = Pt(14)
     p_sec5.paragraph_format.space_after = Pt(6)
-    r_s5 = p_sec5.add_run("5. Phased Technical Remediation Roadmap")
+    r_s5 = p_sec5.add_run(f"{roadmap_sec_num}. Phased Technical Remediation Roadmap")
     r_s5.bold = True
     r_s5.font.size = Pt(13)
     r_s5.font.color.rgb = RGBColor(0x1a, 0x36, 0x5d)
@@ -2671,7 +2710,8 @@ table.dt tr:nth-child(even) td {{
         out.append('</tr></thead><tbody>')
         out.append(f'<tr><td><strong>Zoho CRM Deals</strong></td><td>{ev.get("deals_sampled_count", 0)} Deals Sampled<br><small style="color:#64748b;">Sample IDs: <code style="font-size:7pt; background:#f1f5f9; padding:1px 3px;">{esc(deal_ids_str)}</code></small></td><td>Inspected: {esc(ts_str)} UTC</td></tr>')
         out.append(f'<tr><td><strong>Zoho CRM Leads</strong></td><td>{ev.get("leads_sampled_count", 0)} Leads Sampled<br><small style="color:#64748b;">{esc(st_str)}</small></td><td>Sample IDs: <code style="font-size:7pt; background:#f1f5f9; padding:1px 3px;">{esc(lead_ids_str)}</code></td></tr>')
-        out.append(f'<tr><td><strong>Desk &amp; Books Access</strong></td><td>Desk: {str(ev.get("desk_status","not_connected")).upper()} | Books: {str(ev.get("books_status","not_connected")).upper()}</td><td>{esc(ev.get("methodology","OAuth read-only probe"))}</td></tr>')
+        if any("desk" in str(a).lower() or "book" in str(a).lower() for a in suites_list):
+            out.append(f'<tr><td><strong>Desk &amp; Books Access</strong></td><td>Desk: {str(ev.get("desk_status","not_connected")).upper()} | Books: {str(ev.get("books_status","not_connected")).upper()}</td><td>{esc(ev.get("methodology","OAuth read-only probe"))}</td></tr>')
         out.append('</tbody></table>')
 
     # Section 2: Detailed App Audits (starts on fresh page)
@@ -2785,8 +2825,9 @@ table.dt tr:nth-child(even) td {{
                 out.append('</tr>')
             out.append('</tbody></table></div>')
 
-    # Section 4: Cross-App Integration (starts on fresh page)
+    # Section 4 / Roadmap
     gaps = audit_data.get("cross_app_integration_gaps", [])
+    roadmap_sec_num = 4
     if gaps:
         out.append('<h2 class="sh" style="page-break-before: always; margin-top: 0;">4. Cross-Application Integration Gaps &amp; Sync Health</h2>')
         out.append('<p class="body">The following matrix details data flow bottlenecks and field synchronization failures between connected Zoho applications:</p>')
@@ -2802,10 +2843,11 @@ table.dt tr:nth-child(even) td {{
             out.append(f'<td>{esc(g.get("fix",""))}</td>')
             out.append('</tr>')
         out.append('</tbody></table>')
+        roadmap_sec_num = 5
 
-    # Section 5: Roadmap (starts on fresh page)
+    # Section: Phased Technical Remediation Roadmap
     roadmap = audit_data.get("action_roadmap", {})
-    out.append('<h2 class="sh" style="page-break-before: always; margin-top: 0;">5. Phased Technical Remediation Roadmap</h2>')
+    out.append(f'<h2 class="sh" style="page-break-before: always; margin-top: 0;">{roadmap_sec_num}. Phased Technical Remediation Roadmap</h2>')
     out.append('<p class="body">Remediation is partitioned into two prioritized phases to restore security and data integrity immediately, followed by structured workflow optimization:</p>')
 
     # Phase 1

@@ -345,30 +345,29 @@ async def trigger_audit(
             else:
                 suites_list.append(s.title())
 
-    # Auto-detect and include all active tools configured for this Zoho organization
+    # Auto-detect and include ONLY active tools configured for this Zoho organization
     if cid and csec and reftok:
         try:
             disc = agent.discover_environment(cid, csec, reftok, acc_url)
+            active_from_zoho = []
             for d in disc.get("discovered_apps", []):
-                if d.get("status") in ("active", "recommended") or d.get("recommended"):
+                # ONLY include if genuinely active with live verified data
+                if d.get("status") == "active":
                     name = d.get("name")
-                    if name and name not in suites_list:
-                        suites_list.append(name)
+                    if name and name not in active_from_zoho:
+                        active_from_zoho.append(name)
+            if not suites_list:
+                suites_list = active_from_zoho
+            else:
+                if active_from_zoho:
+                    filtered = [s for s in suites_list if s in active_from_zoho]
+                    suites_list = filtered if filtered else active_from_zoho
         except Exception as e:
             print(f"Ecosystem discovery note: {e}")
 
-    # If default or not specified, cover the complete enterprise ecosystem
-    if not suites_list or suites_list == ["Zoho CRM", "Zoho Desk", "Zoho Books"]:
-        suites_list = [
-            "Zoho CRM",
-            "Zoho Desk",
-            "Zoho Books",
-            "Zoho Inventory",
-            "Zoho Projects",
-            "Zoho WorkDrive",
-            "Zoho Flow",
-            "Zoho Analytics"
-        ]
+    # If still empty or not specified, audit Zoho CRM
+    if not suites_list:
+        suites_list = ["Zoho CRM"]
 
     # Ensure live credentials dictionary is built from user-provided token
     creds = None
