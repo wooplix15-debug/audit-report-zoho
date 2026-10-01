@@ -42,9 +42,16 @@ app.add_middleware(
 @app.middleware("http")
 async def vercel_path_rewrite(request: Request, call_next):
     """Normalize Vercel rewrite paths so FastAPI router receives the intended endpoint."""
-    matched = request.headers.get("x-matched-path")
-    if matched:
-        request.scope["path"] = matched
+    route = request.query_params.get("_route")
+    if route:
+        clean_route = "/" + route.lstrip("/")
+        if not clean_route.startswith("/api"):
+            clean_route = "/api" + clean_route
+        request.scope["path"] = clean_route
+    elif request.headers.get("x-matched-path"):
+        matched = request.headers.get("x-matched-path")
+        if matched and matched != "/api/index.py":
+            request.scope["path"] = matched
     return await call_next(request)
 
 
@@ -136,16 +143,34 @@ async def exchange_token(
 @app.post("/api/discover")
 @app.post("/discover")
 async def discover_environment_endpoint(
+    request: Request,
     client_id: Optional[str] = Form(""),
     client_secret: Optional[str] = Form(""),
     refresh_token: Optional[str] = Form(""),
+    token: Optional[str] = Form(""),
     accounts_url: Optional[str] = Form("https://accounts.zoho.in"),
 ):
     """Inspect environment to auto-detect client organization profile and installed applications."""
-    cid = (client_id or "").strip() or os.environ.get("ZOHO_CLIENT_ID", "")
-    csec = (client_secret or "").strip() or os.environ.get("ZOHO_CLIENT_SECRET", "")
-    reftok = (refresh_token or "").strip() or os.environ.get("ZOHO_REFRESH_TOKEN", "")
-    acc = (accounts_url or "").strip() or os.environ.get("ZOHO_ACCOUNTS_URL", "https://accounts.zoho.in")
+    cid = (client_id or "").strip()
+    csec = (client_secret or "").strip()
+    reftok = (token or refresh_token or "").strip()
+    acc = (accounts_url or "").strip()
+
+    if not cid or not csec or not reftok:
+        try:
+            body = await request.json()
+            if isinstance(body, dict):
+                cid = cid or body.get("client_id", "")
+                csec = csec or body.get("client_secret", "")
+                reftok = reftok or body.get("token", "") or body.get("refresh_token", "")
+                acc = acc or body.get("accounts_url", "")
+        except Exception:
+            pass
+
+    cid = cid or os.environ.get("ZOHO_CLIENT_ID", "")
+    csec = csec or os.environ.get("ZOHO_CLIENT_SECRET", "")
+    reftok = reftok or os.environ.get("ZOHO_REFRESH_TOKEN", "")
+    acc = acc or os.environ.get("ZOHO_ACCOUNTS_URL", "https://accounts.zoho.in")
 
     if not cid or not csec or not reftok:
         return {
@@ -213,9 +238,6 @@ def _render_audit_pdf(audit_data: dict, target_pdf: Path, host: Optional[str] = 
 
 @app.post("/api/audit")
 @app.post("/audit")
-@app.post("/api/index.py/api/audit")
-@app.post("/api/index.py/audit")
-@app.post("/api/index.py")
 async def trigger_audit(
     request: Request,
     company_name: Optional[str] = Form(""),
