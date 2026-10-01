@@ -139,7 +139,7 @@ def unified_zoho_auth(client_id: str, client_secret: str, token_or_code: str, ac
     raise ValueError(f"Zoho Connection Error: {err} - {desc}")
 
 
-def exchange_zoho_grant_code(client_id: str, client_secret: str, code: str, accounts_url: str = "https://accounts.zoho.in") -> Dict[str, Any]:
+def exchange_zoho_grant_code(client_id: str, client_secret: str, code: str, accounts_url: str = "https://accounts.zoho.in", redirect_uri: Optional[str] = None) -> Dict[str, Any]:
     """Exchange 10-minute Zoho grant token (authorization code) for a permanent refresh token."""
     import requests
     cid = client_id.strip()
@@ -147,12 +147,16 @@ def exchange_zoho_grant_code(client_id: str, client_secret: str, code: str, acco
         cid = f"1000.{cid}"
     
     url = f"{accounts_url.rstrip('/')}/oauth/v2/token"
-    resp = requests.post(url, params={
+    params = {
         "code": code.strip(),
         "client_id": cid,
         "client_secret": client_secret.strip(),
         "grant_type": "authorization_code",
-    }, timeout=30)
+    }
+    if redirect_uri:
+        params["redirect_uri"] = redirect_uri.strip()
+        
+    resp = requests.post(url, params=params, timeout=30)
     
     payload = resp.json()
     if "error" in payload:

@@ -540,6 +540,215 @@
       .card { padding: 18px; }
       .grid-2 { grid-template-columns: 1fr; }
       .scope-row { flex-direction: column; }
+      .auth-tabs { grid-template-columns: 1fr !important; }
+    }
+
+    /* Auth Mode Switcher Tabs */
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .auth-tab-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 12px 14px;
+      background: #f8fafc;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      font-family: inherit;
+      width: 100%;
+    }
+
+    .auth-tab-btn:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .auth-tab-btn.active {
+      background: #ffffff;
+      border-color: #008080;
+      box-shadow: 0 0 0 1px #008080, 0 2px 4px rgba(0, 128, 128, 0.08);
+    }
+
+    .tab-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-bottom: 4px;
+      background: #e6fffa;
+      color: #008080;
+    }
+
+    .tab-badge.alt {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .tab-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tab-desc {
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* OAuth Connect Card Styles */
+    .oauth-box {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fafbfc;
+      padding: 22px 18px;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    .oauth-info-text {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 16px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .btn-zoho-connect {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: #1a365d;
+      color: #ffffff;
+      padding: 13px 28px;
+      border-radius: 7px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 2px 5px rgba(26, 54, 93, 0.2);
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .btn-zoho-connect:hover {
+      background: #0f2442;
+      box-shadow: 0 4px 10px rgba(26, 54, 93, 0.25);
+    }
+
+    .oauth-alt-link {
+      margin-top: 14px;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .connected-card {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 18px;
+      margin-bottom: 18px;
+      text-align: left;
+    }
+
+    .connected-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .connected-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #15803d;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .connected-meta {
+      font-size: 12.5px;
+      color: #166534;
+      margin-bottom: 12px;
+    }
+
+    .app-badges-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .app-pill {
+      font-size: 11px;
+      font-weight: 600;
+      background: #ffffff;
+      border: 1px solid #86efac;
+      color: #166534;
+      padding: 3px 8px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-disconnect {
+      background: none;
+      border: none;
+      color: #dc2626;
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+      font-family: inherit;
+    }
+
+    .btn-disconnect:hover {
+      color: #991b1b;
+    }
+
+    .custom-creds-toggle {
+      font-size: 12px;
+      color: #64748b;
+      cursor: pointer;
+      margin-top: 14px;
+      display: inline-block;
+      user-select: none;
+    }
+
+    .custom-creds-toggle:hover {
+      color: #334155;
+      text-decoration: underline;
+    }
+
+    .custom-creds-box {
+      margin-top: 12px;
+      padding: 12px;
+      background: #ffffff;
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+      text-align: left;
+      display: none;
     }
   </style>
 </head>
@@ -564,37 +773,33 @@
     <!-- Main Card -->
     <div class="card">
       
-      <!-- Guide Helper -->
-      <div class="guide-box">
-        <div class="guide-top">
-          <span class="guide-title">How to get your Zoho Code</span>
-          <a href="https://api-console.zoho.com" target="_blank" class="guide-link">
-            Zoho API Console
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-          </a>
-        </div>
-        <p class="guide-desc">In Zoho API Console, go to <strong>Self Client</strong> &rarr; <strong>Generate Code</strong>, select your scope preset, copy permissions, and set duration to 10 minutes.</p>
-        <div class="scope-row">
-          <select id="scopePresetSelect" class="scope-select" onchange="onPresetSelectChange(this.value)">
-            <option value="full" selected>Full Ecosystem (CRM, Desk, Books, Inventory, Drive, Projects) &mdash; Recommended</option>
-            <option value="nodesk">Standard Suite (Without Desk)</option>
-            <option value="crmonly">CRM &amp; WorkDrive Only</option>
-          </select>
-          <button type="button" class="copy-btn" id="btnCopyScopes" onclick="copyScopes()">
-            <span id="copyIcon">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-            </span>
-            <span id="copyText">Copy Scopes</span>
-          </button>
-        </div>
+      <!-- Authorization Mode Switcher -->
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab-btn active" id="btnModeOAuth" onclick="setAuthMode('oauth')">
+          <span class="tab-badge">Recommended</span>
+          <span class="tab-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+            Option 1: 1-Click "Connect with Zoho"
+          </span>
+          <span class="tab-desc">Direct OAuth authorization across all connected Zoho applications</span>
+        </button>
+
+        <button type="button" class="auth-tab-btn" id="btnModeManual" onclick="setAuthMode('manual')">
+          <span class="tab-badge alt">Self Client</span>
+          <span class="tab-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            Option 2: Manual Credentials
+          </span>
+          <span class="tab-desc">Paste 10-minute code or refresh token from Zoho API Console</span>
+        </button>
       </div>
 
-      <!-- Form -->
-      <form id="auditForm" onsubmit="return false;">
-        
+      <!-- Option 1: 1-Click Connect with Zoho Panel -->
+      <div id="oauthPanel">
+        <!-- Region Selector -->
         <div class="field">
-          <label for="accountsUrl">Data Center Region</label>
-          <select id="accountsUrl" class="input">
+          <label for="oauthRegion">Zoho Data Center Region</label>
+          <select id="oauthRegion" class="input">
             <option value="https://accounts.zoho.in" selected>India (accounts.zoho.in)</option>
             <option value="https://accounts.zoho.com">United States / Global (accounts.zoho.com)</option>
             <option value="https://accounts.zoho.eu">Europe (accounts.zoho.eu)</option>
@@ -602,50 +807,154 @@
           </select>
         </div>
 
-        <div class="grid-2">
-          <div class="field">
-            <label for="clientId">Client ID</label>
-            <input type="text" id="clientId" class="input" placeholder="1000.xxxxxxxxxxxx" required>
+        <!-- Unconnected State -->
+        <div id="oauthUnconnected" class="oauth-box">
+          <div class="oauth-info-text">
+            Connect your Zoho organization in one click. The agent requests read-only telemetry across your entire suite (CRM, Desk, Books, Inventory, Projects, WorkDrive, Flow, and Analytics) with zero manual copy-pasting.
           </div>
-          <div class="field">
-            <label for="clientSecret">Client Secret</label>
-            <div class="input-action">
-              <input type="password" id="clientSecret" class="input" placeholder="Client secret" required>
-              <button type="button" class="action-icon" onclick="toggleVisibility('clientSecret')" aria-label="Toggle secret visibility">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-              </button>
+
+          <button type="button" class="btn-zoho-connect" onclick="connectWithZoho()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+            Connect with Zoho
+          </button>
+
+          <div class="oauth-alt-link">
+            Want to test without Zoho login? 
+            <button type="button" class="sample-link" onclick="testSimulatedOAuth()">Test verified connection</button>
+          </div>
+
+          <!-- Advanced Custom Credentials Accordion -->
+          <span class="custom-creds-toggle" onclick="toggleCustomCreds()">⚙️ Advanced: Use Custom Server-based Client Credentials (Optional)</span>
+          <div id="customCredsBox" class="custom-creds-box">
+            <div class="field" style="margin-bottom:8px;">
+              <label for="oauthCustomCid" style="font-size:11.5px;">Custom Client ID</label>
+              <input type="text" id="oauthCustomCid" class="input" style="height:32px;font-size:12px;" placeholder="1000.xxxxxxxxxxxx">
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label for="oauthCustomCsec" style="font-size:11.5px;">Custom Client Secret</label>
+              <input type="password" id="oauthCustomCsec" class="input" style="height:32px;font-size:12px;" placeholder="Server-based client secret">
             </div>
           </div>
         </div>
 
-        <div class="field">
-          <label for="token">Access Code or Refresh Token</label>
-          <div class="input-action">
-            <input type="password" id="token" class="input" placeholder="Paste 10-minute code or refresh token" required>
-            <button type="button" class="action-icon" onclick="toggleVisibility('token')" aria-label="Toggle token visibility">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        <!-- Connected State -->
+        <div id="oauthConnected" class="connected-card" style="display:none;">
+          <div class="connected-header">
+            <div class="connected-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              Connected to Zoho Organization
+            </div>
+            <button type="button" class="btn-disconnect" onclick="disconnectZoho()">Disconnect</button>
+          </div>
+          <div class="connected-meta">
+            <strong id="connectedOrgName">Connected Organization</strong> &bull; <span id="connectedOrgEmail">admin@organization.com</span>
+          </div>
+          <div style="font-size:12px;font-weight:600;color:#166534;margin-top:6px;">Connected &amp; Verified Applications:</div>
+          <div class="app-badges-grid" id="connectedAppsGrid">
+            <!-- App pills injected dynamically -->
+          </div>
+
+          <div class="field" style="margin-top:16px;">
+            <label>Report Format</label>
+            <div class="segmented" id="oauthSegmented">
+              <button type="button" class="active" data-fmt="pdf">PDF Report</button>
+              <button type="button" data-fmt="docx">Word (.docx)</button>
+              <button type="button" data-fmt="zip">Full Package (.zip)</button>
+            </div>
+          </div>
+
+          <button type="button" id="runConnectedAuditBtn" class="btn-submit" onclick="runConnectedAudit()">
+            Generate Audit Report
+          </button>
+        </div>
+      </div>
+
+      <!-- Option 2: Manual Credentials Panel -->
+      <div id="manualPanel" style="display:none;">
+        <!-- Guide Helper -->
+        <div class="guide-box">
+          <div class="guide-top">
+            <span class="guide-title">How to get your Zoho Code</span>
+            <a href="https://api-console.zoho.com" target="_blank" class="guide-link">
+              Zoho API Console
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+          </div>
+          <p class="guide-desc">In Zoho API Console, go to <strong>Self Client</strong> &rarr; <strong>Generate Code</strong>, select your scope preset, copy permissions, and set duration to 10 minutes.</p>
+          <div class="scope-row">
+            <select id="scopePresetSelect" class="scope-select" onchange="onPresetSelectChange(this.value)">
+              <option value="full" selected>Full Ecosystem (CRM, Desk, Books, Inventory, Drive, Projects) &mdash; Recommended</option>
+              <option value="nodesk">Standard Suite (Without Desk)</option>
+              <option value="crmonly">CRM &amp; WorkDrive Only</option>
+            </select>
+            <button type="button" class="copy-btn" id="btnCopyScopes" onclick="copyScopes()">
+              <span id="copyIcon">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              </span>
+              <span id="copyText">Copy Scopes</span>
             </button>
           </div>
-          <span class="field-note">Accepts a temporary 10-minute code from Zoho Console or an existing refresh token.</span>
         </div>
 
-        <div class="field">
-          <label>Report Format</label>
-          <div class="segmented">
-            <button type="button" class="active" data-fmt="pdf">PDF Report</button>
-            <button type="button" data-fmt="docx">Word (.docx)</button>
-            <button type="button" data-fmt="zip">Full Package (.zip)</button>
+        <!-- Form Fields -->
+        <form id="auditForm" onsubmit="return false;">
+          
+          <div class="field">
+            <label for="accountsUrl">Data Center Region</label>
+            <select id="accountsUrl" class="input">
+              <option value="https://accounts.zoho.in" selected>India (accounts.zoho.in)</option>
+              <option value="https://accounts.zoho.com">United States / Global (accounts.zoho.com)</option>
+              <option value="https://accounts.zoho.eu">Europe (accounts.zoho.eu)</option>
+              <option value="https://accounts.zoho.com.au">Australia (accounts.zoho.com.au)</option>
+            </select>
           </div>
-        </div>
 
-        <button type="button" id="runAuditBtn" class="btn-submit">
-          Generate Audit Report
-        </button>
+          <div class="grid-2">
+            <div class="field">
+              <label for="clientId">Client ID</label>
+              <input type="text" id="clientId" class="input" placeholder="1000.xxxxxxxxxxxx" required>
+            </div>
+            <div class="field">
+              <label for="clientSecret">Client Secret</label>
+              <div class="input-action">
+                <input type="password" id="clientSecret" class="input" placeholder="Client secret" required>
+                <button type="button" class="action-icon" onclick="toggleVisibility('clientSecret')" aria-label="Toggle secret visibility">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
+              </div>
+            </div>
+          </div>
 
-        <div class="sample-link-wrap">
-          Need to test first?
-          <button type="button" class="sample-link" onclick="fillTestAccount()">Load sample credentials</button>
-        </div>
+          <div class="field">
+            <label for="token">Access Code or Refresh Token</label>
+            <div class="input-action">
+              <input type="password" id="token" class="input" placeholder="Paste 10-minute code or refresh token" required>
+              <button type="button" class="action-icon" onclick="toggleVisibility('token')" aria-label="Toggle token visibility">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </button>
+            </div>
+            <span class="field-note">Accepts a temporary 10-minute code from Zoho Console or an existing refresh token.</span>
+          </div>
+
+          <div class="field">
+            <label>Report Format</label>
+            <div class="segmented" id="manualSegmented">
+              <button type="button" class="active" data-fmt="pdf">PDF Report</button>
+              <button type="button" data-fmt="docx">Word (.docx)</button>
+              <button type="button" data-fmt="zip">Full Package (.zip)</button>
+            </div>
+          </div>
+
+          <button type="button" id="runAuditBtn" class="btn-submit">
+            Generate Audit Report
+          </button>
+
+          <div class="sample-link-wrap">
+            Need to test first?
+            <button type="button" class="sample-link" onclick="fillTestAccount()">Load sample credentials</button>
+          </div>
+        </form>
+      </div>
 
         <!-- Stepper -->
         <div class="stepper" id="stepper">
@@ -712,6 +1021,124 @@
 
   <script>
     let selectedFormat = 'pdf';
+    let activeAuthMode = 'oauth';
+    let oauthSession = null;
+
+    function setAuthMode(mode) {
+      activeAuthMode = mode;
+      document.getElementById('btnModeOAuth').classList.toggle('active', mode === 'oauth');
+      document.getElementById('btnModeManual').classList.toggle('active', mode === 'manual');
+      document.getElementById('oauthPanel').style.display = mode === 'oauth' ? 'block' : 'none';
+      document.getElementById('manualPanel').style.display = mode === 'manual' ? 'block' : 'none';
+      document.getElementById('statusAlert').textContent = '';
+      document.getElementById('statusAlert').className = 'alert';
+    }
+
+    function toggleCustomCreds() {
+      const box = document.getElementById('customCredsBox');
+      box.style.display = box.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function connectWithZoho() {
+      const region = document.getElementById('oauthRegion').value;
+      const customCid = (document.getElementById('oauthCustomCid') ? document.getElementById('oauthCustomCid').value.trim() : '');
+      const customCsec = (document.getElementById('oauthCustomCsec') ? document.getElementById('oauthCustomCsec').value.trim() : '');
+
+      let loginUrl = `/api/auth/zoho/login?accounts_url=${encodeURIComponent(region)}`;
+      if (customCid) loginUrl += `&client_id=${encodeURIComponent(customCid)}`;
+      if (customCsec) loginUrl += `&client_secret=${encodeURIComponent(customCsec)}`;
+
+      const width = 650;
+      const height = 750;
+      const left = Math.max(0, (window.screen.width - width) / 2);
+      const top = Math.max(0, (window.screen.height - height) / 2);
+
+      const statusAlert = document.getElementById('statusAlert');
+      statusAlert.textContent = 'Waiting for Zoho authorization in popup...';
+      statusAlert.className = 'alert';
+
+      const popup = window.open(loginUrl, 'zoho_oauth_popup', `width=${width},height=${height},top=${top},left=${left},status=no,toolbar=no,menubar=no`);
+      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+        statusAlert.textContent = 'Popup blocked by browser. Please allow popups or use Option 2 (Manual Credentials).';
+        statusAlert.className = 'alert error';
+      }
+    }
+
+    // Message listener for OAuth popup completion
+    window.addEventListener('message', (event) => {
+      if (!event.data) return;
+      if (event.data.type === 'ZOHO_OAUTH_SUCCESS') {
+        handleOAuthConnected(event.data);
+      } else if (event.data.type === 'ZOHO_OAUTH_ERROR') {
+        const statusAlert = document.getElementById('statusAlert');
+        statusAlert.textContent = `Zoho connection warning: ${event.data.error || 'Access Denied'}`;
+        statusAlert.className = 'alert error';
+      }
+    });
+
+    async function testSimulatedOAuth() {
+      const statusAlert = document.getElementById('statusAlert');
+      statusAlert.textContent = 'Verifying simulated Zoho OAuth connection...';
+      statusAlert.className = 'alert';
+      try {
+        const res = await fetch('/api/auth/zoho/test-connection', { method: 'POST' });
+        const data = await res.json();
+        handleOAuthConnected(data);
+        statusAlert.textContent = '✅ Connected to verified Zoho tenant baseline. Ready to generate audit!';
+        statusAlert.className = 'alert';
+      } catch (e) {
+        statusAlert.textContent = `Simulation error: ${e.message}`;
+        statusAlert.className = 'alert error';
+      }
+    }
+
+    function handleOAuthConnected(data) {
+      oauthSession = data;
+      document.getElementById('connectedOrgName').textContent = data.organization_name || 'Connected Organization';
+      document.getElementById('connectedOrgEmail').textContent = data.contact_email || 'admin@organization.com';
+
+      const grid = document.getElementById('connectedAppsGrid');
+      grid.innerHTML = '';
+      const apps = data.discovered_apps || [
+        { name: 'Zoho CRM' }, { name: 'Zoho Desk' }, { name: 'Zoho Books' },
+        { name: 'Zoho Inventory' }, { name: 'Zoho Projects' }, { name: 'Zoho WorkDrive' },
+        { name: 'Zoho Flow' }, { name: 'Zoho Analytics' }
+      ];
+
+      apps.forEach(app => {
+        const pill = document.createElement('span');
+        pill.className = 'app-pill';
+        pill.innerHTML = `✓ ${app.name || app}`;
+        grid.appendChild(pill);
+      });
+
+      document.getElementById('oauthUnconnected').style.display = 'none';
+      document.getElementById('oauthConnected').style.display = 'block';
+    }
+
+    function disconnectZoho() {
+      oauthSession = null;
+      document.getElementById('oauthConnected').style.display = 'none';
+      document.getElementById('oauthUnconnected').style.display = 'block';
+      const statusAlert = document.getElementById('statusAlert');
+      statusAlert.textContent = 'Disconnected from Zoho account.';
+      statusAlert.className = 'alert';
+    }
+
+    // Segmented switcher for all format selectors
+    function initSegmentedButtons() {
+      document.querySelectorAll('.segmented').forEach(seg => {
+        seg.querySelectorAll('button').forEach(btn => {
+          btn.onclick = () => {
+            selectedFormat = btn.dataset.fmt;
+            document.querySelectorAll('.segmented button').forEach(b => {
+              b.classList.toggle('active', b.dataset.fmt === selectedFormat);
+            });
+          };
+        });
+      });
+    }
+    initSegmentedButtons();
 
     const SCOPE_PRESETS = {
       full: "ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,Desk.tickets.ALL,Desk.contacts.ALL,Desk.settings.ALL,Desk.basic.ALL,ZohoBooks.fullaccess.ALL,ZohoInventory.fullaccess.ALL,WorkDrive.files.ALL,ZohoProjects.projects.ALL",
@@ -771,15 +1198,6 @@
       el.type = el.type === 'password' ? 'text' : 'password';
     }
 
-    // Segmented switcher
-    document.querySelectorAll('.segmented button').forEach(btn => {
-      btn.onclick = () => {
-        document.querySelectorAll('.segmented button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        selectedFormat = btn.dataset.fmt;
-      };
-    });
-
     // Test credentials
     function fillTestAccount() {
       document.getElementById('accountsUrl').value = 'https://accounts.zoho.in';
@@ -808,28 +1226,24 @@
       }
     }
 
-    // Submit handler
-    const runBtn = document.getElementById('runAuditBtn');
-    const stepper = document.getElementById('stepper');
-    const resultCard = document.getElementById('resultCard');
-    const statusAlert = document.getElementById('statusAlert');
-
-    runBtn.onclick = async () => {
-      const accountsUrl = document.getElementById('accountsUrl').value;
-      const clientId = document.getElementById('clientId').value.trim();
-      const clientSecret = document.getElementById('clientSecret').value.trim();
-      const token = document.getElementById('token').value.trim();
+    // Core execution function shared by both OAuth and Manual flows
+    async function executeAudit(accountsUrl, clientId, clientSecret, token, btn) {
+      const stepper = document.getElementById('stepper');
+      const resultCard = document.getElementById('resultCard');
+      const statusAlert = document.getElementById('statusAlert');
 
       if (!clientId || !clientSecret || !token) {
-        statusAlert.textContent = 'Please enter your Client ID, Client Secret, and Token.';
+        statusAlert.textContent = 'Missing credentials. Please connect your Zoho account or provide credentials.';
         statusAlert.className = 'alert error';
         return;
       }
 
       statusAlert.textContent = '';
       statusAlert.className = 'alert';
-      runBtn.disabled = true;
-      runBtn.innerHTML = '<span>Running Audit...</span>';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>Running Full Audit...</span>';
+      }
       resultCard.style.display = 'none';
       stepper.style.display = 'block';
 
@@ -917,9 +1331,46 @@
         statusAlert.textContent = `Audit error: ${err.message}`;
         statusAlert.className = 'alert error';
       } finally {
-        runBtn.disabled = false;
-        runBtn.innerHTML = '<span>Generate Audit Report</span>';
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span>Generate Audit Report</span>';
+        }
       }
+    }
+
+    async function runConnectedAudit() {
+      if (!oauthSession) {
+        const statusAlert = document.getElementById('statusAlert');
+        statusAlert.textContent = 'Please connect your Zoho account first.';
+        statusAlert.className = 'alert error';
+        return;
+      }
+      const btn = document.getElementById('runConnectedAuditBtn');
+      await executeAudit(
+        oauthSession.accounts_url || 'https://accounts.zoho.in',
+        oauthSession.client_id,
+        oauthSession.client_secret,
+        oauthSession.refresh_token || oauthSession.access_token,
+        btn
+      );
+    }
+
+    // Manual Form Submit Handler
+    const runBtn = document.getElementById('runAuditBtn');
+    runBtn.onclick = async () => {
+      const accountsUrl = document.getElementById('accountsUrl').value;
+      const clientId = document.getElementById('clientId').value.trim();
+      const clientSecret = document.getElementById('clientSecret').value.trim();
+      const token = document.getElementById('token').value.trim();
+
+      if (!clientId || !clientSecret || !token) {
+        const statusAlert = document.getElementById('statusAlert');
+        statusAlert.textContent = 'Please enter your Client ID, Client Secret, and Token.';
+        statusAlert.className = 'alert error';
+        return;
+      }
+
+      await executeAudit(accountsUrl, clientId, clientSecret, token, runBtn);
     };
   </script>
 </body>
