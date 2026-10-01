@@ -40,38 +40,55 @@ app.add_middleware(
 
 
 @app.get("/", response_class=HTMLResponse)
+@app.get("/index.html", response_class=HTMLResponse)
+@app.get("/api/index.py", response_class=HTMLResponse)
+@app.get("/api/index.py/", response_class=HTMLResponse)
 async def serve_portal():
-    html_path = HERE / "index.html"
-    if not html_path.exists():
-        raise HTTPException(status_code=404, detail="index.html portal not found")
-    return HTMLResponse(content=html_path.read_text(encoding="utf-8"))
+    candidates = [
+        HERE / "index.html",
+        HERE / "public" / "index.html",
+        HERE.parent / "index.html",
+        HERE.parent / "public" / "index.html",
+        Path("index.html"),
+        Path("public/index.html"),
+    ]
+    for c in candidates:
+        if c.exists():
+            return HTMLResponse(content=c.read_text(encoding="utf-8"))
+    return HTMLResponse(content="<h1>Wooplix Zoho System Audit Agent</h1>")
 
 
 @app.get("/wooplix_main_logo.png")
+@app.get("/api/index.py/wooplix_main_logo.png")
 async def get_main_logo():
-    path = HERE / "wooplix_main_logo.png"
-    if path.exists():
-        return FileResponse(path, media_type="image/png")
+    for c in [HERE / "wooplix_main_logo.png", HERE / "public" / "wooplix_main_logo.png", HERE.parent / "wooplix_main_logo.png"]:
+        if c.exists():
+            return FileResponse(c, media_type="image/png")
     raise HTTPException(status_code=404, detail="Logo not found")
 
 
 @app.get("/wooplix_partner_badge.png")
+@app.get("/api/index.py/wooplix_partner_badge.png")
 async def get_partner_badge():
-    path = HERE / "wooplix_partner_badge.png"
-    if path.exists():
-        return FileResponse(path, media_type="image/png")
+    for c in [HERE / "wooplix_partner_badge.png", HERE / "public" / "wooplix_partner_badge.png", HERE.parent / "wooplix_partner_badge.png"]:
+        if c.exists():
+            return FileResponse(c, media_type="image/png")
     raise HTTPException(status_code=404, detail="Badge not found")
 
 
 @app.get("/wooplix_logo.png")
+@app.get("/api/index.py/wooplix_logo.png")
 async def get_legacy_logo():
-    path = HERE / "wooplix_logo.png"
-    if path.exists():
-        return FileResponse(path, media_type="image/png")
+    for c in [HERE / "wooplix_logo.png", HERE / "public" / "wooplix_logo.png", HERE.parent / "wooplix_logo.png"]:
+        if c.exists():
+            return FileResponse(c, media_type="image/png")
     raise HTTPException(status_code=404, detail="Logo not found")
 
 
 @app.get("/api/health")
+@app.get("/health")
+@app.get("/api/index.py/api/health")
+@app.get("/api/index.py/health")
 async def health_check():
     has_groq = bool(os.environ.get("GROQ_API_KEY") or agent.GROQ_API_KEY)
     has_zoho = bool(os.environ.get("ZOHO_CLIENT_ID") or agent.ZOHO_CLIENT_ID)
@@ -115,6 +132,10 @@ def _render_audit_pdf(audit_data: dict, target_pdf: Path, host: Optional[str] = 
 
 
 @app.post("/api/audit")
+@app.post("/audit")
+@app.post("/api/index.py/api/audit")
+@app.post("/api/index.py/audit")
+@app.post("/api/index.py")
 async def trigger_audit(
     request: Request,
     company_name: str = Form("Client Organization"),

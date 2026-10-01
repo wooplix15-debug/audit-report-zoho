@@ -1,0 +1,920 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1a365d">
+  <title>Wooplix | Zoho System Audit Agent</title>
+  <link rel="icon" type="image/png" href="/wooplix_logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #1a365d;
+      --navy-dark: #0f233d;
+      --navy-light: #2a4365;
+      --teal: #008080;
+      --teal-hover: #006666;
+      --teal-light: #e6f3f3;
+      --ink: #1e293b;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --paper: #ffffff;
+      --bg: #f8fafc;
+      --critical: #b91c1c;
+      --critical-bg: #fee2e2;
+      --medium: #b45309;
+      --medium-bg: #fef3c7;
+      --success: #15803d;
+      --success-bg: #dcfce7;
+      --card-shadow: 0 12px 36px rgba(26, 54, 93, 0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 36px 20px;
+    }
+    .container {
+      width: 100%;
+      max-width: 780px;
+      margin: auto;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 30px;
+      background: #ffffff;
+      padding: 14px 22px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+    }
+    .brand-logos {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .main-logo {
+      height: 38px;
+      width: auto;
+      object-fit: contain;
+    }
+    .partner-badge {
+      height: 28px;
+      width: auto;
+      object-fit: contain;
+    }
+    .header-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--navy);
+      background: #edf4fc;
+      border: 1px solid #d0e1f7;
+      padding: 6px 12px;
+      border-radius: 99px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .intro {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .intro h1 {
+      font-family: "Manrope", sans-serif;
+      font-weight: 800;
+      font-size: clamp(26px, 4.5vw, 34px);
+      letter-spacing: -0.8px;
+      color: var(--navy);
+      margin-bottom: 10px;
+      line-height: 1.25;
+    }
+    .intro p {
+      font-size: 14.5px;
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--card-shadow);
+      padding: 32px 34px;
+    }
+    .section-title {
+      font-family: "Manrope", sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--navy);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title span.step-num {
+      background: var(--navy);
+      color: #fff;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 10.5px;
+      display: grid;
+      place-items: center;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .form-grid.single {
+      grid-template-columns: 1fr;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #334155;
+    }
+    .form-group input, .form-group select {
+      padding: 10px 14px;
+      border: 1.5px solid var(--line);
+      border-radius: 10px;
+      font-size: 13px;
+      font-family: "DM Sans", sans-serif;
+      color: var(--ink);
+      background: #fafbfd;
+      transition: all 0.2s;
+      outline: none;
+    }
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--navy);
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.08);
+    }
+    .password-wrap {
+      position: relative;
+    }
+    .password-wrap input {
+      width: 100%;
+      padding-right: 40px;
+    }
+    .toggle-pwd {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 4px;
+    }
+    .quick-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: -10px 0 20px;
+    }
+    .quick-btn {
+      background: none;
+      border: 1px dashed var(--teal);
+      color: var(--teal);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .quick-btn:hover {
+      background: var(--teal-light);
+    }
+    .suites-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+    .suite-card {
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: #fafbfd;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .suite-card:hover {
+      border-color: #94a3b8;
+      background: #ffffff;
+    }
+    .suite-card.selected {
+      border-color: var(--teal);
+      background: var(--teal-light);
+    }
+    .suite-card input[type="checkbox"] {
+      margin-top: 3px;
+      accent-color: var(--teal);
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+    .suite-info strong {
+      display: block;
+      font-size: 12.5px;
+      color: var(--navy);
+      margin-bottom: 2px;
+    }
+    .suite-info span {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .format-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .format-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px 10px;
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      background: #fafbfd;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #334155;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .format-btn:hover {
+      border-color: var(--navy-light);
+      background: #f1f5f9;
+    }
+    .format-btn.active {
+      border-color: var(--navy);
+      background: #edf4fc;
+      color: var(--navy);
+    }
+    .submit-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--navy) 0%, #1e4273 100%);
+      color: #ffffff;
+      border: 0;
+      border-radius: 12px;
+      padding: 15px 22px;
+      font-family: "Manrope", sans-serif;
+      font-weight: 700;
+      font-size: 14.5px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(26, 54, 93, 0.24);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .submit-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, #132a4a 0%, #17365d 100%);
+      transform: translateY(-1px);
+    }
+    .submit-btn:disabled {
+      background: #94a3b8;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+    /* Execution Stepper */
+    .stepper {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 12px;
+      background: #f1f5f9;
+      display: none;
+      border: 1px solid var(--line);
+    }
+    .stepper-header {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .stepper-steps {
+      display: grid;
+      gap: 8px;
+    }
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .step-item.active {
+      color: var(--navy);
+      font-weight: 600;
+    }
+    .step-item.done {
+      color: var(--success);
+    }
+    .step-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      display: grid;
+      place-items: center;
+      font-size: 10px;
+      color: #fff;
+    }
+    .step-item.active .step-icon {
+      background: var(--navy);
+      animation: pulse 1.2s infinite;
+    }
+    .step-item.done .step-icon {
+      background: var(--success);
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.15); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    /* Results Box */
+    .result-card {
+      margin-top: 22px;
+      padding: 24px;
+      border-radius: 16px;
+      border: 1.5px solid #86efac;
+      background: #f0fdf4;
+      display: none;
+      animation: fadeIn 0.3s ease-out;
+    }
+    .result-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .health-pill {
+      font-family: "Manrope", sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--navy);
+      background: #ffffff;
+      padding: 6px 16px;
+      border-radius: 99px;
+      border: 1px solid #bbf7d0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    .health-pill span {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .result-details strong {
+      display: block;
+      font-size: 15px;
+      color: #14532d;
+      margin-bottom: 2px;
+    }
+    .result-details span {
+      font-size: 12px;
+      color: #166534;
+      font-family: "JetBrains Mono", monospace;
+    }
+    .result-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--navy);
+      color: #fff;
+      text-decoration: none;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 700;
+      transition: 0.2s;
+    }
+    .download-btn:hover {
+      background: var(--navy-dark);
+    }
+    .status-alert {
+      margin-top: 14px;
+      font-size: 12.5px;
+      text-align: center;
+      color: var(--muted);
+      min-height: 20px;
+    }
+    .status-alert.error {
+      color: var(--critical);
+      font-weight: 600;
+    }
+    .footer {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 11.5px;
+      margin-top: 36px;
+      line-height: 1.6;
+    }
+    .footer a {
+      color: var(--navy);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: none; }
+    }
+    @media (max-width: 600px) {
+      .card { padding: 22px 18px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .format-options { grid-template-columns: 1fr; }
+      .header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="brand-logos">
+        <img class="main-logo" src="/wooplix_main_logo.png" alt="Wooplix Technologies">
+        <img class="partner-badge" src="/wooplix_partner_badge.png" alt="Zoho Authorized Partner">
+      </div>
+      <span class="header-badge">Zoho Audit Agent</span>
+    </header>
+
+    <div class="intro">
+      <h1>Automated Zoho System Audit</h1>
+      <p>Diagnostic telemetry collector and LLM architectural audit engine. Generates authoritative, branded audit deliverables (DOCX & PDF).</p>
+    </div>
+
+    <div class="card">
+      <form id="auditForm" onsubmit="return false;">
+        
+        <!-- SECTION 1: Client & Auditor -->
+        <div class="section-title">
+          <span class="step-num">1</span> Client &amp; Auditor Profile
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="companyName">Client Organization Name *</label>
+            <input type="text" id="companyName" placeholder="e.g. Acme Global Logistics Ltd" required value="Acme Global Logistics Ltd">
+          </div>
+          <div class="form-group">
+            <label for="auditorName">Lead Systems Auditor *</label>
+            <input type="text" id="auditorName" placeholder="e.g. Lead Solutions Architect" required value="Ankita Pandey (Zoho Certified Lead)">
+          </div>
+        </div>
+
+        <!-- SECTION 2: Zoho Cloud Authentication -->
+        <div class="section-title" style="justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="step-num">2</span> Zoho Cloud Authentication
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap: wrap;">
+            <button type="button" class="quick-btn" id="demoBtn">⚡ Load Test Credentials</button>
+            <button type="button" class="quick-btn" id="clearCredsBtn" style="border-color:#94a3b8; color:#64748b;">🧹 Clear</button>
+          </div>
+        </div>
+
+        <div style="background:#f1f5f9; border:1px solid #e2e8f0; border-radius:10px; padding:10px 14px; margin-bottom:14px; font-size:12px; color:#475569; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <strong>Active Mode:</strong> <span id="authModeBadge" style="font-weight:700; color:#1a365d;">Live API Audit (Custom Client Credentials)</span>
+          </div>
+          <span style="font-size:11px; color:#64748b;">Leave fields blank to run Simulated Diagnostic Probe</span>
+        </div>
+
+        <div class="form-grid single">
+          <div class="form-group">
+            <label for="accountsUrl">Zoho Data Center Domain</label>
+            <select id="accountsUrl">
+              <option value="https://accounts.zoho.in" selected>Zoho India (.in) — https://accounts.zoho.in</option>
+              <option value="https://accounts.zoho.com">Zoho US / Global (.com) — https://accounts.zoho.com</option>
+              <option value="https://accounts.zoho.eu">Zoho Europe (.eu) — https://accounts.zoho.eu</option>
+              <option value="https://accounts.zoho.com.au">Zoho Australia (.com.au) — https://accounts.zoho.com.au</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="clientId">Zoho Client ID</label>
+            <input type="text" id="clientId" placeholder="1000.XXXXXXXXXXXXXX">
+          </div>
+          <div class="form-group">
+            <label for="clientSecret">Zoho Client Secret</label>
+            <div class="password-wrap">
+              <input type="password" id="clientSecret" placeholder="••••••••••••••••••••••••">
+              <button type="button" class="toggle-pwd" onclick="toggleVisibility('clientSecret')">👁</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-grid single">
+          <div class="form-group">
+            <label for="refreshToken">Zoho Refresh Token</label>
+            <div class="password-wrap">
+              <input type="password" id="refreshToken" placeholder="1000.xxxxxxxx.xxxxxxxxxxxx">
+              <button type="button" class="toggle-pwd" onclick="toggleVisibility('refreshToken')">👁</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin:-8px 0 16px; font-size:11.5px; color:#64748b;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+            <input type="checkbox" id="rememberCreds" style="accent-color:var(--teal);"> Remember credentials in this browser
+          </label>
+          <a href="https://api-console.zoho.com" target="_blank" style="color:var(--teal); text-decoration:none; font-weight:600;">Open Zoho API Console ↗</a>
+        </div>
+
+        <!-- SECTION 3: Target Suites -->
+        <div class="section-title">
+          <span class="step-num">3</span> Target Application Suites
+        </div>
+        <div class="suites-grid">
+          <label class="suite-card selected" id="cardCrm">
+            <input type="checkbox" value="zoho_crm" checked>
+            <div class="suite-info">
+              <strong>Zoho CRM</strong>
+              <span>Lead routing, pipeline stages, custom fields, &amp; data decay</span>
+            </div>
+          </label>
+          <label class="suite-card selected" id="cardDesk">
+            <input type="checkbox" value="zoho_desk" checked>
+            <div class="suite-info">
+              <strong>Zoho Desk</strong>
+              <span>Department queues, SLA policies, &amp; escalation triggers</span>
+            </div>
+          </label>
+          <label class="suite-card selected" id="cardBooks">
+            <input type="checkbox" value="zoho_books" checked>
+            <div class="suite-info">
+              <strong>Zoho Books</strong>
+              <span>Overdue receivables, forex feeds, &amp; invoice workflows</span>
+            </div>
+          </label>
+          <label class="suite-card" id="cardFlow">
+            <input type="checkbox" value="zoho_flow">
+            <div class="suite-info">
+              <strong>Zoho Flow / Creator</strong>
+              <span>Cross-app webhooks &amp; custom integration orchestration</span>
+            </div>
+          </label>
+        </div>
+
+        <!-- SECTION 4: Format Selection -->
+        <div class="section-title">
+          <span class="step-num">4</span> Deliverable Format
+        </div>
+        <div class="format-options">
+          <div class="format-btn active" data-fmt="pdf">📄 Branded PDF</div>
+          <div class="format-btn" data-fmt="docx">📝 Word Document (DOCX)</div>
+          <div class="format-btn" data-fmt="zip">📦 Complete Package (ZIP)</div>
+        </div>
+
+        <!-- Run Action -->
+        <button type="button" class="submit-btn" id="runAuditBtn">
+          <span>Run Diagnostic Audit &amp; Generate Deliverables</span> →
+        </button>
+
+        <!-- Stepper Tracker -->
+        <div class="stepper" id="stepper">
+          <div class="stepper-header">
+            <span>AUDIT EXECUTION PIPELINE</span>
+            <span id="stepperTime">In Progress...</span>
+          </div>
+          <div class="stepper-steps">
+            <div class="step-item" id="step1">
+              <span class="step-icon">1</span>
+              <span>Authenticating Zoho OAuth &amp; verifying scope permissions</span>
+            </div>
+            <div class="step-item" id="step2">
+              <span class="step-icon">2</span>
+              <span>Extracting environment telemetry (CRM, Desk, Books, &amp; Sync)</span>
+            </div>
+            <div class="step-item" id="step3">
+              <span class="step-icon">3</span>
+              <span>Running Groq LLM Diagnostic Engine (House Style Analysis)</span>
+            </div>
+            <div class="step-item" id="step4">
+              <span class="step-icon">4</span>
+              <span>Compiling branded deliverables (DOCX &amp; Dompdf PDF)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="status-alert" id="statusAlert"></div>
+
+        <!-- Result Box -->
+        <div class="result-card" id="resultCard">
+          <div class="result-top">
+            <div class="result-details">
+              <strong id="resultClient">Acme Global Logistics Ltd</strong>
+              <span id="resultFile">Wooplix_Audit_Acme_Global_Logistics_Ltd.pdf</span>
+            </div>
+            <div class="health-pill" id="healthScore">
+              60 <span>/ 100</span>
+            </div>
+          </div>
+          <p style="font-size:12.5px; color:#14532d; line-height:1.45;" id="resultSummary">
+            Audit complete. Operational diagnosis, technical findings, and phased remediation roadmap generated.
+          </p>
+          <div class="result-actions">
+            <a id="downloadAgainBtn" class="download-btn" href="#" download>Download Deliverable</a>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <footer class="footer">
+      <strong>Wooplix Technologies Private Limited</strong> &bull; Authorized Zoho Partner<br>
+      <a href="https://www.wooplix.com/" target="_blank">www.wooplix.com</a> &bull; <a href="mailto:enquiry@wooplix.com">enquiry@wooplix.com</a>
+    </footer>
+  </div>
+
+  <script>
+    let selectedFormat = 'pdf';
+
+    // Suite card checkbox toggle
+    document.querySelectorAll('.suite-card').forEach(card => {
+      const cb = card.querySelector('input[type="checkbox"]');
+      card.onclick = (e) => {
+        if (e.target !== cb) {
+          cb.checked = !cb.checked;
+        }
+        card.classList.toggle('selected', cb.checked);
+      };
+    });
+
+    // Format selection
+    document.querySelectorAll('.format-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedFormat = btn.dataset.fmt;
+      };
+    });
+
+    // Password visibility toggle
+    function toggleVisibility(id) {
+      const el = document.getElementById(id);
+      if (el.type === 'password') {
+        el.type = 'text';
+      } else {
+        el.type = 'password';
+      }
+    }
+
+    const clientIdInput = document.getElementById('clientId');
+    const clientSecretInput = document.getElementById('clientSecret');
+    const refreshTokenInput = document.getElementById('refreshToken');
+    const accountsUrlSelect = document.getElementById('accountsUrl');
+    const authModeBadge = document.getElementById('authModeBadge');
+    const rememberCreds = document.getElementById('rememberCreds');
+
+    function updateAuthBadge() {
+      const hasCreds = refreshTokenInput.value.trim() && clientIdInput.value.trim();
+      if (hasCreds) {
+        authModeBadge.textContent = 'Live API Audit (Custom Client Credentials)';
+        authModeBadge.style.color = '#1a365d';
+      } else {
+        authModeBadge.textContent = 'Simulated Diagnostic Probe (Enriched Baseline)';
+        authModeBadge.style.color = '#008080';
+      }
+    }
+
+    [clientIdInput, clientSecretInput, refreshTokenInput].forEach(inp => {
+      inp.oninput = () => {
+        updateAuthBadge();
+        if (rememberCreds.checked) saveCredsToStorage();
+      };
+    });
+
+    function saveCredsToStorage() {
+      localStorage.setItem('wooplix_zoho_cid', clientIdInput.value.trim());
+      localStorage.setItem('wooplix_zoho_csec', clientSecretInput.value.trim());
+      localStorage.setItem('wooplix_zoho_tok', refreshTokenInput.value.trim());
+      localStorage.setItem('wooplix_zoho_url', accountsUrlSelect.value);
+    }
+
+    function loadCredsFromStorage() {
+      const cid = localStorage.getItem('wooplix_zoho_cid');
+      const csec = localStorage.getItem('wooplix_zoho_csec');
+      const tok = localStorage.getItem('wooplix_zoho_tok');
+      const url = localStorage.getItem('wooplix_zoho_url');
+      if (tok && cid) {
+        clientIdInput.value = cid;
+        clientSecretInput.value = csec || '';
+        refreshTokenInput.value = tok;
+        if (url) accountsUrlSelect.value = url;
+        rememberCreds.checked = true;
+      }
+      updateAuthBadge();
+    }
+
+    // Demo Fill button
+    document.getElementById('demoBtn').onclick = () => {
+      clientIdInput.value = '1000.Q8BYX2ZJY8O4212XQ744NMRTZEWU2K';
+      clientSecretInput.value = 'c85f73afcef57c343986e1088939378347a46def3d';
+      refreshTokenInput.value = '1000.dcf12f848682366cb1fab382ec0dbb1d.14dc2a1dea8dbfd8a9079bab5aa43037';
+      accountsUrlSelect.value = 'https://accounts.zoho.in';
+      updateAuthBadge();
+      if (rememberCreds.checked) saveCredsToStorage();
+      document.getElementById('statusAlert').textContent = 'Test credentials loaded. You can replace these with any client credentials at any time.';
+      document.getElementById('statusAlert').className = 'status-alert';
+    };
+
+    // Clear Credentials button
+    document.getElementById('clearCredsBtn').onclick = () => {
+      clientIdInput.value = '';
+      clientSecretInput.value = '';
+      refreshTokenInput.value = '';
+      localStorage.removeItem('wooplix_zoho_cid');
+      localStorage.removeItem('wooplix_zoho_csec');
+      localStorage.removeItem('wooplix_zoho_tok');
+      localStorage.removeItem('wooplix_zoho_url');
+      rememberCreds.checked = false;
+      updateAuthBadge();
+      document.getElementById('statusAlert').textContent = 'Credentials cleared. System will run in Simulated Diagnostic Probe mode with enriched baseline.';
+      document.getElementById('statusAlert').className = 'status-alert';
+    };
+
+    rememberCreds.onchange = () => {
+      if (rememberCreds.checked) {
+        saveCredsToStorage();
+      } else {
+        localStorage.removeItem('wooplix_zoho_cid');
+        localStorage.removeItem('wooplix_zoho_csec');
+        localStorage.removeItem('wooplix_zoho_tok');
+      }
+    };
+
+    // Initialize credentials
+    loadCredsFromStorage();
+
+    // Audit Run Handler
+    const runBtn = document.getElementById('runAuditBtn');
+    const stepper = document.getElementById('stepper');
+    const statusAlert = document.getElementById('statusAlert');
+    const resultCard = document.getElementById('resultCard');
+
+    function setStep(stepNum) {
+      for (let i = 1; i <= 4; i++) {
+        const el = document.getElementById(`step${i}`);
+        el.classList.remove('active', 'done');
+        if (i < stepNum) {
+          el.classList.add('done');
+          el.querySelector('.step-icon').textContent = '✓';
+        } else if (i === stepNum) {
+          el.classList.add('active');
+          el.querySelector('.step-icon').textContent = i;
+        } else {
+          el.querySelector('.step-icon').textContent = i;
+        }
+      }
+    }
+
+    runBtn.onclick = async () => {
+      const companyName = document.getElementById('companyName').value.trim() || 'Client Organization';
+      const auditorName = document.getElementById('auditorName').value.trim() || 'Lead Systems Auditor';
+      const accountsUrl = document.getElementById('accountsUrl').value;
+      const clientId = document.getElementById('clientId').value.trim();
+      const clientSecret = document.getElementById('clientSecret').value.trim();
+      const refreshToken = document.getElementById('refreshToken').value.trim();
+
+      // Collect checked suites
+      const suites = [];
+      document.querySelectorAll('.suite-card input[type="checkbox"]').forEach(cb => {
+        if (cb.checked) suites.push(cb.value);
+      });
+      if (suites.length === 0) {
+        statusAlert.textContent = 'Please select at least one target application suite.';
+        statusAlert.className = 'status-alert error';
+        return;
+      }
+
+      runBtn.disabled = true;
+      runBtn.innerHTML = '<span>Executing Audit Pipeline…</span>';
+      stepper.style.display = 'block';
+      resultCard.style.display = 'none';
+      statusAlert.textContent = '';
+      statusAlert.className = 'status-alert';
+
+      setStep(1);
+
+      // Simulation of progress steps while server works
+      const stepTimer1 = setTimeout(() => setStep(2), 1200);
+      const stepTimer2 = setTimeout(() => setStep(3), 3000);
+      const stepTimer3 = setTimeout(() => setStep(4), 6500);
+
+      try {
+        const fd = new FormData();
+        fd.append('company_name', companyName);
+        fd.append('auditor_name', auditorName);
+        fd.append('accounts_url', accountsUrl);
+        fd.append('client_id', clientId);
+        fd.append('client_secret', clientSecret);
+        fd.append('refresh_token', refreshToken);
+        fd.append('target_suites', suites.join(','));
+        fd.append('use_demo', !refreshToken);
+
+        const res = await fetch(`/api/audit?format=${selectedFormat}`, {
+          method: 'POST',
+          body: fd
+        });
+
+        clearTimeout(stepTimer1);
+        clearTimeout(stepTimer2);
+        clearTimeout(stepTimer3);
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || `Audit failed with status ${res.status}`);
+        }
+
+        setStep(5); // all done
+        document.getElementById('step4').classList.add('done');
+        document.getElementById('step4').querySelector('.step-icon').textContent = '✓';
+
+        let filename = res.headers.get('x-audit-filename');
+        if (!filename) {
+          const disp = res.headers.get('content-disposition') || '';
+          const match = disp.match(/filename="?([^";]+)"?/);
+          if (match) filename = match[1];
+        }
+        if (!filename) {
+          filename = selectedFormat === 'docx' ? 'Wooplix_Audit.docx' : (selectedFormat === 'zip' ? 'Wooplix_Audit.zip' : 'Wooplix_Audit.pdf');
+        }
+
+        const score = res.headers.get('x-audit-score') || '65';
+        const client = res.headers.get('x-audit-client') || companyName;
+
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+
+        // Auto trigger download
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        // Update UI
+        resultCard.style.display = 'block';
+        document.getElementById('resultClient').textContent = client;
+        document.getElementById('resultFile').textContent = `Downloaded: ${filename}`;
+        document.getElementById('healthScore').innerHTML = `${score} <span>/ 100</span>`;
+        document.getElementById('downloadAgainBtn').href = blobUrl;
+        document.getElementById('downloadAgainBtn').download = filename;
+
+        statusAlert.textContent = `✓ Diagnostic audit completed successfully! Deliverable downloaded.`;
+        statusAlert.className = 'status-alert';
+      } catch (err) {
+        statusAlert.textContent = `Audit Failed: ${err.message}`;
+        statusAlert.className = 'status-alert error';
+      } finally {
+        runBtn.disabled = false;
+        runBtn.innerHTML = '<span>Run Diagnostic Audit &amp; Generate Deliverables</span> →';
+      }
+    };
+  </script>
+</body>
+</html>
