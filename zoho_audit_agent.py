@@ -2067,40 +2067,34 @@ def build_docx(audit_data: Dict[str, Any], output_path: str) -> str:
         if ci == 0:
             rnv.font.color.rgb = RGBColor(0xb9, 0x1c, 0x1c) if health_score < 70 else RGBColor(0x15, 0x80, 0x3d)
 
-    # 1.1 Mathematical Scoring Methodology & Application Weighting (Items 1 & 2)
-    p_sc_h = doc.add_paragraph()
-    p_sc_h.paragraph_format.space_before = Pt(10)
-    p_sc_h.paragraph_format.space_after = Pt(4)
-    r_sc = p_sc_h.add_run("1.1 Mathematical Scoring Methodology & Application Weighting")
-    r_sc.bold = True
-    r_sc.font.size = Pt(11)
-    r_sc.font.color.rgb = RGBColor(0x00, 0x80, 0x80)
-
-    p_sc_desc = doc.add_paragraph()
-    p_sc_desc.paragraph_format.space_after = Pt(6)
-    p_sc_desc.paragraph_format.line_spacing = 1.25
-    r_sd = p_sc_desc.add_run(audit_data.get("scoring_methodology", "Overall Health Score = Sum(Config Score × Weight) / Sum(Weights)."))
-    r_sd.font.size = Pt(9.5)
-    r_sd.italic = True
-
+    # 1.1 Application Configuration Health Summary (shown only if multiple apps in scope)
     breakdown = audit_data.get("scoring_breakdown", [])
-    if breakdown:
-        w_sc = [1.8, 2.2, 1.4, 1.6]
-        tbl_sc = _make_table(4, w_sc, ["Cloud Application", "Access Status", "Assessed Weight", "Configuration Score"])
+    if len(breakdown) > 1:
+        p_sc_h = doc.add_paragraph()
+        p_sc_h.paragraph_format.space_before = Pt(10)
+        p_sc_h.paragraph_format.space_after = Pt(4)
+        r_sc = p_sc_h.add_run("1.1 Application Configuration Health Summary")
+        r_sc.bold = True
+        r_sc.font.size = Pt(11)
+        r_sc.font.color.rgb = RGBColor(0x00, 0x80, 0x80)
+
+        w_sc = [2.4, 2.6, 2.0]
+        tbl_sc = _make_table(3, w_sc, ["Cloud Application", "Access Status", "Configuration Score"])
         for b_idx, b in enumerate(breakdown):
             _add_row(
                 tbl_sc,
                 w_sc,
-                [b.get("app_name", ""), b.get("status", ""), b.get("weight_percentage", ""), b.get("config_score", "")],
+                [b.get("app_name", ""), b.get("status", ""), b.get("config_score", "")],
                 zebra=b_idx % 2 == 1
             )
         doc.add_paragraph().paragraph_format.space_after = Pt(8)
 
-    # 1.2 Telemetry Evidence & Inspection Provenance (Item 9)
+    # Telemetry Evidence & Inspection Scope
     p_ev_h = doc.add_paragraph()
     p_ev_h.paragraph_format.space_before = Pt(8)
     p_ev_h.paragraph_format.space_after = Pt(4)
-    r_ev = p_ev_h.add_run("1.2 Telemetry Evidence & Inspection Provenance")
+    ev_sub = "1.1 Telemetry Evidence & Inspection Scope" if len(breakdown) <= 1 else "1.2 Telemetry Evidence & Inspection Scope"
+    r_ev = p_ev_h.add_run(ev_sub)
     r_ev.bold = True
     r_ev.font.size = Pt(11)
     r_ev.font.color.rgb = RGBColor(0x00, 0x80, 0x80)
@@ -2117,7 +2111,8 @@ def build_docx(audit_data: Dict[str, Any], output_path: str) -> str:
 
     _add_row(tbl_ev, w_ev, ["Zoho CRM Deals", f"{ev.get('deals_sampled_count', 0)} Deals Sampled\nIDs: {deal_ids_str}", f"Inspected: {ts_str} UTC"], zebra=False)
     _add_row(tbl_ev, w_ev, ["Zoho CRM Leads", f"{ev.get('leads_sampled_count', 0)} Leads Sampled\n{st_str}", f"IDs: {lead_ids_str}"], zebra=True)
-    _add_row(tbl_ev, w_ev, ["Desk & Books Access", f"Desk: {str(ev.get('desk_status', 'not_connected')).upper()} | Books: {str(ev.get('books_status', 'not_connected')).upper()}", ev.get("methodology", "OAuth read-only probe")], zebra=False)
+    if any("desk" in a.lower() or "book" in a.lower() for a in suites_list):
+        _add_row(tbl_ev, w_ev, ["Desk & Books Access", f"Desk: {str(ev.get('desk_status', 'not_connected')).upper()} | Books: {str(ev.get('books_status', 'not_connected')).upper()}", ev.get("methodology", "OAuth read-only probe")], zebra=False)
     doc.add_paragraph().paragraph_format.space_after = Pt(12)
 
     # SECTION 2: PER-APPLICATION AUDIT FINDINGS
@@ -2673,30 +2668,28 @@ table.dt tr:nth-child(even) td {{
   </table>
 </div>""")
 
-    # 1.1 Scoring Breakdown Table (Items 1 & 2)
+    # 1.1 Application Configuration Health Summary (shown only if multiple apps in scope)
     breakdown = audit_data.get("scoring_breakdown", [])
-    if breakdown:
-        out.append('<h3 class="mh">1.1 Mathematical Scoring Methodology &amp; Application Weighting</h3>')
-        out.append(f'<p class="desc">{esc(audit_data.get("scoring_methodology", "Overall Health Score = Sum(Config Score × Weight) / Sum(Weights). Inaccessible applications are marked NOT ASSESSED with 0% weight to prevent false negative scoring."))}</p>')
+    if len(breakdown) > 1:
+        out.append('<h3 class="mh">1.1 Application Configuration Health Summary</h3>')
         out.append('<table class="dt"><thead><tr>')
-        out.append('<th style="width:28%;">Cloud Application</th>')
-        out.append('<th style="width:30%;">Access Status</th>')
-        out.append('<th style="width:20%;">Assessed Weight</th>')
-        out.append('<th style="width:22%;">Configuration Score</th>')
+        out.append('<th style="width:36%;">Cloud Application</th>')
+        out.append('<th style="width:38%;">Access Status</th>')
+        out.append('<th style="width:26%;">Configuration Score</th>')
         out.append('</tr></thead><tbody>')
         for b in breakdown:
             out.append('<tr>')
             out.append(f'<td><strong>{esc(b.get("app_name",""))}</strong></td>')
             out.append(f'<td>{esc(b.get("status",""))}</td>')
-            out.append(f'<td>{esc(b.get("weight_percentage",""))}</td>')
             out.append(f'<td><strong>{esc(b.get("config_score",""))}</strong></td>')
             out.append('</tr>')
         out.append('</tbody></table>')
 
-    # 1.2 Telemetry Evidence & Provenance Table (Item 9)
+    # Telemetry Evidence & Inspection Scope
     ev = audit_data.get("evidence_provenance", {})
     if ev:
-        out.append('<h3 class="mh">1.2 Telemetry Evidence &amp; Inspection Provenance</h3>')
+        ev_sub = "1.1 Telemetry Evidence &amp; Inspection Scope" if len(breakdown) <= 1 else "1.2 Telemetry Evidence &amp; Inspection Scope"
+        out.append(f'<h3 class="mh">{ev_sub}</h3>')
         deal_ids_str = ", ".join(str(i) for i in ev.get("sample_deal_ids", [])[:3]) or "Sampled live"
         lead_ids_str = ", ".join(str(i) for i in ev.get("sample_lead_ids", [])[:3]) or "Sampled live"
         ts_str = str(ev.get("observation_timestamp", ""))[:19].replace("T", " ")
