@@ -150,10 +150,73 @@
       margin-bottom: 10px;
     }
 
+    .all-scope-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: linear-gradient(135deg, #eef2ff 0%, #f0fdf4 100%);
+      border: 1px solid #c7d2fe;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .all-scope-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #3730a3;
+    }
+
+    .all-scope-banner-left svg {
+      flex-shrink: 0;
+      color: #6366f1;
+    }
+
+    .all-scope-copy-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .all-scope-copy-btn:hover { background: #4f46e5; transform: translateY(-1px); }
+    .all-scope-copy-btn.copied { background: #16a34a; }
+
+    .scope-warning-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: 7px;
+      padding: 9px 13px;
+      font-size: 12px;
+      color: #92400e;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .scope-warning-note svg { flex-shrink: 0; margin-top: 1px; color: #d97706; }
+    .scope-warning-note code { background: #fef3c7; padding: 1px 4px; border-radius: 3px; font-size: 11px; }
+
     /* App Scope Selector Component */
     .scope-selector-container {
       margin-top: 10px;
     }
+
 
     .scope-quick-bar {
       display: flex;
@@ -855,14 +918,20 @@
         </div>
         <p class="guide-desc">Select which Zoho applications your client uses. Copy the generated scope and paste it into Zoho API Console (<strong>Self Client &rarr; Generate Code</strong>).</p>
 
+        <!-- ⚠️ Warning: only select apps the client actually subscribes to -->
+        <div class="scope-warning-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span><strong>Important:</strong> Only tick apps the client actually has a Zoho subscription for. Adding an unused app scope causes an <code>invalid_scope</code> error in the API Console.</span>
+        </div>
+
         <div class="scope-selector-container">
           <div class="scope-quick-bar">
             <div class="scope-presets-pills">
-              <button type="button" class="scope-pill-btn active" id="preset_full" onclick="setAppPreset('full')">All Apps</button>
+              <button type="button" class="scope-pill-btn" id="preset_full" onclick="setAppPreset('full')">All Apps ⚠️</button>
               <button type="button" class="scope-pill-btn" id="preset_sales" onclick="setAppPreset('sales')">Sales &amp; Support</button>
               <button type="button" class="scope-pill-btn" id="preset_finance" onclick="setAppPreset('finance')">Finance Suite</button>
               <button type="button" class="scope-pill-btn" id="preset_marketing" onclick="setAppPreset('marketing')">Marketing</button>
-              <button type="button" class="scope-pill-btn" id="preset_crmonly" onclick="setAppPreset('crmonly')">CRM Only</button>
+              <button type="button" class="scope-pill-btn active" id="preset_crmonly" onclick="setAppPreset('crmonly')">CRM Only ✓</button>
               <button type="button" class="scope-pill-btn" id="preset_nodesk" onclick="setAppPreset('nodesk')">Standard (No Desk)</button>
               <button type="button" class="scope-pill-btn" id="preset_none" onclick="setAppPreset('none')">Clear All</button>
             </div>
