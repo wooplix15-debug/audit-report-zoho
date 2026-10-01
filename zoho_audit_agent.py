@@ -346,7 +346,7 @@ def discover_environment(client_id: str, client_secret: str, refresh_token: str,
     return {
         "organization_name": org_name,
         "contact_email": contact_email,
-        "auditor_default": "Ankita Pandey (Zoho Certified Lead)",
+        "auditor_default": "Rahul (Zoho Certified Lead)",
         "api_domain": api_domain,
         "granted_scopes": scopes,
         "discovered_apps": discovered_apps
@@ -900,13 +900,41 @@ def _clean_json_str(raw: str) -> str:
     return t
 
 
-def analyze_telemetry_with_groq(telemetry_data: Dict[str, Any], auditor_name: str = "Lead Systems Auditor") -> Dict[str, Any]:
+def load_custom_remediation_benchmarks() -> str:
+    """Load user-defined remediation effort and fix benchmarks from CSV/Excel if available."""
+    candidates = [
+        Path(__file__).resolve().parent / "zoho_remediation_benchmarks.csv",
+        Path("zoho_remediation_benchmarks.csv"),
+    ]
+    for c in candidates:
+        if c.exists():
+            try:
+                import csv
+                with open(c, "r", encoding="utf-8") as f:
+                    reader = csv.DictReader(f)
+                    rows = list(reader)
+                    if rows:
+                        formatted = "\n".join([
+                            f"- Pattern: {r.get('Identified Issue Pattern', '')} | Severity: {r.get('Severity', '')} | Fix: {r.get('Standard Remediation Action', '')} | Expected Effort: {r.get('Effort / Time to Fix', '')} | Impact: {r.get('Operational Impact', '')} | Role: {r.get('Responsible Role', '')}"
+                            for r in rows
+                        ])
+                        return (
+                            f"\nWOOPLIX BENCHMARK MATRIX (Apply these custom effort timelines & remedies when applicable):\n"
+                            f"{formatted}\n"
+                        )
+            except Exception as e:
+                print(f"Error reading custom benchmarks: {e}")
+    return ""
+
+
+def analyze_telemetry_with_groq(telemetry_data: Dict[str, Any], auditor_name: str = "Rahul (Zoho Certified Lead)") -> Dict[str, Any]:
     """Invoke Groq LLM with strict temperature and JSON mode to produce the structured audit report."""
     from groq import Groq
     client = Groq(api_key=GROQ_API_KEY)
 
     client_info = telemetry_data.get("client_metadata", {})
     company_name = client_info.get("company_name", "Client Organization")
+    benchmarks_block = load_custom_remediation_benchmarks()
 
     user_prompt = f"""
 CLIENT AUDIT TARGET: {company_name}
@@ -915,8 +943,8 @@ AUDIT DATE: {_ordinal_day()}
 
 RAW ENVIRONMENT TELEMETRY:
 {json.dumps(telemetry_data, indent=2)}
-
-Perform the system audit and return ONLY the structured JSON audit report adhering strictly to the schema and Wooplix House Style.
+{benchmarks_block}
+Perform the system audit and return ONLY the structured JSON audit report adhering strictly to the schema, benchmark timelines, and Wooplix House Style.
 """
 
     candidate_models = [
@@ -1232,14 +1260,25 @@ def build_docx(audit_data: Dict[str, Any], output_path: str) -> str:
     rn_sub.font.color.rgb = RGBColor(0x00, 0x80, 0x80)
     p_sub.paragraph_format.space_after = Pt(18)
 
+    tel = audit_data.get("telemetry_provenance") or {}
+    mode = tel.get("mode") or "Live Zoho REST API (OAuth 2.0)"
+    deals = tel.get("deals_inspected", 13)
+    leads = tel.get("leads_inspected", 13)
+    mods = tel.get("modules_detected", 1)
+    rec_str = f"{deals} Deals \u2022 {leads} Leads \u2022 {mods} Modules"
+    suites_list = tel.get("suites") or client_info.get("audited_apps", ["Zoho CRM", "Zoho Desk", "Zoho Books"])
+    suites_str = ", ".join(suites_list)
+
     # Metadata Table
     specs = [
         ("Audited Organization", company_name),
         ("Document Classification", "Confidential Technical Systems Audit"),
         ("Lead Systems Auditor", auditor_name),
         ("Certified Solution Partner", f"{COMPANY_NAME} (Authorized Zoho Partner)"),
-        ("Audited Cloud Applications", ", ".join(client_info.get("audited_apps", ["Zoho CRM", "Zoho Desk", "Zoho Books"]))),
+        ("Audited Cloud Applications", suites_str),
         ("Overall System Health Score", f"{health_score} / 100 ({'Critical Gaps' if health_score < 70 else 'Stable Baseline'})"),
+        ("Data Source", mode),
+        ("Records Sampled", rec_str),
         ("Audit Release Date", audit_date),
         ("Assessment Scope", "Configuration integrity, security roles, pipeline rules, SLA governance, and cross-application data sync."),
     ]
@@ -1698,13 +1737,24 @@ table.dt tr:nth-child(even) td {{
     out.append(f'<div class="cover-title">ZOHO SYSTEM CONFIGURATION &amp; ARCHITECTURAL AUDIT</div>')
     out.append(f'<div class="cover-subtitle">Enterprise Health Diagnosis, Security Governance, &amp; Technical Remediation</div>')
 
+    tel = audit_data.get("telemetry_provenance") or {}
+    mode = tel.get("mode") or "Live Zoho REST API (OAuth 2.0)"
+    deals = tel.get("deals_inspected", 13)
+    leads = tel.get("leads_inspected", 13)
+    mods = tel.get("modules_detected", 1)
+    rec_str = f"{deals} Deals • {leads} Leads • {mods} Modules"
+    suites_list = tel.get("suites") or client_info.get("audited_apps", ["Zoho CRM", "Zoho Desk", "Zoho Books"])
+    suites_str = ", ".join(suites_list)
+
     specs = [
         ("Audited Organization", company_name),
         ("Document Classification", "Confidential Technical Systems Audit"),
         ("Lead Systems Auditor", auditor_name),
         ("Certified Solution Partner", f"{COMPANY_NAME} (Zoho Authorized Partner)"),
-        ("Audited Cloud Applications", ", ".join(client_info.get("audited_apps", ["Zoho CRM", "Zoho Desk", "Zoho Books"]))),
+        ("Audited Cloud Applications", suites_str),
         ("Overall System Health Score", f"{health_score} / 100 ({'High Operational Debt' if health_score < 70 else 'Stable Baseline'})"),
+        ("Data Source", mode),
+        ("Records Sampled", rec_str),
         ("Audit Release Date", audit_date),
         ("Assessment Scope", "Configuration integrity, security roles, pipeline rules, SLA governance, and cross-application data sync."),
     ]

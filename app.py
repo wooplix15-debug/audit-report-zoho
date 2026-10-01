@@ -180,7 +180,7 @@ async def discover_environment_endpoint(
         return {
             "organization_name": "Wooplix Client Organization",
             "contact_email": "enquiry@wooplix.com",
-            "auditor_default": "Ankita Pandey (Zoho Certified Lead)",
+            "auditor_default": "Rahul (Zoho Certified Lead)",
             "api_domain": "https://www.zohoapis.in",
             "discovered_apps": [
                 {"id": "zoho_crm", "name": "Zoho CRM", "description": "Core Sales, Deals, Pipeline stages, & data hygiene", "status": "active", "status_label": "Probed Baseline", "recommended": True},
@@ -198,7 +198,7 @@ async def discover_environment_endpoint(
         return {
             "organization_name": "Connected Client Organization",
             "contact_email": "",
-            "auditor_default": "Ankita Pandey (Zoho Certified Lead)",
+            "auditor_default": "Rahul (Zoho Certified Lead)",
             "api_domain": acc,
             "warning": str(exc),
             "discovered_apps": [
@@ -278,7 +278,7 @@ def _extract_telemetry_summary(telemetry: dict, company_name: str, suites_list: 
 async def trigger_audit(
     request: Request,
     company_name: Optional[str] = Form(""),
-    auditor_name: Optional[str] = Form("Ankita Pandey (Zoho Certified Lead)"),
+    auditor_name: Optional[str] = Form("Rahul (Zoho Certified Lead)"),
     contact_email: Optional[str] = Form(""),
     client_id: Optional[str] = Form(""),
     client_secret: Optional[str] = Form(""),
@@ -313,7 +313,7 @@ async def trigger_audit(
         except Exception:
             comp_name = "Client Organization"
     company_name = comp_name
-    auditor = (auditor_name or "Ankita Pandey (Zoho Certified Lead)").strip()
+    auditor = (auditor_name or "Rahul (Zoho Certified Lead)").strip()
 
     # Parse target suites
     suites_list = []
@@ -369,6 +369,7 @@ async def trigger_audit(
                 telemetry_data=telemetry,
                 auditor_name=auditor_name
             )
+            audit_data["telemetry_provenance"] = tel_summary
 
             health_score = audit_data.get("overall_health_score", 65)
 
