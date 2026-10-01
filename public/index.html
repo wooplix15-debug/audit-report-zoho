@@ -576,9 +576,9 @@
         <p class="guide-desc">In Zoho API Console, go to <strong>Self Client</strong> &rarr; <strong>Generate Code</strong>, select your scope preset, copy permissions, and set duration to 10 minutes.</p>
         <div class="scope-row">
           <select id="scopePresetSelect" class="scope-select" onchange="onPresetSelectChange(this.value)">
-            <option value="nodesk" selected>Standard Suite (CRM, Books, Drive, Projects)</option>
+            <option value="full" selected>Full Ecosystem (CRM, Desk, Books, Inventory, Drive, Projects) &mdash; Recommended</option>
+            <option value="nodesk">Standard Suite (Without Desk)</option>
             <option value="crmonly">CRM &amp; WorkDrive Only</option>
-            <option value="full">All Modules (with Zoho Desk)</option>
           </select>
           <button type="button" class="copy-btn" id="btnCopyScopes" onclick="copyScopes()">
             <span id="copyIcon">
@@ -714,12 +714,12 @@
     let selectedFormat = 'pdf';
 
     const SCOPE_PRESETS = {
+      full: "ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,Desk.tickets.ALL,Desk.contacts.ALL,Desk.settings.ALL,Desk.basic.ALL,ZohoBooks.fullaccess.ALL,ZohoInventory.fullaccess.ALL,WorkDrive.files.ALL,ZohoProjects.projects.ALL",
       nodesk: "ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,ZohoBooks.fullaccess.ALL,ZohoInventory.fullaccess.ALL,WorkDrive.files.ALL,ZohoProjects.projects.ALL",
-      crmonly: "ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,WorkDrive.files.ALL",
-      full: "ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,Desk.tickets.ALL,Desk.contacts.ALL,Desk.settings.ALL,Desk.basic.ALL,ZohoBooks.fullaccess.ALL,ZohoInventory.fullaccess.ALL,WorkDrive.files.ALL,ZohoProjects.projects.ALL"
+      crmonly: "ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,WorkDrive.files.ALL"
     };
 
-    let activeScopePreset = 'nodesk';
+    let activeScopePreset = 'full';
 
     function onPresetSelectChange(val) {
       activeScopePreset = val;

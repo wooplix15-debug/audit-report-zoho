@@ -315,7 +315,7 @@ async def trigger_audit(
     company_name = comp_name
     auditor = (auditor_name or "Rahul (Zoho Certified Lead)").strip()
 
-    # Parse target suites
+    # Parse target suites or auto-discover all active tools
     suites_list = []
     if target_suites:
         raw_items = [s.strip().lower() for s in target_suites.split(",") if s.strip()]
@@ -326,14 +326,49 @@ async def trigger_audit(
                 suites_list.append("Zoho Desk")
             elif "book" in s or "billing" in s:
                 suites_list.append("Zoho Books")
+            elif "inventory" in s:
+                suites_list.append("Zoho Inventory")
+            elif "project" in s:
+                suites_list.append("Zoho Projects")
+            elif "workdrive" in s or "drive" in s:
+                suites_list.append("Zoho WorkDrive")
             elif "flow" in s:
                 suites_list.append("Zoho Flow")
+            elif "analytic" in s:
+                suites_list.append("Zoho Analytics")
+            elif "campaign" in s:
+                suites_list.append("Zoho Campaigns")
+            elif "salesiq" in s:
+                suites_list.append("Zoho SalesIQ")
             elif "creator" in s:
                 suites_list.append("Zoho Creator")
             else:
                 suites_list.append(s.title())
-    if not suites_list:
-        suites_list = ["Zoho CRM", "Zoho Desk", "Zoho Books"]
+
+    # Auto-detect and include all active tools configured for this Zoho organization
+    if cid and csec and reftok:
+        try:
+            disc = agent.discover_environment(cid, csec, reftok, acc_url)
+            for d in disc.get("discovered_apps", []):
+                if d.get("status") in ("active", "recommended") or d.get("recommended"):
+                    name = d.get("name")
+                    if name and name not in suites_list:
+                        suites_list.append(name)
+        except Exception as e:
+            print(f"Ecosystem discovery note: {e}")
+
+    # If default or not specified, cover the complete enterprise ecosystem
+    if not suites_list or suites_list == ["Zoho CRM", "Zoho Desk", "Zoho Books"]:
+        suites_list = [
+            "Zoho CRM",
+            "Zoho Desk",
+            "Zoho Books",
+            "Zoho Inventory",
+            "Zoho Projects",
+            "Zoho WorkDrive",
+            "Zoho Flow",
+            "Zoho Analytics"
+        ]
 
     # Ensure live credentials dictionary is built from user-provided token
     creds = None
@@ -376,9 +411,11 @@ async def trigger_audit(
             # Step 3: Compile Deliverables
             docx_file = work_path / f"Wooplix_Audit_{stem}.docx"
             pdf_file  = work_path / f"Wooplix_Audit_{stem}.pdf"
-            json_file = work_path / f"Wooplix_Audit_{stem}.json"
+            json_file = work_path / f"Wooplix_Audit_Report_{stem}.json"
+            raw_tel_file = work_path / f"Wooplix_Raw_Telemetry_{stem}.json"
 
             json_file.write_text(json.dumps(audit_data, indent=2, ensure_ascii=False), encoding="utf-8")
+            raw_tel_file.write_text(json.dumps(telemetry, indent=2, ensure_ascii=False), encoding="utf-8")
             agent.build_docx(audit_data, str(docx_file))
 
             pdf_generated = _render_audit_pdf(audit_data, pdf_file, host=host)
@@ -419,7 +456,7 @@ async def trigger_audit(
                     headers=common_headers
                 )
 
-            # Stream complete ZIP package (PDF + DOCX + JSON Telemetry)
+            # Stream complete ZIP package (PDF + DOCX + Audit Report JSON + Raw Telemetry JSON)
             zip_buffer = io.BytesIO()
             with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as bundle:
                 if docx_file.exists():
@@ -428,6 +465,8 @@ async def trigger_audit(
                     bundle.write(pdf_file, arcname=f"Wooplix_Audit_{stem}/{pdf_file.name}")
                 if json_file.exists():
                     bundle.write(json_file, arcname=f"Wooplix_Audit_{stem}/{json_file.name}")
+                if raw_tel_file.exists():
+                    bundle.write(raw_tel_file, arcname=f"Wooplix_Audit_{stem}/{raw_tel_file.name}")
 
             zip_buffer.seek(0)
             out_name = f"Wooplix_Audit_{stem}_Package.zip"

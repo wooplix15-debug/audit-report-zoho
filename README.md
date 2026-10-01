@@ -30,7 +30,7 @@ The **Zoho System Audit Agent** is a full-stack, enterprise-grade diagnostic pla
 3. **Branded Deliverable Exporters**:
    - **DOCX Exporter**: Clean Microsoft Word documents styled with Wooplix brand colors (`#1a365d` Navy, `#008080` Teal, `#f8fafc` background), dual logos header, metadata table, severity badges, and phased roadmap.
    - **PDF Exporter**: High-resolution vector PDF rendered via local Dompdf (PHP) with embedded base64 headers and footers.
-   - **All-in-One ZIP Package**: Bundles PDF, DOCX, and raw telemetry JSON.
+   - **All-in-One ZIP Package**: Bundles PDF, DOCX, analyzed audit report JSON, and raw telemetry JSON.
 
 4. **FastAPI Web Service & Intake Portal**:
    - High-performance asynchronous API (`app.py`).
@@ -92,13 +92,14 @@ You can also run audits directly from the command line:
 python3 zoho_audit_agent.py --client "Acme Global Solutions" --auditor "Lead Systems Architect" --sample
 
 # Run audit against live Zoho environment (using .env credentials)
-python3 zoho_audit_agent.py --client "Nexus Logistics Ltd" --auditor "Ankita Pandey"
+python3 zoho_audit_agent.py --client "Nexus Logistics Ltd" --auditor "Rahul (Zoho Certified Lead)"
 ```
 
 Generated outputs will be saved in `./out/`:
 - `Wooplix_Audit_<Client>.pdf`
 - `Wooplix_Audit_<Client>.docx`
-- `Wooplix_Audit_<Client>.json`
+- `Wooplix_Audit_Report_<Client>.json`
+- `Wooplix_Raw_Telemetry_<Client>.json`
 
 ---
 
@@ -141,7 +142,7 @@ Content-Type: multipart/form-data
 
 ## Deploying to Vercel (Step-by-Step)
 
-The repository is already configured with [`vercel.json`](file:///Users/ankitapandey/Downloads/audit%20report%20zoho/vercel.json), serverless Python entrypoint ([`api/index.py`](file:///Users/ankitapandey/Downloads/audit%20report%20zoho/api/index.py)), and serverless PHP Dompdf renderer ([`api/pdf.php`](file:///Users/ankitapandey/Downloads/audit%20report%20zoho/api/pdf.php)).
+The repository is already configured with `vercel.json`, serverless Python entrypoint (`api/index.py`), and serverless PHP Dompdf renderer (`api/pdf.php`).
 
 ### Step 1: Connect Your GitHub Repository in Vercel
 1. Log into your [Vercel Dashboard](https://vercel.com/dashboard).
@@ -183,11 +184,11 @@ If auditing a new client or organization:
 1. Log in to the [Zoho API Console](https://api-console.zoho.com).
 2. Click **Add Client** → select **Self Client**.
 3. Under **Client Secret**, copy the **Client ID** and **Client Secret**.
-4. Under **Generate Code**, paste the **Full-Access Ecosystem Scopes** (covering CRM, Desk, Books, Inventory, WorkDrive, and Projects):
+4. Under **Generate Code**, paste the **Full-Access Ecosystem Scopes** (to audit all connected applications—CRM, Desk, Books, Inventory, WorkDrive, and Projects—without access-denied errors):
    ```text
    ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,Desk.tickets.ALL,Desk.contacts.ALL,Desk.settings.ALL,Desk.basic.ALL,ZohoBooks.fullaccess.ALL,ZohoInventory.fullaccess.ALL,WorkDrive.files.ALL,ZohoProjects.projects.ALL
    ```
-   *(Or for Core Suite only: `ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,Desk.tickets.ALL,Desk.contacts.ALL,Desk.settings.ALL,Desk.basic.ALL,ZohoBooks.fullaccess.ALL`)*
+   *(Or for Standard Suite without Desk: `ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,ZohoBooks.fullaccess.ALL,ZohoInventory.fullaccess.ALL,WorkDrive.files.ALL,ZohoProjects.projects.ALL`)*
 5. Set Time Duration to **10 minutes** and enter a Scope Description (e.g. `Wooplix Zoho Full Audit`).
 6. Click **Create** and copy the generated **Code** (starts with `1000.xxxx...`).
 7. Paste the Client ID, Client Secret, and Code directly into the audit portal. The tool automatically converts the 10-minute code into a persistent token behind the scenes and inspects all connected tools!
