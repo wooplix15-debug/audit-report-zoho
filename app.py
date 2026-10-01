@@ -84,8 +84,39 @@ async def health_check():
     }
 
 
+def _render_audit_pdf(audit_data: dict, target_pdf: Path, host: Optional[str] = None) -> bool:
+    """Render PDF deliverable via Vercel PHP Dompdf function or local Dompdf."""
+    if os.environ.get("VERCEL"):
+        base = host or os.environ.get("VERCEL_PROJECT_PRODUCTION_URL") or os.environ.get("VERCEL_URL")
+        token = os.environ.get("PDF_RENDER_TOKEN") or "wooplix-zoho-audit-render-secret-2026"
+        if base:
+            url = base if base.startswith("http") else f"https://{base}"
+            url = f"{url.rstrip('/')}/api/pdf.php"
+            try:
+                import requests
+                r = requests.post(
+                    url,
+                    json={"html": agent.build_html(audit_data)},
+                    headers={"Authorization": f"Bearer {token}"},
+                    timeout=240,
+                )
+                if r.status_code == 200 and len(r.content) > 100:
+                    target_pdf.write_bytes(r.content)
+                    return True
+            except Exception as e:
+                print(f"Vercel PHP PDF generation warning: {e}")
+    try:
+        agent.build_pdf(audit_data, str(target_pdf))
+        if target_pdf.exists() and target_pdf.stat().st_size > 0:
+            return True
+    except Exception as pdf_err:
+        print(f"Local Dompdf generation warning: {pdf_err}")
+    return False
+
+
 @app.post("/api/audit")
 async def trigger_audit(
+    request: Request,
     company_name: str = Form("Client Organization"),
     auditor_name: str = Form("Lead Systems Auditor"),
     contact_email: str = Form(""),
@@ -98,6 +129,7 @@ async def trigger_audit(
     format: Optional[str] = Query("pdf")
 ):
     """Run end-to-end Zoho environment audit and return requested deliverable."""
+    host = request.headers.get("x-forwarded-host") or request.headers.get("host")
     groq_key = os.environ.get("GROQ_API_KEY") or agent.GROQ_API_KEY
     if not groq_key:
         raise HTTPException(
@@ -170,13 +202,7 @@ async def trigger_audit(
             json_file.write_text(json.dumps(audit_data, indent=2, ensure_ascii=False), encoding="utf-8")
             agent.build_docx(audit_data, str(docx_file))
 
-            pdf_generated = False
-            try:
-                agent.build_pdf(audit_data, str(pdf_file))
-                if pdf_file.exists() and pdf_file.stat().st_size > 0:
-                    pdf_generated = True
-            except Exception as pdf_err:
-                print(f"Warning: PDF compilation issue: {pdf_err}")
+            pdf_generated = _render_audit_pdf(audit_data, pdf_file, host=host)
 
             req_format = (format or "pdf").lower()
 
