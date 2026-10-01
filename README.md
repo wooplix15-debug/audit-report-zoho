@@ -182,11 +182,13 @@ In the web interface:
 If auditing a new client or organization:
 1. Log in to the [Zoho API Console](https://api-console.zoho.com).
 2. Click **Add Client** → select **Self Client**.
-3. Under **Generate Code**, enter the following scopes:
+3. Under **Client Secret**, copy the **Client ID** and **Client Secret**.
+4. Under **Generate Code**, paste the **Full-Access Ecosystem Scopes** (covering CRM, Desk, Books, Inventory, WorkDrive, and Projects):
    ```text
-   ZohoCRM.modules.READ,ZohoCRM.settings.READ,Desk.tickets.READ,Desk.settings.READ,ZohoBooks.fullaccess.READ
+   ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,Desk.tickets.ALL,Desk.contacts.ALL,Desk.settings.ALL,Desk.basic.ALL,ZohoBooks.fullaccess.ALL,ZohoInventory.fullaccess.ALL,WorkDrive.files.ALL,ZohoProjects.projects.ALL
    ```
-4. Set Time Duration to **10 minutes** and enter a Scope Description (e.g. `Audit Diagnostic Probe`).
-5. Copy the generated authorization code.
-6. Under **Self Client** → **Generate Access/Refresh Token**, paste the authorization code to obtain the persistent **Refresh Token**.
+   *(Or for Core Suite only: `ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ,Desk.tickets.ALL,Desk.contacts.ALL,Desk.settings.ALL,Desk.basic.ALL,ZohoBooks.fullaccess.ALL`)*
+5. Set Time Duration to **10 minutes** and enter a Scope Description (e.g. `Wooplix Zoho Full Audit`).
+6. Click **Create** and copy the generated **Code** (starts with `1000.xxxx...`).
+7. Paste the Client ID, Client Secret, and Code directly into the audit portal. The tool automatically converts the 10-minute code into a persistent token behind the scenes and inspects all connected tools!
 

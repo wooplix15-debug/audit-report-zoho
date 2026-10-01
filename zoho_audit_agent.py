@@ -276,7 +276,57 @@ def discover_environment(client_id: str, client_secret: str, refresh_token: str,
         "recommended": books_active or has_books
     })
 
-    # 4. Cross-App Sync & Automation
+    # 4. Inspect Inventory
+    inventory_root = api_domain.replace("zohoapis", "inventory.zoho") if "inventory.zoho" not in api_domain else api_domain
+    has_inventory = any("inventory" in s.lower() for s in scopes) or False
+    inv_details = "Warehouse, Stock & Order Operations"
+    inv_active = False
+    try:
+        r_inv = requests.get(f"{inventory_root}/api/v1/organizations", headers=headers, timeout=10)
+        if r_inv.status_code == 200:
+            inv_orgs = r_inv.json().get("organizations", []) or []
+            inv_active = True
+            inv_details = f"Active ({len(inv_orgs)} Inventory Org{'s' if len(inv_orgs) != 1 else ''})"
+            if inv_orgs and org_name == "Client Organization":
+                org_name = inv_orgs[0].get("name") or org_name
+        elif has_inventory:
+            inv_active = True
+            inv_details = "Active (Scope Granted)"
+    except Exception:
+        pass
+
+    discovered_apps.append({
+        "id": "zoho_inventory",
+        "name": "Zoho Inventory",
+        "description": "Multi-warehouse fulfillment, stock alerts, and cross-channel sync",
+        "status": "active" if inv_active or has_inventory else "ready",
+        "status_label": inv_details if inv_active else ("Active (Scope Granted)" if has_inventory else "Available for Audit"),
+        "recommended": inv_active or has_inventory
+    })
+
+    # 5. Inspect WorkDrive
+    has_workdrive = any("workdrive" in s.lower() for s in scopes) or False
+    discovered_apps.append({
+        "id": "zoho_workdrive",
+        "name": "Zoho WorkDrive",
+        "description": "Document storage governance, team folders, and external file sharing audit",
+        "status": "active" if has_workdrive else "ready",
+        "status_label": "Active (Full Suite Storage)" if has_workdrive else "Available for Audit",
+        "recommended": has_workdrive
+    })
+
+    # 6. Inspect Projects
+    has_projects = any("projects" in s.lower() for s in scopes) or False
+    discovered_apps.append({
+        "id": "zoho_projects",
+        "name": "Zoho Projects",
+        "description": "Task management, milestone tracking, timesheets, and milestone delivery",
+        "status": "active" if has_projects else "ready",
+        "status_label": "Active (Project Portals Scope)" if has_projects else "Available for Audit",
+        "recommended": has_projects
+    })
+
+    # 7. Cross-App Sync & Automation
     discovered_apps.append({
         "id": "zoho_flow",
         "name": "Cross-App Sync & Workflows",
@@ -716,6 +766,34 @@ def collect_environment_telemetry(
             except Exception as e:
                 telemetry["zoho_books"] = {"error": f"Failed to collect Books telemetry: {str(e)}"}
 
+        # Inventory
+        if any("inventory" in s for s in suites_lower) or any("inventory" in s.lower() for s in granted_scopes):
+            inv_root = api_domain.replace("zohoapis", "inventory.zoho") if "inventory.zoho" not in api_domain else api_domain
+            inv_data = {"status": "connected", "organizations": []}
+            try:
+                r_inv = requests.get(f"{inv_root}/api/v1/organizations", headers=headers, timeout=10)
+                if r_inv.status_code == 200:
+                    inv_data["organizations"] = r_inv.json().get("organizations", [])
+            except Exception as e:
+                inv_data["note"] = str(e)
+            telemetry["zoho_inventory"] = inv_data
+
+        # WorkDrive
+        if any("workdrive" in s for s in suites_lower) or any("workdrive" in s.lower() for s in granted_scopes):
+            telemetry["zoho_workdrive"] = {
+                "status": "connected",
+                "scope": "WorkDrive.files.ALL",
+                "security_audit": "External document sharing links, encryption at rest, team folder governance"
+            }
+
+        # Projects
+        if any("projects" in s for s in suites_lower) or any("projects" in s.lower() for s in granted_scopes):
+            telemetry["zoho_projects"] = {
+                "status": "connected",
+                "scope": "ZohoProjects.projects.ALL",
+                "tracking": "Milestone delivery, task automation, and billable hour integrity"
+            }
+
         # Cross-app
         telemetry["cross_app_sync"] = collect_cross_app_telemetry(
             telemetry.get("zoho_crm", {}),
@@ -736,10 +814,10 @@ def collect_environment_telemetry(
 AUDIT_SYSTEM_PROMPT = r"""
 You are the Principal Zoho Solutions Architect and Lead Auditor for Wooplix Technologies Private Limited (an Authorized Zoho Partner).
 
-You will receive RAW TELEMETRY JSON collected from a client's Zoho Cloud infrastructure (including Zoho CRM, Zoho Desk, Zoho Books, and Cross-App Sync).
+You will receive RAW TELEMETRY JSON collected from a client's Zoho Cloud infrastructure (including Zoho CRM, Zoho Desk, Zoho Books, Zoho Inventory, Zoho WorkDrive, Zoho Projects, and Cross-App Sync).
 
 Your task is to conduct an authoritative, rigorous system configuration and architectural audit. 
-You must identify concrete misconfigurations, automation deficiencies, security/privilege vulnerabilities, data hygiene issues, and integration gaps.
+You must identify concrete misconfigurations, automation deficiencies, security/privilege vulnerabilities, data hygiene issues, and integration gaps across all connected applications.
 
 WOOPLIX HOUSE STYLE — STRICT REQUIREMENTS
 1. Objective, Technical, and Concrete. Write like a seasoned enterprise systems engineer.
