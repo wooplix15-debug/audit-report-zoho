@@ -39,18 +39,25 @@ app.add_middleware(
 )
 
 
+@app.middleware("http")
+async def vercel_path_rewrite(request: Request, call_next):
+    """Normalize Vercel rewrite paths so FastAPI router receives the intended endpoint."""
+    matched = request.headers.get("x-matched-path")
+    if matched:
+        request.scope["path"] = matched
+    return await call_next(request)
+
+
 @app.get("/", response_class=HTMLResponse)
 @app.get("/index.html", response_class=HTMLResponse)
-@app.get("/api/index.py", response_class=HTMLResponse)
-@app.get("/api/index.py/", response_class=HTMLResponse)
 async def serve_portal():
     candidates = [
-        HERE / "index.html",
         HERE / "public" / "index.html",
-        HERE.parent / "index.html",
+        HERE / "index.html",
         HERE.parent / "public" / "index.html",
-        Path("index.html"),
+        HERE.parent / "index.html",
         Path("public/index.html"),
+        Path("index.html"),
     ]
     for c in candidates:
         if c.exists():
@@ -59,27 +66,24 @@ async def serve_portal():
 
 
 @app.get("/wooplix_main_logo.png")
-@app.get("/api/index.py/wooplix_main_logo.png")
 async def get_main_logo():
-    for c in [HERE / "wooplix_main_logo.png", HERE / "public" / "wooplix_main_logo.png", HERE.parent / "wooplix_main_logo.png"]:
+    for c in [HERE / "public" / "wooplix_main_logo.png", HERE / "wooplix_main_logo.png", HERE.parent / "wooplix_main_logo.png"]:
         if c.exists():
             return FileResponse(c, media_type="image/png")
     raise HTTPException(status_code=404, detail="Logo not found")
 
 
 @app.get("/wooplix_partner_badge.png")
-@app.get("/api/index.py/wooplix_partner_badge.png")
 async def get_partner_badge():
-    for c in [HERE / "wooplix_partner_badge.png", HERE / "public" / "wooplix_partner_badge.png", HERE.parent / "wooplix_partner_badge.png"]:
+    for c in [HERE / "public" / "wooplix_partner_badge.png", HERE / "wooplix_partner_badge.png", HERE.parent / "wooplix_partner_badge.png"]:
         if c.exists():
             return FileResponse(c, media_type="image/png")
     raise HTTPException(status_code=404, detail="Badge not found")
 
 
 @app.get("/wooplix_logo.png")
-@app.get("/api/index.py/wooplix_logo.png")
 async def get_legacy_logo():
-    for c in [HERE / "wooplix_logo.png", HERE / "public" / "wooplix_logo.png", HERE.parent / "wooplix_logo.png"]:
+    for c in [HERE / "public" / "wooplix_logo.png", HERE / "wooplix_logo.png", HERE.parent / "wooplix_logo.png"]:
         if c.exists():
             return FileResponse(c, media_type="image/png")
     raise HTTPException(status_code=404, detail="Logo not found")
@@ -87,8 +91,7 @@ async def get_legacy_logo():
 
 @app.get("/api/health")
 @app.get("/health")
-@app.get("/api/index.py/api/health")
-@app.get("/api/index.py/health")
+@app.get("/api/index.py")
 async def health_check():
     has_groq = bool(os.environ.get("GROQ_API_KEY") or agent.GROQ_API_KEY)
     has_zoho = bool(os.environ.get("ZOHO_CLIENT_ID") or agent.ZOHO_CLIENT_ID)
