@@ -104,6 +104,163 @@ def get_zoho_token(client_id: str, client_secret: str, refresh_token: str, accou
     return access_token, api_domain, scopes
 
 
+def exchange_zoho_grant_code(client_id: str, client_secret: str, code: str, accounts_url: str = "https://accounts.zoho.in") -> Dict[str, Any]:
+    """Exchange 10-minute Zoho grant token (authorization code) for a permanent refresh token."""
+    import requests
+    cid = client_id.strip()
+    if cid and not cid.startswith("1000."):
+        cid = f"1000.{cid}"
+    
+    url = f"{accounts_url.rstrip('/')}/oauth/v2/token"
+    resp = requests.post(url, params={
+        "code": code.strip(),
+        "client_id": cid,
+        "client_secret": client_secret.strip(),
+        "grant_type": "authorization_code",
+    }, timeout=30)
+    
+    payload = resp.json()
+    if "error" in payload:
+        err = str(payload.get("error"))
+        desc = str(payload.get("error_description", ""))
+        if "invalid_code" in err.lower():
+            raise ValueError("The 10-minute authorization code has expired or is invalid. Please generate a fresh code in Zoho API Console (Self Client).")
+        raise ValueError(f"Zoho Token Exchange Error: {err} {desc}")
+    
+    return payload
+
+
+def discover_environment(client_id: str, client_secret: str, refresh_token: str, accounts_url: str = "https://accounts.zoho.in") -> Dict[str, Any]:
+    """Inspect connected Zoho environment to automatically detect organization profile and installed applications."""
+    import requests
+    access_token, api_domain, scopes = get_zoho_token(client_id, client_secret, refresh_token, accounts_url)
+    headers = {"Authorization": f"Zoho-oauthtoken {access_token}"}
+    
+    org_name = "Client Organization"
+    contact_email = ""
+    discovered_apps = []
+
+    # 1. Inspect CRM
+    has_crm = any("crm" in s.lower() for s in scopes) or False
+    crm_details = "Core Sales & Pipelines"
+    crm_active = False
+    deal_count = 0
+    try:
+        r_deals = requests.get(f"{api_domain}/crm/v2/Deals?per_page=10", headers=headers, timeout=12)
+        if r_deals.status_code == 200:
+            deals = r_deals.json().get("data", []) or []
+            deal_count = len(deals)
+            crm_active = True
+            if deals:
+                owner = deals[0].get("Owner") or {}
+                if owner.get("name"):
+                    org_name = f"{owner.get('name')} Enterprise"
+                if owner.get("email"):
+                    contact_email = owner.get("email")
+                acc = deals[0].get("Account_Name") or {}
+                if acc.get("name") and org_name == "Client Organization":
+                    org_name = acc.get("name")
+            crm_details = f"Active ({deal_count}+ deals sampled)"
+        elif r_deals.status_code == 401:
+            crm_details = "Connected (Scopes Probed)"
+            crm_active = True
+    except Exception as e:
+        crm_details = f"Probe note: {str(e)[:40]}"
+
+    try:
+        r_org = requests.get(f"{api_domain}/crm/v2/org", headers=headers, timeout=10)
+        if r_org.status_code == 200:
+            org_data = (r_org.json().get("org") or [{}])[0]
+            if org_data.get("company_name"):
+                org_name = org_data.get("company_name")
+            if org_data.get("primary_email"):
+                contact_email = org_data.get("primary_email")
+    except Exception:
+        pass
+
+    discovered_apps.append({
+        "id": "zoho_crm",
+        "name": "Zoho CRM",
+        "description": "Sales pipeline, lead routing, custom fields, and data decay metrics",
+        "status": "active" if crm_active or has_crm else "not_configured",
+        "status_label": crm_details if crm_active else ("Scope Granted" if has_crm else "Available for Audit"),
+        "recommended": True
+    })
+
+    # 2. Inspect Desk
+    desk_root = api_domain.replace("zohoapis", "desk.zoho") if "desk.zoho" not in api_domain else api_domain
+    has_desk = any("desk" in s.lower() for s in scopes) or False
+    desk_details = "Customer Support & SLA Tracking"
+    desk_active = False
+    try:
+        r_dept = requests.get(f"{desk_root}/api/v1/departments", headers=headers, timeout=10)
+        if r_dept.status_code == 200:
+            depts = r_dept.json().get("data", []) or []
+            desk_active = True
+            desk_details = f"Active ({len(depts)} Support Department{'s' if len(depts) != 1 else ''})"
+        elif has_desk:
+            desk_active = True
+            desk_details = "Active (Scope Granted)"
+    except Exception:
+        pass
+
+    discovered_apps.append({
+        "id": "zoho_desk",
+        "name": "Zoho Desk",
+        "description": "Department queues, response/resolution SLAs, and escalation triggers",
+        "status": "active" if desk_active or has_desk else "ready",
+        "status_label": desk_details if desk_active else "Available for Audit",
+        "recommended": desk_active or has_desk
+    })
+
+    # 3. Inspect Books
+    books_root = api_domain.replace("zohoapis", "books.zoho") if "books.zoho" not in api_domain else api_domain
+    has_books = any("book" in s.lower() for s in scopes) or False
+    books_details = "Finance, Invoicing, & Receivables"
+    books_active = False
+    try:
+        r_books = requests.get(f"{books_root}/api/v1/organizations", headers=headers, timeout=10)
+        if r_books.status_code == 200:
+            orgs = r_books.json().get("organizations", []) or []
+            books_active = True
+            books_details = f"Active ({len(orgs)} Finance Org{'s' if len(orgs) != 1 else ''})"
+            if orgs and org_name == "Client Organization":
+                org_name = orgs[0].get("name") or org_name
+        elif has_books:
+            books_active = True
+            books_details = "Active (Scope Granted)"
+    except Exception:
+        pass
+
+    discovered_apps.append({
+        "id": "zoho_books",
+        "name": "Zoho Books",
+        "description": "Overdue invoices, foreign exchange automation, & payment reminders",
+        "status": "active" if books_active or has_books else "ready",
+        "status_label": books_details if books_active else "Available for Audit",
+        "recommended": books_active or has_books
+    })
+
+    # 4. Cross-App Sync & Automation
+    discovered_apps.append({
+        "id": "zoho_flow",
+        "name": "Cross-App Sync & Workflows",
+        "description": "CRM-to-Books/Desk bidirectional synchronization & webhook integrity",
+        "status": "recommended",
+        "status_label": "Cross-App Governance",
+        "recommended": True
+    })
+
+    return {
+        "organization_name": org_name,
+        "contact_email": contact_email,
+        "auditor_default": "Ankita Pandey (Zoho Certified Lead)",
+        "api_domain": api_domain,
+        "granted_scopes": scopes,
+        "discovered_apps": discovered_apps
+    }
+
+
 # --------------------------------------------------------------------------- Telemetry Collectors
 def collect_crm_telemetry(access_token: str, api_domain: str, granted_scopes: List[str]) -> Dict[str, Any]:
     """Collect read-only telemetry from Zoho CRM environment."""

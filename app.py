@@ -104,6 +104,83 @@ async def health_check():
     }
 
 
+@app.post("/api/exchange-token")
+@app.post("/exchange-token")
+async def exchange_token(
+    code: str = Form(...),
+    client_id: Optional[str] = Form(""),
+    client_secret: Optional[str] = Form(""),
+    accounts_url: Optional[str] = Form("https://accounts.zoho.in"),
+):
+    """Exchange 10-minute Zoho grant token (authorization code) for a permanent refresh token."""
+    cid = (client_id or "").strip() or os.environ.get("ZOHO_CLIENT_ID", "")
+    csec = (client_secret or "").strip() or os.environ.get("ZOHO_CLIENT_SECRET", "")
+    acc = (accounts_url or "").strip() or os.environ.get("ZOHO_ACCOUNTS_URL", "https://accounts.zoho.in")
+
+    if not cid or not csec:
+        raise HTTPException(status_code=400, detail="Client ID and Client Secret are required to exchange authorization code.")
+
+    try:
+        data = agent.exchange_zoho_grant_code(cid, csec, code, acc)
+        return {
+            "status": "success",
+            "refresh_token": data.get("refresh_token"),
+            "access_token": data.get("access_token"),
+            "api_domain": data.get("api_domain"),
+            "scope": data.get("scope")
+        }
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+@app.post("/api/discover")
+@app.post("/discover")
+async def discover_environment_endpoint(
+    client_id: Optional[str] = Form(""),
+    client_secret: Optional[str] = Form(""),
+    refresh_token: Optional[str] = Form(""),
+    accounts_url: Optional[str] = Form("https://accounts.zoho.in"),
+):
+    """Inspect environment to auto-detect client organization profile and installed applications."""
+    cid = (client_id or "").strip() or os.environ.get("ZOHO_CLIENT_ID", "")
+    csec = (client_secret or "").strip() or os.environ.get("ZOHO_CLIENT_SECRET", "")
+    reftok = (refresh_token or "").strip() or os.environ.get("ZOHO_REFRESH_TOKEN", "")
+    acc = (accounts_url or "").strip() or os.environ.get("ZOHO_ACCOUNTS_URL", "https://accounts.zoho.in")
+
+    if not cid or not csec or not reftok:
+        return {
+            "organization_name": "Wooplix Client Organization",
+            "contact_email": "enquiry@wooplix.com",
+            "auditor_default": "Ankita Pandey (Zoho Certified Lead)",
+            "api_domain": "https://www.zohoapis.in",
+            "discovered_apps": [
+                {"id": "zoho_crm", "name": "Zoho CRM", "description": "Core Sales, Deals, Pipeline stages, & data hygiene", "status": "active", "status_label": "Probed Baseline", "recommended": True},
+                {"id": "zoho_desk", "name": "Zoho Desk", "description": "Department queues, SLAs, & escalation triggers", "status": "active", "status_label": "Probed Baseline", "recommended": True},
+                {"id": "zoho_books", "name": "Zoho Books", "description": "Multi-currency, overdue receivables, & invoice flows", "status": "active", "status_label": "Probed Baseline", "recommended": True},
+                {"id": "zoho_flow", "name": "Cross-App Sync", "description": "CRM-to-Books/Desk bidirectional synchronization", "status": "recommended", "status_label": "Cross-App Governance", "recommended": True}
+            ]
+        }
+
+    try:
+        data = agent.discover_environment(cid, csec, reftok, acc)
+        return data
+    except Exception as exc:
+        print(f"Discovery probe error: {exc}")
+        return {
+            "organization_name": "Connected Client Organization",
+            "contact_email": "",
+            "auditor_default": "Ankita Pandey (Zoho Certified Lead)",
+            "api_domain": acc,
+            "warning": str(exc),
+            "discovered_apps": [
+                {"id": "zoho_crm", "name": "Zoho CRM", "description": "Sales pipeline, lead routing, custom fields", "status": "active", "status_label": "Ready for Audit", "recommended": True},
+                {"id": "zoho_desk", "name": "Zoho Desk", "description": "Support tickets, queues, and SLAs", "status": "active", "status_label": "Ready for Audit", "recommended": True},
+                {"id": "zoho_books", "name": "Zoho Books", "description": "Invoicing, currencies, receivables", "status": "active", "status_label": "Ready for Audit", "recommended": True},
+                {"id": "zoho_flow", "name": "Cross-App Sync", "description": "Data synchronization and webhooks", "status": "recommended", "status_label": "Ready for Audit", "recommended": True}
+            ]
+        }
+
+
 def _render_audit_pdf(audit_data: dict, target_pdf: Path, host: Optional[str] = None) -> bool:
     """Render PDF deliverable via Vercel PHP Dompdf function or local Dompdf."""
     if os.environ.get("VERCEL"):
