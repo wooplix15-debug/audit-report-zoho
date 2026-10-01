@@ -170,7 +170,7 @@ async def zoho_oauth_login(
     scopes = (scope or "").strip() or DEFAULT_OAUTH_SCOPES
 
     # Derive dynamic callback URL from request if not explicitly supplied
-    red_uri = (redirect_uri or "").strip()
+    red_uri = (redirect_uri or "").strip() or os.environ.get("ZOHO_REDIRECT_URI", "")
     if not red_uri:
         proto = request.headers.get("x-forwarded-proto") or request.url.scheme
         host = request.headers.get("x-forwarded-host") or request.headers.get("host") or request.url.netloc
