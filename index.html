@@ -278,44 +278,47 @@
       display: block;
     }
 
-    /* Token Action & Storage Styles */
-    .token-helper-bar {
+    /* Permanent Refresh Token Tool Styles */
+    .refresh-token-tool {
+      margin-top: 10px;
+      margin-bottom: 4px;
+    }
+
+    .tool-action-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      margin-top: 8px;
+      gap: 12px;
       flex-wrap: wrap;
     }
 
-    .btn-token-action {
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
-      border-radius: 5px;
-      color: #0f172a;
-      font-size: 12px;
+    .btn-generate-refresh {
+      background: #0f172a;
+      color: #ffffff;
+      border: 1px solid #0f172a;
+      border-radius: 6px;
+      font-size: 12.5px;
       font-weight: 500;
-      padding: 6px 12px;
+      padding: 7px 14px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
       transition: all 0.15s ease;
       font-family: inherit;
     }
 
-    .btn-token-action:hover {
-      background: #f1f5f9;
-      border-color: #94a3b8;
-      color: var(--primary);
+    .btn-generate-refresh:hover {
+      background: #1e293b;
+      border-color: #1e293b;
     }
 
-    .btn-token-action:disabled {
+    .btn-generate-refresh:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
 
-    .token-save-toggle {
+    .remember-check-label {
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -325,17 +328,17 @@
       user-select: none;
     }
 
-    .token-save-toggle input {
+    .remember-check-label input {
       accent-color: var(--primary);
       cursor: pointer;
     }
 
-    .token-details-card {
+    .refresh-token-result-box {
       margin-top: 12px;
-      padding: 12px 14px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 14px;
       animation: fadeIn 0.2s ease;
     }
 
@@ -344,27 +347,49 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .token-details-header {
+    .result-box-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
-    .token-header-left {
+    .result-title {
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 12px;
-      color: #0f172a;
+      font-size: 12.5px;
+      color: #15803d;
+      font-weight: 600;
     }
 
-    .pulse-indicator {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+    .copy-refresh-token-btn {
+      background: #ffffff;
+      border: 1px solid #86efac;
+      border-radius: 5px;
+      color: #15803d;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+
+    .copy-refresh-token-btn:hover {
+      background: #dcfce7;
+      border-color: #4ade80;
+    }
+
+    .copy-refresh-token-btn.copied {
+      background: #15803d;
+      color: #ffffff;
+      border-color: #15803d;
     }
 
     .clear-storage-btn {
@@ -382,90 +407,36 @@
       color: #ef4444;
     }
 
-    .token-row {
+    .token-input-display-wrap {
       margin-bottom: 8px;
     }
 
-    .token-label-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 11px;
-      margin-bottom: 4px;
-    }
-
-    .token-type-tag {
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      padding: 2px 6px;
-      border-radius: 3px;
-    }
-
-    .token-type-tag.access-tag {
-      background: #eff6ff;
-      color: #1d4ed8;
-      border: 1px solid #bfdbfe;
-    }
-
-    .token-type-tag.refresh-tag {
-      background: #ecfdf5;
-      color: #047857;
-      border: 1px solid #a7f3d0;
-    }
-
-    .token-expiry-badge, .token-saved-badge {
-      color: #64748b;
-      font-size: 11px;
-    }
-
-    .token-field-group {
-      display: flex;
-      gap: 5px;
-    }
-
-    .token-mini-input {
-      flex: 1;
-      height: 30px;
+    .refresh-token-code-input {
+      width: 100%;
+      height: 36px;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 11px;
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-      border-radius: 4px;
-      padding: 0 8px;
-      color: #334155;
-    }
-
-    .token-mini-btn {
-      height: 30px;
-      padding: 0 9px;
-      border: 1px solid #cbd5e1;
-      background: #ffffff;
-      border-radius: 4px;
-      font-size: 11.5px;
+      font-size: 12px;
       font-weight: 500;
-      font-family: inherit;
-      color: #475569;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      transition: all 0.15s;
-    }
-
-    .token-mini-btn:hover {
-      background: #f1f5f9;
+      background: #ffffff;
+      border: 1px solid #86efac;
+      border-radius: 5px;
+      padding: 0 10px;
       color: #0f172a;
+      letter-spacing: 0.02em;
     }
 
-    .token-sync-status {
+    .refresh-token-instruction {
       font-size: 11.5px;
-      color: #059669;
-      margin-top: 6px;
+      color: #334155;
       display: flex;
-      align-items: center;
-      gap: 4px;
+      align-items: flex-start;
+      gap: 6px;
+      line-height: 1.45;
+    }
+
+    .refresh-token-instruction svg {
+      flex-shrink: 0;
+      margin-top: 2px;
     }
 
     /* Segmented Format Switcher */
@@ -817,71 +788,52 @@
         </div>
 
         <div class="field">
-          <label for="token">Access Code or Refresh Token</label>
+          <label for="token">Access Token / Authorization Code</label>
           <div class="input-action">
-            <input type="password" id="token" class="input" placeholder="Paste 10-minute code or refresh token" required>
+            <input type="password" id="token" class="input" placeholder="Paste 10-minute access token or code from Zoho Console" required>
             <button type="button" class="action-icon" onclick="toggleVisibility('token')" aria-label="Toggle token visibility">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
             </button>
           </div>
-          <span class="field-note">Accepts a temporary 10-minute code from Zoho Console or an existing refresh token.</span>
+          <span class="field-note">Enter your Client ID, Secret, and Access Token above to generate your permanent Refresh Token below.</span>
 
-          <div class="token-helper-bar">
-            <button type="button" class="btn-token-action" id="exchangeBtn" onclick="exchangeAndSaveToken()">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-              <span>Exchange to Access Token & Save</span>
-            </button>
-            <label class="token-save-toggle">
-              <input type="checkbox" id="saveCredentialsCheck" checked>
-              <span>Remember in browser storage</span>
-            </label>
-          </div>
-
-          <!-- Token Management Panel -->
-          <div id="tokenDetailsCard" class="token-details-card" style="display: none;">
-            <div class="token-details-header">
-              <div class="token-header-left">
-                <span class="pulse-indicator"></span>
-                <strong>Live Token Credentials</strong>
-              </div>
-              <button type="button" class="clear-storage-btn" onclick="clearSavedCredentials()" title="Wipe saved credentials from browser storage">
-                Clear Saved
+          <!-- Dedicated Refresh Token Generator Tool -->
+          <div class="refresh-token-tool">
+            <div class="tool-action-header">
+              <button type="button" class="btn-generate-refresh" id="generateRefreshBtn" onclick="generatePermanentRefreshToken()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                <span>Get Permanent Refresh Token</span>
               </button>
+              <label class="remember-check-label">
+                <input type="checkbox" id="saveCredentialsCheck" checked>
+                <span>Remember Refresh Token in browser</span>
+              </label>
             </div>
 
-            <div class="token-row">
-              <div class="token-label-row">
-                <span class="token-type-tag access-tag">Active Access Token</span>
-                <span class="token-expiry-badge" id="tokenExpiryText">Expires in ~60m</span>
+            <!-- Refresh Token Result Box (Appears right below) -->
+            <div id="refreshTokenResultBox" class="refresh-token-result-box" style="display: none;">
+              <div class="result-box-top">
+                <div class="result-title">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                  <span>Your Permanent Refresh Token:</span>
+                </div>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <button type="button" class="copy-refresh-token-btn" id="copyRefreshMainBtn" onclick="copyGeneratedRefreshToken()">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    <span>Copy Refresh Token</span>
+                  </button>
+                  <button type="button" class="clear-storage-btn" onclick="clearSavedCredentials()" title="Clear saved credentials">Clear</button>
+                </div>
               </div>
-              <div class="token-field-group">
-                <input type="password" id="displayAccessToken" class="token-mini-input" readonly placeholder="Access token will appear here">
-                <button type="button" class="token-mini-btn" onclick="toggleVisibility('displayAccessToken')" title="Show / Hide">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                </button>
-                <button type="button" class="token-mini-btn" id="copyAccessBtn" onclick="copyTokenValue('displayAccessToken', this)">
-                  Copy
-                </button>
-              </div>
-            </div>
 
-            <div class="token-row">
-              <div class="token-label-row">
-                <span class="token-type-tag refresh-tag">Permanent Refresh Token</span>
-                <span class="token-saved-badge">Saved for Future Audits</span>
+              <div class="token-input-display-wrap">
+                <input type="text" id="generatedRefreshTokenInput" class="refresh-token-code-input" readonly placeholder="Permanent refresh token will appear here">
               </div>
-              <div class="token-field-group">
-                <input type="password" id="displayRefreshToken" class="token-mini-input" readonly placeholder="Permanent refresh token">
-                <button type="button" class="token-mini-btn" onclick="toggleVisibility('displayRefreshToken')" title="Show / Hide">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                </button>
-                <button type="button" class="token-mini-btn" id="copyRefreshBtn" onclick="copyTokenValue('displayRefreshToken', this)">
-                  Copy
-                </button>
+
+              <div class="refresh-token-instruction">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <span><strong>Copy and save this Refresh Token!</strong> In future audits, you can just paste this Refresh Token (or let the browser remember it) and you never have to generate the 10-minute access token again.</span>
               </div>
-            </div>
-            <div class="token-sync-status" id="tokenSyncStatus">
-              Active access token is ready for live audit scanning.
             </div>
           </div>
         </div>
@@ -1040,19 +992,23 @@
     // Token storage & copy helpers
     const STORAGE_KEY = 'wooplix_zoho_credentials';
 
-    function copyTokenValue(inputId, btn) {
-      const input = document.getElementById(inputId);
+    function copyGeneratedRefreshToken() {
+      const input = document.getElementById('generatedRefreshTokenInput');
       if (!input || !input.value) return;
       navigator.clipboard.writeText(input.value).then(() => {
-        const origText = btn.textContent;
-        btn.textContent = 'Copied!';
-        btn.style.color = '#059669';
-        btn.style.borderColor = '#86efac';
+        const btn = document.getElementById('copyRefreshMainBtn');
+        btn.innerHTML = `
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <span>Copied to Clipboard!</span>
+        `;
+        btn.classList.add('copied');
         setTimeout(() => {
-          btn.textContent = origText;
-          btn.style.color = '';
-          btn.style.borderColor = '';
-        }, 2000);
+          btn.innerHTML = `
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span>Copy Refresh Token</span>
+          `;
+          btn.classList.remove('copied');
+        }, 2500);
       }).catch(() => {
         input.select();
         document.execCommand('copy');
@@ -1077,12 +1033,8 @@
         if (creds.clientSecret) document.getElementById('clientSecret').value = creds.clientSecret;
         if (creds.refreshToken) {
           document.getElementById('token').value = creds.refreshToken;
-          document.getElementById('displayRefreshToken').value = creds.refreshToken;
-          if (creds.accessToken) {
-            document.getElementById('displayAccessToken').value = creds.accessToken;
-          }
-          document.getElementById('tokenDetailsCard').style.display = 'block';
-          document.getElementById('tokenSyncStatus').textContent = 'Saved permanent refresh token restored from browser storage.';
+          document.getElementById('generatedRefreshTokenInput').value = creds.refreshToken;
+          document.getElementById('refreshTokenResultBox').style.display = 'block';
         }
       } catch (e) {
         console.warn('LocalStorage load error', e);
@@ -1093,34 +1045,35 @@
       try {
         localStorage.removeItem(STORAGE_KEY);
       } catch (e) {}
-      document.getElementById('tokenDetailsCard').style.display = 'none';
+      document.getElementById('refreshTokenResultBox').style.display = 'none';
+      document.getElementById('generatedRefreshTokenInput').value = '';
       const alert = document.getElementById('statusAlert');
-      alert.textContent = 'Saved credentials cleared from browser storage.';
+      alert.textContent = 'Saved credentials cleared.';
       alert.className = 'alert';
       setTimeout(() => {
         if (alert.textContent.includes('cleared')) alert.textContent = '';
       }, 3000);
     }
 
-    async function exchangeAndSaveToken() {
+    async function generatePermanentRefreshToken() {
       const accountsUrl = document.getElementById('accountsUrl').value;
       const clientId = document.getElementById('clientId').value.trim();
       const clientSecret = document.getElementById('clientSecret').value.trim();
       const token = document.getElementById('token').value.trim();
       const saveCheck = document.getElementById('saveCredentialsCheck').checked;
       const alert = document.getElementById('statusAlert');
-      const exchangeBtn = document.getElementById('exchangeBtn');
+      const btn = document.getElementById('generateRefreshBtn');
 
       if (!clientId || !clientSecret || !token) {
-        alert.textContent = 'Please enter your Client ID, Client Secret, and Grant Code or Refresh Token first.';
+        alert.textContent = 'Please enter your Client ID, Client Secret, and Access Token / Code above.';
         alert.className = 'alert error';
         return;
       }
 
-      alert.textContent = 'Exchanging token with Zoho Accounts server...';
+      alert.textContent = 'Generating permanent Refresh Token from Zoho Accounts...';
       alert.className = 'alert';
-      exchangeBtn.disabled = true;
-      exchangeBtn.innerHTML = '<span>Exchanging...</span>';
+      btn.disabled = true;
+      btn.innerHTML = '<span>Generating...</span>';
 
       try {
         const fd = new FormData();
@@ -1140,40 +1093,36 @@
           throw new Error(data.detail || `Exchange failed with status ${res.status}`);
         }
 
-        // Update token details card
-        document.getElementById('displayAccessToken').value = data.access_token || '';
-        document.getElementById('displayRefreshToken').value = data.refresh_token || token;
-        // Keep the permanent refresh token in the input form so audits never expire
-        document.getElementById('token').value = data.refresh_token || token;
-        document.getElementById('tokenDetailsCard').style.display = 'block';
-        document.getElementById('tokenSyncStatus').textContent = `Verified with ${data.api_domain || 'Zoho API'}. Refresh token saved for permanent reuse!`;
-        document.getElementById('tokenExpiryText').textContent = `Expires in ~${Math.round((data.expires_in || 3600) / 60)}m`;
+        const refreshToken = data.refresh_token || token;
+        document.getElementById('generatedRefreshTokenInput').value = refreshToken;
+        document.getElementById('refreshTokenResultBox').style.display = 'block';
+        // Auto-fill active form input with the permanent refresh token
+        document.getElementById('token').value = refreshToken;
 
         if (saveCheck) {
           saveCredentialsToStorage({
             accountsUrl,
             clientId,
             clientSecret,
-            refreshToken: data.refresh_token || token,
-            accessToken: data.access_token || '',
+            refreshToken: refreshToken,
             savedAt: Date.now()
           });
         }
 
-        alert.textContent = 'Tokens successfully exchanged! Permanent refresh token is saved and active.';
+        alert.textContent = 'Permanent Refresh Token generated! You can copy it above and never have to generate access tokens again.';
         alert.className = 'alert success';
         setTimeout(() => {
-          if (alert.textContent.includes('exchanged')) alert.textContent = '';
-        }, 4000);
+          if (alert.textContent.includes('generated!')) alert.textContent = '';
+        }, 5000);
 
       } catch (err) {
         alert.textContent = `Token Exchange Error: ${err.message}`;
         alert.className = 'alert error';
       } finally {
-        exchangeBtn.disabled = false;
-        exchangeBtn.innerHTML = `
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-          <span>Exchange to Access Token & Save</span>
+        btn.disabled = false;
+        btn.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          <span>Get Permanent Refresh Token</span>
         `;
       }
     }
