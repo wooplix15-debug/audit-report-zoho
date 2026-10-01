@@ -104,6 +104,41 @@ def get_zoho_token(client_id: str, client_secret: str, refresh_token: str, accou
     return access_token, api_domain, scopes
 
 
+def unified_zoho_auth(client_id: str, client_secret: str, token_or_code: str, accounts_url: str = "https://accounts.zoho.in") -> Tuple[str, str, str, List[str]]:
+    """Automatically authenticate against Zoho by detecting whether the token is a 10-minute authorization code or a refresh token.
+    Returns (access_token, persistent_refresh_token, api_domain, scopes)."""
+    import requests
+    cid = client_id.strip()
+    if cid and not cid.startswith("1000."):
+        cid = f"1000.{cid}"
+    csec = client_secret.strip()
+    tok = token_or_code.strip()
+    url = f"{accounts_url.rstrip('/')}/oauth/v2/token"
+
+    # Attempt 1: Try as 10-minute authorization code
+    try:
+        r1 = requests.post(url, params={
+            "code": tok, "client_id": cid, "client_secret": csec, "grant_type": "authorization_code"
+        }, timeout=25)
+        d1 = r1.json()
+        if "refresh_token" in d1:
+            return d1["access_token"], d1["refresh_token"], (d1.get("api_domain") or "https://www.zohoapis.in").rstrip("/"), (d1.get("scope") or "").split()
+    except Exception:
+        pass
+
+    # Attempt 2: Try as standard refresh token
+    r2 = requests.post(url, params={
+        "refresh_token": tok, "client_id": cid, "client_secret": csec, "grant_type": "refresh_token"
+    }, timeout=25)
+    d2 = r2.json()
+    if "access_token" in d2:
+        return d2["access_token"], tok, (d2.get("api_domain") or "https://www.zohoapis.in").rstrip("/"), (d2.get("scope") or "").split()
+
+    err = d2.get("error") or "Authentication failed"
+    desc = d2.get("error_description") or "Check Client ID, Secret, and Code/Refresh Token."
+    raise ValueError(f"Zoho Connection Error: {err} - {desc}")
+
+
 def exchange_zoho_grant_code(client_id: str, client_secret: str, code: str, accounts_url: str = "https://accounts.zoho.in") -> Dict[str, Any]:
     """Exchange 10-minute Zoho grant token (authorization code) for a permanent refresh token."""
     import requests
@@ -654,7 +689,7 @@ def collect_environment_telemetry(
     }
 
     try:
-        access_token, api_domain, granted_scopes = get_zoho_token(client_id, client_secret, refresh_token, accounts_url)
+        access_token, persistent_tok, api_domain, granted_scopes = unified_zoho_auth(client_id, client_secret, refresh_token, accounts_url)
         telemetry["client_metadata"]["api_domain"] = api_domain
         telemetry["client_metadata"]["granted_scopes"] = granted_scopes
 

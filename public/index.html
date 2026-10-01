@@ -24,8 +24,6 @@
       --bg: #f8fafc;
       --critical: #b91c1c;
       --critical-bg: #fee2e2;
-      --medium: #b45309;
-      --medium-bg: #fef3c7;
       --success: #15803d;
       --success-bg: #dcfce7;
       --card-shadow: 0 12px 36px rgba(26, 54, 93, 0.08);
@@ -39,11 +37,11 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 36px 20px;
+      padding: 32px 18px;
     }
     .container {
       width: 100%;
-      max-width: 820px;
+      max-width: 680px;
       margin: auto;
     }
     .header {
@@ -51,35 +49,35 @@
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      margin-bottom: 26px;
+      margin-bottom: 24px;
       background: #ffffff;
-      padding: 14px 22px;
-      border-radius: 16px;
+      padding: 12px 20px;
+      border-radius: 14px;
       border: 1px solid var(--line);
-      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.03);
     }
     .brand-logos {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
     }
     .main-logo {
-      height: 38px;
+      height: 34px;
       width: auto;
       object-fit: contain;
     }
     .partner-badge {
-      height: 28px;
+      height: 25px;
       width: auto;
       object-fit: contain;
     }
     .header-badge {
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
       color: var(--navy);
       background: #edf4fc;
       border: 1px solid #d0e1f7;
-      padding: 6px 12px;
+      padding: 5px 10px;
       border-radius: 99px;
       letter-spacing: 0.3px;
       text-transform: uppercase;
@@ -87,106 +85,92 @@
     }
     .intro {
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
     }
     .intro h1 {
       font-family: "Manrope", sans-serif;
       font-weight: 800;
-      font-size: clamp(26px, 4.5vw, 34px);
-      letter-spacing: -0.8px;
+      font-size: clamp(24px, 4vw, 30px);
+      letter-spacing: -0.6px;
       color: var(--navy);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       line-height: 1.25;
     }
     .intro p {
-      font-size: 14.5px;
+      font-size: 13.5px;
       color: var(--muted);
-      max-width: 620px;
-      margin: 0 auto;
       line-height: 1.5;
+    }
+    /* Simple Instructions accordion */
+    .guide-box {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      font-size: 12.5px;
+      color: #334155;
+    }
+    .guide-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--navy);
+      user-select: none;
+    }
+    .guide-steps {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #e2e8f0;
+      display: none;
+      line-height: 1.55;
+    }
+    .guide-steps ol {
+      margin-left: 20px;
+      margin-top: 6px;
+    }
+    .guide-steps li {
+      margin-bottom: 6px;
+    }
+    .guide-steps code {
+      background: #ffffff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #cbd5e1;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      color: #0f172a;
     }
     .card {
       background: var(--paper);
       border: 1px solid var(--line);
-      border-radius: 20px;
+      border-radius: 18px;
       box-shadow: var(--card-shadow);
-      padding: 30px 32px;
-    }
-    .section-title {
-      font-family: "Manrope", sans-serif;
-      font-size: 13.5px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      color: var(--navy);
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .section-title span.step-num {
-      background: var(--navy);
-      color: #fff;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      font-size: 11px;
-      display: grid;
-      place-items: center;
-    }
-    /* Tab bar for connection mode */
-    .tab-bar {
-      display: flex;
-      background: #f1f5f9;
-      border-radius: 12px;
-      padding: 4px;
-      gap: 4px;
-      margin-bottom: 18px;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 10px 12px;
-      border: 0;
-      background: none;
-      border-radius: 9px;
-      font-family: "DM Sans", sans-serif;
-      font-size: 12.5px;
-      font-weight: 600;
-      color: #64748b;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-align: center;
-    }
-    .tab-btn:hover {
-      color: var(--navy);
-    }
-    .tab-btn.active {
-      background: #ffffff;
-      color: var(--navy);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      font-weight: 700;
-    }
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 16px;
-    }
-    .form-grid.single {
-      grid-template-columns: 1fr;
+      padding: 28px 28px;
     }
     .form-group {
       display: flex;
       flex-direction: column;
       gap: 6px;
+      margin-bottom: 14px;
     }
     .form-group label {
       font-size: 12px;
-      font-weight: 600;
-      color: #334155;
+      font-weight: 700;
+      color: #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .form-group label span {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
     }
     .form-group input, .form-group select {
-      padding: 10px 14px;
+      padding: 11px 14px;
       border: 1.5px solid var(--line);
       border-radius: 10px;
       font-size: 13px;
@@ -220,185 +204,27 @@
       font-size: 12px;
       padding: 4px;
     }
-    .btn-secondary {
-      background: #edf4fc;
-      border: 1.5px solid #c8dcf6;
-      color: var(--navy);
-      font-family: "DM Sans", sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      padding: 11px 18px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .btn-secondary:hover:not(:disabled) {
-      background: #dbeafc;
-      border-color: var(--navy);
-    }
-    .btn-secondary:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    /* Discovered Profile Box */
-    .discovery-box {
-      background: #f8fafc;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 14px;
-      padding: 18px 20px;
-      margin-bottom: 22px;
-      display: none;
-      animation: fadeIn 0.3s ease-out;
-    }
-    .discovery-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid #e2e8f0;
-    }
-    .discovery-title {
-      font-family: "Manrope", sans-serif;
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--navy);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .discovery-pill {
-      font-size: 11px;
-      font-weight: 700;
-      background: var(--success-bg);
-      color: var(--success);
-      padding: 4px 10px;
-      border-radius: 99px;
-      border: 1px solid #86efac;
-    }
-    .profile-details-grid {
+    .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin-bottom: 16px;
-    }
-    .profile-item {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 10px 14px;
-    }
-    .profile-item label {
-      display: block;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      margin-bottom: 4px;
-    }
-    .profile-item input {
-      width: 100%;
-      border: none;
-      outline: none;
-      font-family: "Manrope", sans-serif;
-      font-size: 13.5px;
-      font-weight: 700;
-      color: var(--navy);
-      background: transparent;
-      padding: 0;
-    }
-    .suites-selector-title {
-      font-size: 12.5px;
-      font-weight: 700;
-      color: #334155;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .suites-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .suite-card {
-      border: 1.5px solid var(--line);
-      border-radius: 12px;
-      padding: 12px 14px;
-      background: #ffffff;
-      cursor: pointer;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      transition: all 0.2s;
-      user-select: none;
-    }
-    .suite-card:hover {
-      border-color: #94a3b8;
-    }
-    .suite-card.selected {
-      border-color: var(--teal);
-      background: var(--teal-light);
-    }
-    .suite-card input[type="checkbox"] {
-      margin-top: 3px;
-      accent-color: var(--teal);
-      width: 16px;
-      height: 16px;
-      cursor: pointer;
-    }
-    .suite-info {
-      flex: 1;
-      min-width: 0;
-    }
-    .suite-info strong {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 13px;
-      color: var(--navy);
-      margin-bottom: 2px;
-    }
-    .suite-badge {
-      font-size: 9.5px;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 99px;
-      background: #edf2f9;
-      color: #475569;
-    }
-    .suite-card.selected .suite-badge {
-      background: #ccfbf1;
-      color: #0f766e;
-    }
-    .suite-info span {
-      display: block;
-      font-size: 11px;
-      color: var(--muted);
-      line-height: 1.35;
     }
     .format-options {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 22px;
+      gap: 8px;
+      margin: 18px 0 20px;
     }
     .format-btn {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      padding: 12px 10px;
+      padding: 10px 8px;
       border: 1.5px solid var(--line);
-      border-radius: 12px;
+      border-radius: 10px;
       background: #fafbfd;
       cursor: pointer;
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 600;
       color: #334155;
       transition: all 0.2s;
@@ -412,6 +238,7 @@
       border-color: var(--navy);
       background: #edf4fc;
       color: var(--navy);
+      font-weight: 700;
     }
     .submit-btn {
       width: 100%;
@@ -419,7 +246,7 @@
       color: #ffffff;
       border: 0;
       border-radius: 12px;
-      padding: 15px 22px;
+      padding: 14px 20px;
       font-family: "Manrope", sans-serif;
       font-weight: 700;
       font-size: 14.5px;
@@ -441,33 +268,48 @@
       cursor: not-allowed;
       transform: none;
     }
+    .demo-link-bar {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .demo-link {
+      color: var(--teal);
+      text-decoration: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .demo-link:hover {
+      text-decoration: underline;
+    }
     /* Stepper */
     .stepper {
       margin-top: 20px;
-      padding: 16px;
+      padding: 14px 16px;
       border-radius: 12px;
       background: #f1f5f9;
       display: none;
       border: 1px solid var(--line);
     }
     .stepper-header {
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 700;
       color: var(--navy);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
     .stepper-steps {
       display: grid;
-      gap: 8px;
+      gap: 7px;
     }
     .step-item {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 12px;
+      gap: 9px;
+      font-size: 11.5px;
       color: var(--muted);
     }
     .step-item.active {
@@ -478,13 +320,13 @@
       color: var(--success);
     }
     .step-icon {
-      width: 18px;
-      height: 18px;
+      width: 17px;
+      height: 17px;
       border-radius: 50%;
       background: #cbd5e1;
       display: grid;
       place-items: center;
-      font-size: 10px;
+      font-size: 9.5px;
       color: #fff;
     }
     .step-item.active .step-icon {
@@ -501,9 +343,9 @@
     }
     /* Results */
     .result-card {
-      margin-top: 22px;
-      padding: 24px;
-      border-radius: 16px;
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 14px;
       border: 1.5px solid #86efac;
       background: #f0fdf4;
       display: none;
@@ -513,39 +355,33 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
     .health-pill {
       font-family: "Manrope", sans-serif;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 800;
       color: var(--navy);
       background: #ffffff;
-      padding: 6px 16px;
+      padding: 5px 14px;
       border-radius: 99px;
       border: 1px solid #bbf7d0;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
     .health-pill span {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       color: var(--muted);
     }
     .result-details strong {
       display: block;
-      font-size: 15px;
+      font-size: 14.5px;
       color: #14532d;
       margin-bottom: 2px;
     }
     .result-details span {
-      font-size: 12px;
+      font-size: 11.5px;
       color: #166534;
       font-family: "JetBrains Mono", monospace;
-    }
-    .result-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 16px;
     }
     .download-btn {
       display: inline-flex;
@@ -559,16 +395,17 @@
       font-size: 12.5px;
       font-weight: 700;
       transition: 0.2s;
+      margin-top: 14px;
     }
     .download-btn:hover {
       background: var(--navy-dark);
     }
     .status-alert {
-      margin-top: 14px;
-      font-size: 12.5px;
+      margin-top: 12px;
+      font-size: 12px;
       text-align: center;
       color: var(--muted);
-      min-height: 20px;
+      min-height: 18px;
     }
     .status-alert.error {
       color: var(--critical);
@@ -577,9 +414,9 @@
     .footer {
       text-align: center;
       color: #94a3b8;
-      font-size: 11.5px;
-      margin-top: 36px;
-      line-height: 1.6;
+      font-size: 11px;
+      margin-top: 32px;
+      line-height: 1.5;
     }
     .footer a {
       color: var(--navy);
@@ -590,11 +427,9 @@
       from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: none; }
     }
-    @media (max-width: 640px) {
-      .card { padding: 22px 18px; }
-      .form-grid { grid-template-columns: 1fr; }
-      .profile-details-grid { grid-template-columns: 1fr; }
-      .suites-grid { grid-template-columns: 1fr; }
+    @media (max-width: 580px) {
+      .card { padding: 20px 16px; }
+      .grid-2 { grid-template-columns: 1fr; }
       .format-options { grid-template-columns: 1fr; }
       .header { flex-direction: column; align-items: flex-start; }
     }
@@ -607,197 +442,92 @@
         <img class="main-logo" src="/wooplix_main_logo.png" alt="Wooplix Technologies">
         <img class="partner-badge" src="/wooplix_partner_badge.png" alt="Zoho Authorized Partner">
       </div>
-      <span class="header-badge">Automated Zoho Audit</span>
+      <span class="header-badge">Zoho Audit Agent</span>
     </header>
 
     <div class="intro">
-      <h1>Smart Zoho Architecture &amp; System Audit</h1>
-      <p>Automated environment inspection, application auto-discovery, and AI diagnostic deliverables (DOCX &amp; PDF).</p>
+      <h1>Zoho System Audit &amp; Architecture Assessment</h1>
+      <p>Connect any client Zoho environment to automatically detect installed applications, diagnose configuration gaps, and generate branded audit deliverables.</p>
+    </div>
+
+    <!-- Quick instructions -->
+    <div class="guide-box">
+      <div class="guide-header" onclick="toggleGuide()">
+        <span>📘 How to get Zoho API Credentials for any client in 60 seconds</span>
+        <span id="guideArrow">▼</span>
+      </div>
+      <div class="guide-steps" id="guideSteps">
+        <ol>
+          <li>Open <strong><a href="https://api-console.zoho.com" target="_blank" style="color:var(--teal);">Zoho API Console</a></strong> and click <strong>Self Client</strong>.</li>
+          <li>Copy the <strong>Client ID</strong> and <strong>Client Secret</strong>.</li>
+          <li>In <strong>Generate Code</strong>, paste these scopes:
+            <br><code>ZohoCRM.modules.READ,ZohoCRM.settings.READ,Desk.tickets.READ,Desk.settings.READ,ZohoBooks.fullaccess.READ</code>
+          </li>
+          <li>Set Duration to <strong>10 minutes</strong>, click <strong>Create</strong>, and copy the <strong>Code</strong>.</li>
+          <li>Paste the Client ID, Secret, and Code below. <em>(The tool automatically detects whether you pasted a 10-minute Code or a Refresh Token!)</em></li>
+        </ol>
+      </div>
     </div>
 
     <div class="card">
       <form id="auditForm" onsubmit="return false;">
-
-        <!-- STEP 1: Connect Zoho Environment -->
-        <div class="section-title">
-          <span class="step-num">1</span> Connect Zoho Environment
+        
+        <div class="form-group">
+          <label for="accountsUrl">
+            Zoho Region Domain
+            <span>Match client's Zoho data center</span>
+          </label>
+          <select id="accountsUrl">
+            <option value="https://accounts.zoho.in" selected>Zoho India (.in) — https://accounts.zoho.in</option>
+            <option value="https://accounts.zoho.com">Zoho US / Global (.com) — https://accounts.zoho.com</option>
+            <option value="https://accounts.zoho.eu">Zoho Europe (.eu) — https://accounts.zoho.eu</option>
+            <option value="https://accounts.zoho.com.au">Zoho Australia (.com.au) — https://accounts.zoho.com.au</option>
+          </select>
         </div>
 
-        <!-- Connection Mode Tabs -->
-        <div class="tab-bar">
-          <button type="button" class="tab-btn active" id="tabTest">⚡ One-Click Test Account</button>
-          <button type="button" class="tab-btn" id="tabCode">🔑 10-Min Grant Code</button>
-          <button type="button" class="tab-btn" id="tabToken">📝 Custom Refresh Token</button>
-        </div>
-
-        <!-- Mode A: Pre-configured Test Account -->
-        <div id="panelTest" style="background:#edf4fc; border:1px solid #cfe2f9; border-radius:12px; padding:16px; margin-bottom:18px;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
-            <div>
-              <strong style="color:var(--navy); font-size:13.5px; display:block;">Pre-configured Wooplix Test Sandbox</strong>
-              <span style="font-size:12px; color:#475569;">Ready to probe. Automatically detects CRM Deals, Leads, Pipelines, and Data Hygiene.</span>
-            </div>
-            <span style="font-size:11px; font-weight:700; background:#dbeafe; color:#1e40af; padding:3px 8px; border-radius:6px;">Self-Client Active</span>
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="clientId">Client ID *</label>
+            <input type="text" id="clientId" placeholder="1000.XXXXXXXXXXXXXX" required>
           </div>
-          <div style="font-size:11.5px; color:#64748b; font-family:'JetBrains Mono', monospace; background:#ffffff; padding:8px 12px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:12px;">
-            Client ID: 1000.Q8BYX2ZJY8O4... &bull; Domain: accounts.zoho.in
-          </div>
-          <button type="button" class="btn-secondary" id="btnTestConnect" style="width:100%;">
-            <span>🔍 Connect &amp; Auto-Discover Environment</span> →
-          </button>
-        </div>
-
-        <!-- Mode B: 10-Minute Authorization Code (Auto-Exchange) -->
-        <div id="panelCode" style="display:none; background:#fafbfd; border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:18px;">
-          <div style="font-size:12px; color:#475569; margin-bottom:12px; line-height:1.45;">
-            Paste the <strong>10-minute Authorization Code</strong> generated from <a href="https://api-console.zoho.com" target="_blank" style="color:var(--teal); font-weight:700;">Zoho API Console</a> (Self Client). The agent will automatically exchange it for a permanent Refresh Token.
-          </div>
-          <div class="form-grid single">
-            <div class="form-group">
-              <label for="grantCode">10-Minute Authorization Code *</label>
-              <input type="text" id="grantCode" placeholder="e.g. 1000.3fa49b82c...">
+          <div class="form-group">
+            <label for="clientSecret">Client Secret *</label>
+            <div class="password-wrap">
+              <input type="password" id="clientSecret" placeholder="••••••••••••••••" required>
+              <button type="button" class="toggle-pwd" onclick="toggleVisibility('clientSecret')">👁</button>
             </div>
-          </div>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="codeClientId">Client ID *</label>
-              <input type="text" id="codeClientId" value="1000.Q8BYX2ZJY8O4212XQ744NMRTZEWU2K">
-            </div>
-            <div class="form-group">
-              <label for="codeClientSecret">Client Secret *</label>
-              <input type="password" id="codeClientSecret" value="c85f73afcef57c343986e1088939378347a46def3d">
-            </div>
-          </div>
-          <div class="form-grid single">
-            <div class="form-group">
-              <label for="codeAccountsUrl">Zoho Accounts Domain</label>
-              <select id="codeAccountsUrl">
-                <option value="https://accounts.zoho.in" selected>Zoho India (.in) — https://accounts.zoho.in</option>
-                <option value="https://accounts.zoho.com">Zoho US / Global (.com) — https://accounts.zoho.com</option>
-                <option value="https://accounts.zoho.eu">Zoho Europe (.eu) — https://accounts.zoho.eu</option>
-                <option value="https://accounts.zoho.com.au">Zoho Australia (.com.au) — https://accounts.zoho.com.au</option>
-              </select>
-            </div>
-          </div>
-          <button type="button" class="btn-secondary" id="btnExchangeCode" style="width:100%;">
-            <span>⚡ Auto-Exchange Code &amp; Discover Environment</span> →
-          </button>
-        </div>
-
-        <!-- Mode C: Custom Refresh Token -->
-        <div id="panelToken" style="display:none; background:#fafbfd; border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:18px;">
-          <div class="form-grid single">
-            <div class="form-group">
-              <label for="customAccountsUrl">Zoho Accounts Domain</label>
-              <select id="customAccountsUrl">
-                <option value="https://accounts.zoho.in" selected>Zoho India (.in) — https://accounts.zoho.in</option>
-                <option value="https://accounts.zoho.com">Zoho US / Global (.com) — https://accounts.zoho.com</option>
-                <option value="https://accounts.zoho.eu">Zoho Europe (.eu) — https://accounts.zoho.eu</option>
-                <option value="https://accounts.zoho.com.au">Zoho Australia (.com.au) — https://accounts.zoho.com.au</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="customClientId">Zoho Client ID *</label>
-              <input type="text" id="customClientId" placeholder="1000.XXXXXXXXXXXXXX">
-            </div>
-            <div class="form-group">
-              <label for="customClientSecret">Zoho Client Secret *</label>
-              <div class="password-wrap">
-                <input type="password" id="customClientSecret" placeholder="••••••••••••••••">
-                <button type="button" class="toggle-pwd" onclick="toggleVisibility('customClientSecret')">👁</button>
-              </div>
-            </div>
-          </div>
-          <div class="form-grid single">
-            <div class="form-group">
-              <label for="customRefreshToken">Zoho Refresh Token *</label>
-              <div class="password-wrap">
-                <input type="password" id="customRefreshToken" placeholder="1000.xxxxxxxx.xxxxxxxxxxxx">
-                <button type="button" class="toggle-pwd" onclick="toggleVisibility('customRefreshToken')">👁</button>
-              </div>
-            </div>
-          </div>
-          <button type="button" class="btn-secondary" id="btnCustomConnect" style="width:100%;">
-            <span>🔍 Discover Client Environment</span> →
-          </button>
-        </div>
-
-        <!-- STEP 2: Discovered Environment & Scope Selection -->
-        <div class="discovery-box" id="discoveryBox">
-          <div class="discovery-header">
-            <div class="discovery-title">
-              <span>🏢 Discovered Environment Profile</span>
-            </div>
-            <span class="discovery-pill" id="discPill">✓ Connected &amp; Analyzed</span>
-          </div>
-
-          <div class="profile-details-grid">
-            <div class="profile-item">
-              <label>Audited Organization (Auto-Detected)</label>
-              <input type="text" id="orgNameInput" value="Amandeep Kaur Enterprise">
-            </div>
-            <div class="profile-item">
-              <label>Lead Systems Auditor</label>
-              <input type="text" id="auditorNameInput" value="Ankita Pandey (Zoho Certified Lead)">
-            </div>
-          </div>
-
-          <div class="suites-selector-title">
-            <span>Detected Application Suites (Select Suites to Include in Audit Report):</span>
-            <span style="font-size:11px; font-weight:normal; color:#64748b;">Click to toggle</span>
-          </div>
-
-          <div class="suites-grid" id="suitesGrid">
-            <label class="suite-card selected" id="card_crm">
-              <input type="checkbox" value="zoho_crm" checked>
-              <div class="suite-info">
-                <strong>Zoho CRM <span class="suite-badge" id="badge_crm">Active (Deals &amp; Leads)</span></strong>
-                <span>Lead routing, pipeline stages, custom fields, &amp; data decay</span>
-              </div>
-            </label>
-            <label class="suite-card selected" id="card_desk">
-              <input type="checkbox" value="zoho_desk" checked>
-              <div class="suite-info">
-                <strong>Zoho Desk <span class="suite-badge" id="badge_desk">Support &amp; SLAs</span></strong>
-                <span>Department queues, SLA policies, &amp; escalation rules</span>
-              </div>
-            </label>
-            <label class="suite-card selected" id="card_books">
-              <input type="checkbox" value="zoho_books" checked>
-              <div class="suite-info">
-                <strong>Zoho Books <span class="suite-badge" id="badge_books">Invoicing &amp; Currencies</span></strong>
-                <span>Overdue receivables, forex feeds, &amp; payment reminders</span>
-              </div>
-            </label>
-            <label class="suite-card selected" id="card_flow">
-              <input type="checkbox" value="zoho_flow" checked>
-              <div class="suite-info">
-                <strong>Cross-App Sync <span class="suite-badge" id="badge_flow">Integration</span></strong>
-                <span>CRM-to-Books/Desk bidirectional sync &amp; webhooks</span>
-              </div>
-            </label>
           </div>
         </div>
 
-        <!-- STEP 3: Deliverable Format & Execution -->
-        <div id="step3Section" style="display:none;">
-          <div class="section-title">
-            <span class="step-num">2</span> Deliverable Format &amp; Export
+        <div class="form-group">
+          <label for="token">
+            Zoho Token *
+            <span>Paste 10-minute Self-Client Code OR Refresh Token</span>
+          </label>
+          <div class="password-wrap">
+            <input type="password" id="token" placeholder="1000.xxxxxxxxxxxxxxxxxxxxxxxxxxxx" required>
+            <button type="button" class="toggle-pwd" onclick="toggleVisibility('token')">👁</button>
           </div>
-          <div class="format-options">
-            <div class="format-btn active" data-fmt="pdf">📄 Branded PDF</div>
-            <div class="format-btn" data-fmt="docx">📝 Word Document (DOCX)</div>
-            <div class="format-btn" data-fmt="zip">📦 Complete Package (ZIP)</div>
-          </div>
-
-          <button type="button" class="submit-btn" id="runAuditBtn">
-            <span>Generate Branded Audit Deliverables</span> →
-          </button>
         </div>
 
-        <!-- Stepper Tracker -->
+        <!-- Format picker -->
+        <label style="font-size:12px; font-weight:700; color:#1e293b; margin-top:8px; display:block;">Download Format</label>
+        <div class="format-options">
+          <div class="format-btn active" data-fmt="pdf">📄 Branded PDF</div>
+          <div class="format-btn" data-fmt="docx">📝 Word (DOCX)</div>
+          <div class="format-btn" data-fmt="zip">📦 All Files (ZIP)</div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="button" class="submit-btn" id="runAuditBtn">
+          <span>⚡ Inspect Environment &amp; Generate Audit Report</span> →
+        </button>
+
+        <div class="demo-link-bar">
+          Want to test right now? <a class="demo-link" onclick="fillTestAccount()">Fill pre-configured test account credentials</a>
+        </div>
+
+        <!-- Execution Stepper -->
         <div class="stepper" id="stepper">
           <div class="stepper-header">
             <span>AUDIT EXECUTION PIPELINE</span>
@@ -806,15 +536,15 @@
           <div class="stepper-steps">
             <div class="step-item" id="step1">
               <span class="step-icon">1</span>
-              <span>Authenticating Zoho environment &amp; reading live telemetry</span>
+              <span>Authenticating Zoho environment &amp; discovering installed applications</span>
             </div>
             <div class="step-item" id="step2">
               <span class="step-icon">2</span>
-              <span>Running Groq LLM Diagnostic Engine (House Style Analysis)</span>
+              <span>Probing pipelines, assignment rules, SLAs, &amp; data decay telemetry</span>
             </div>
             <div class="step-item" id="step3">
               <span class="step-icon">3</span>
-              <span>Identifying cross-app data gaps &amp; synthesizing 2-phase roadmap</span>
+              <span>Running Groq LLM Diagnostic Engine (House Style Analysis)</span>
             </div>
             <div class="step-item" id="step4">
               <span class="step-icon">4</span>
@@ -825,7 +555,7 @@
 
         <div class="status-alert" id="statusAlert"></div>
 
-        <!-- Results Box -->
+        <!-- Results Card -->
         <div class="result-card" id="resultCard">
           <div class="result-top">
             <div class="result-details">
@@ -833,15 +563,13 @@
               <span id="resultFile">Wooplix_Audit.pdf</span>
             </div>
             <div class="health-pill" id="healthScore">
-              60 <span>/ 100</span>
+              45 <span>/ 100</span>
             </div>
           </div>
-          <p style="font-size:12.5px; color:#14532d; line-height:1.45;" id="resultSummary">
-            Audit complete. System health index, technical findings, and phased remediation roadmap generated.
+          <p style="font-size:12px; color:#14532d; line-height:1.45;" id="resultSummary">
+            Audit complete. Discovered applications probed, architecture diagnosed, and phased roadmap generated.
           </p>
-          <div class="result-actions">
-            <a id="downloadAgainBtn" class="download-btn" href="#" download>Download Deliverable</a>
-          </div>
+          <a id="downloadAgainBtn" class="download-btn" href="#" download>Download Deliverable</a>
         </div>
 
       </form>
@@ -854,69 +582,24 @@
   </div>
 
   <script>
-    // Global active credentials
-    let activeCreds = {
-      clientId: '1000.Q8BYX2ZJY8O4212XQ744NMRTZEWU2K',
-      clientSecret: 'c85f73afcef57c343986e1088939378347a46def3d',
-      refreshToken: '1000.dcf12f848682366cb1fab382ec0dbb1d.14dc2a1dea8dbfd8a9079bab5aa43037',
-      accountsUrl: 'https://accounts.zoho.in'
-    };
-
     let selectedFormat = 'pdf';
-    let currentMode = 'test';
 
-    // Tab switching
-    const tabTest = document.getElementById('tabTest');
-    const tabCode = document.getElementById('tabCode');
-    const tabToken = document.getElementById('tabToken');
-    const panelTest = document.getElementById('panelTest');
-    const panelCode = document.getElementById('panelCode');
-    const panelToken = document.getElementById('panelToken');
+    function toggleGuide() {
+      const el = document.getElementById('guideSteps');
+      const arrow = document.getElementById('guideArrow');
+      if (el.style.display === 'block') {
+        el.style.display = 'none';
+        arrow.textContent = '▼';
+      } else {
+        el.style.display = 'block';
+        arrow.textContent = '▲';
+      }
+    }
 
-    tabTest.onclick = () => {
-      currentMode = 'test';
-      tabTest.classList.add('active');
-      tabCode.classList.remove('active');
-      tabToken.classList.remove('active');
-      panelTest.style.display = 'block';
-      panelCode.style.display = 'none';
-      panelToken.style.display = 'none';
-    };
-
-    tabCode.onclick = () => {
-      currentMode = 'code';
-      tabCode.classList.add('active');
-      tabTest.classList.remove('active');
-      tabToken.classList.remove('active');
-      panelTest.style.display = 'none';
-      panelCode.style.display = 'block';
-      panelToken.style.display = 'none';
-    };
-
-    tabToken.onclick = () => {
-      currentMode = 'token';
-      tabToken.classList.add('active');
-      tabTest.classList.remove('active');
-      tabCode.classList.remove('active');
-      panelTest.style.display = 'none';
-      panelCode.style.display = 'none';
-      panelToken.style.display = 'block';
-    };
-
-    // Toggle password visibility
     function toggleVisibility(id) {
       const el = document.getElementById(id);
       el.type = el.type === 'password' ? 'text' : 'password';
     }
-
-    // Suite card checkbox clicks
-    document.querySelectorAll('.suite-card').forEach(card => {
-      const cb = card.querySelector('input[type="checkbox"]');
-      card.onclick = (e) => {
-        if (e.target !== cb) cb.checked = !cb.checked;
-        card.classList.toggle('selected', cb.checked);
-      };
-    });
 
     // Format selection
     document.querySelectorAll('.format-btn').forEach(btn => {
@@ -927,132 +610,17 @@
       };
     });
 
-    const statusAlert = document.getElementById('statusAlert');
-    const discoveryBox = document.getElementById('discoveryBox');
-    const step3Section = document.getElementById('step3Section');
-    const orgNameInput = document.getElementById('orgNameInput');
-    const auditorNameInput = document.getElementById('auditorNameInput');
-
-    // DISCOVER FUNCTION
-    async function runDiscovery(creds) {
-      statusAlert.textContent = 'Probing Zoho environment and discovering installed suites…';
-      statusAlert.className = 'status-alert';
-
-      const fd = new FormData();
-      fd.append('client_id', creds.clientId);
-      fd.append('client_secret', creds.clientSecret);
-      fd.append('refresh_token', creds.refreshToken);
-      fd.append('accounts_url', creds.accountsUrl);
-
-      try {
-        const res = await fetch('/api/discover', { method: 'POST', body: fd });
-        const data = await res.json();
-        
-        orgNameInput.value = data.organization_name || 'Amandeep Kaur Enterprise';
-        if (data.auditor_default) auditorNameInput.value = data.auditor_default;
-
-        // Update badges
-        if (data.discovered_apps) {
-          data.discovered_apps.forEach(app => {
-            const b = document.getElementById(`badge_${app.id.replace('zoho_', '')}`);
-            if (b && app.status_label) b.textContent = app.status_label;
-          });
-        }
-
-        discoveryBox.style.display = 'block';
-        step3Section.style.display = 'block';
-        statusAlert.textContent = `✓ Environment connected! Detected "${orgNameInput.value}". Choose suites below and generate audit report.`;
-        statusAlert.className = 'status-alert';
-        
-        // Scroll smoothly to discovery box
-        discoveryBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      } catch (err) {
-        statusAlert.textContent = `Discovery warning: ${err.message}. Default baseline loaded.`;
-        statusAlert.className = 'status-alert';
-        discoveryBox.style.display = 'block';
-        step3Section.style.display = 'block';
-      }
+    // Fill test credentials
+    function fillTestAccount() {
+      document.getElementById('accountsUrl').value = 'https://accounts.zoho.in';
+      document.getElementById('clientId').value = '1000.Q8BYX2ZJY8O4212XQ744NMRTZEWU2K';
+      document.getElementById('clientSecret').value = 'c85f73afcef57c343986e1088939378347a46def3d';
+      document.getElementById('token').value = '1000.dcf12f848682366cb1fab382ec0dbb1d.14dc2a1dea8dbfd8a9079bab5aa43037';
+      document.getElementById('statusAlert').textContent = '✓ Pre-configured test credentials filled. Click "Inspect Environment & Generate Audit Report" to run!';
+      document.getElementById('statusAlert').className = 'status-alert';
     }
 
-    // Connect Test Account
-    document.getElementById('btnTestConnect').onclick = async () => {
-      activeCreds = {
-        clientId: '1000.Q8BYX2ZJY8O4212XQ744NMRTZEWU2K',
-        clientSecret: 'c85f73afcef57c343986e1088939378347a46def3d',
-        refreshToken: '1000.dcf12f848682366cb1fab382ec0dbb1d.14dc2a1dea8dbfd8a9079bab5aa43037',
-        accountsUrl: 'https://accounts.zoho.in'
-      };
-      await runDiscovery(activeCreds);
-    };
-
-    // Auto-Exchange 10-Minute Authorization Code
-    document.getElementById('btnExchangeCode').onclick = async () => {
-      const code = document.getElementById('grantCode').value.trim();
-      const cid = document.getElementById('codeClientId').value.trim();
-      const csec = document.getElementById('codeClientSecret').value.trim();
-      const acc = document.getElementById('codeAccountsUrl').value;
-
-      if (!code) {
-        statusAlert.textContent = 'Please enter the 10-minute Authorization Code generated from Zoho API Console.';
-        statusAlert.className = 'status-alert error';
-        return;
-      }
-
-      statusAlert.textContent = 'Exchanging 10-minute Authorization Code for permanent Refresh Token…';
-      statusAlert.className = 'status-alert';
-
-      const fd = new FormData();
-      fd.append('code', code);
-      fd.append('client_id', cid);
-      fd.append('client_secret', csec);
-      fd.append('accounts_url', acc);
-
-      try {
-        const res = await fetch('/api/exchange-token', { method: 'POST', body: fd });
-        const result = await res.json();
-        if (!res.ok) throw new Error(result.detail || 'Code exchange failed');
-
-        statusAlert.textContent = '✓ Refresh Token acquired successfully! Probing environment…';
-        activeCreds = {
-          clientId: cid,
-          clientSecret: csec,
-          refreshToken: result.refresh_token,
-          accountsUrl: acc
-        };
-        await runDiscovery(activeCreds);
-      } catch (err) {
-        statusAlert.textContent = `Exchange Error: ${err.message}`;
-        statusAlert.className = 'status-alert error';
-      }
-    };
-
-    // Connect Custom Token
-    document.getElementById('btnCustomConnect').onclick = async () => {
-      const cid = document.getElementById('customClientId').value.trim();
-      const csec = document.getElementById('customClientSecret').value.trim();
-      const tok = document.getElementById('customRefreshToken').value.trim();
-      const acc = document.getElementById('customAccountsUrl').value;
-
-      if (!cid || !tok) {
-        statusAlert.textContent = 'Please enter both Client ID and Refresh Token.';
-        statusAlert.className = 'status-alert error';
-        return;
-      }
-
-      activeCreds = {
-        clientId: cid,
-        clientSecret: csec,
-        refreshToken: tok,
-        accountsUrl: acc
-      };
-      await runDiscovery(activeCreds);
-    };
-
-    // AUDIT GENERATION HANDLER
-    const runBtn = document.getElementById('runAuditBtn');
-    const stepper = document.getElementById('stepper');
-    const resultCard = document.getElementById('resultCard');
-
+    // Execution Stepper
     function setStep(stepNum) {
       for (let i = 1; i <= 4; i++) {
         const el = document.getElementById(`step${i}`);
@@ -1069,43 +637,42 @@
       }
     }
 
-    runBtn.onclick = async () => {
-      const companyName = orgNameInput.value.trim() || 'Client Organization';
-      const auditorName = auditorNameInput.value.trim() || 'Lead Systems Auditor';
+    // Audit Run
+    const runBtn = document.getElementById('runAuditBtn');
+    const stepper = document.getElementById('stepper');
+    const resultCard = document.getElementById('resultCard');
+    const statusAlert = document.getElementById('statusAlert');
 
-      // Collect checked suites
-      const suites = [];
-      document.querySelectorAll('.suite-card input[type="checkbox"]').forEach(cb => {
-        if (cb.checked) suites.push(cb.value);
-      });
-      if (suites.length === 0) {
-        statusAlert.textContent = 'Please select at least one application suite to audit.';
+    runBtn.onclick = async () => {
+      const accountsUrl = document.getElementById('accountsUrl').value;
+      const clientId = document.getElementById('clientId').value.trim();
+      const clientSecret = document.getElementById('clientSecret').value.trim();
+      const token = document.getElementById('token').value.trim();
+
+      if (!clientId || !clientSecret || !token) {
+        statusAlert.textContent = 'Please enter Client ID, Client Secret, and Token (or click the test link below).';
         statusAlert.className = 'status-alert error';
         return;
       }
 
       runBtn.disabled = true;
-      runBtn.innerHTML = '<span>Executing System Audit Pipeline…</span>';
+      runBtn.innerHTML = '<span>Inspecting &amp; Generating Audit…</span>';
       stepper.style.display = 'block';
       resultCard.style.display = 'none';
       statusAlert.textContent = '';
       statusAlert.className = 'status-alert';
 
       setStep(1);
-      const stepTimer1 = setTimeout(() => setStep(2), 1200);
-      const stepTimer2 = setTimeout(() => setStep(3), 3200);
-      const stepTimer3 = setTimeout(() => setStep(4), 6500);
+      const stepTimer1 = setTimeout(() => setStep(2), 1500);
+      const stepTimer2 = setTimeout(() => setStep(3), 3500);
+      const stepTimer3 = setTimeout(() => setStep(4), 7000);
 
       try {
         const fd = new FormData();
-        fd.append('company_name', companyName);
-        fd.append('auditor_name', auditorName);
-        fd.append('accounts_url', activeCreds.accountsUrl);
-        fd.append('client_id', activeCreds.clientId);
-        fd.append('client_secret', activeCreds.clientSecret);
-        fd.append('refresh_token', activeCreds.refreshToken);
-        fd.append('target_suites', suites.join(','));
-        fd.append('use_demo', !activeCreds.refreshToken);
+        fd.append('accounts_url', accountsUrl);
+        fd.append('client_id', clientId);
+        fd.append('client_secret', clientSecret);
+        fd.append('token', token);
 
         const res = await fetch(`/api/audit?format=${selectedFormat}`, {
           method: 'POST',
@@ -1136,7 +703,7 @@
         }
 
         const score = res.headers.get('x-audit-score') || '60';
-        const client = res.headers.get('x-audit-client') || companyName;
+        const client = res.headers.get('x-audit-client') || 'Client Organization';
 
         const blob = await res.blob();
         const blobUrl = URL.createObjectURL(blob);
@@ -1149,7 +716,7 @@
         a.click();
         a.remove();
 
-        // Update UI
+        // Update Results UI
         resultCard.style.display = 'block';
         document.getElementById('resultClient').textContent = client;
         document.getElementById('resultFile').textContent = `Downloaded: ${filename}`;
@@ -1157,22 +724,17 @@
         document.getElementById('downloadAgainBtn').href = blobUrl;
         document.getElementById('downloadAgainBtn').download = filename;
 
-        statusAlert.textContent = `✓ Diagnostic audit completed successfully! Report downloaded.`;
+        statusAlert.textContent = `✓ Audit completed successfully for ${client}! Deliverable downloaded.`;
         statusAlert.className = 'status-alert';
         resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       } catch (err) {
-        statusAlert.textContent = `Audit Failed: ${err.message}`;
+        statusAlert.textContent = `Error: ${err.message}`;
         statusAlert.className = 'status-alert error';
       } finally {
         runBtn.disabled = false;
-        runBtn.innerHTML = '<span>Generate Branded Audit Deliverables</span> →';
+        runBtn.innerHTML = '<span>⚡ Inspect Environment &amp; Generate Audit Report</span> →';
       }
     };
-
-    // Auto-discover test account on initial page load for instantaneous evaluation!
-    window.addEventListener('DOMContentLoaded', () => {
-      runDiscovery(activeCreds);
-    });
   </script>
 </body>
 </html>

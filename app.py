@@ -218,11 +218,12 @@ def _render_audit_pdf(audit_data: dict, target_pdf: Path, host: Optional[str] = 
 @app.post("/api/index.py")
 async def trigger_audit(
     request: Request,
-    company_name: str = Form("Client Organization"),
-    auditor_name: str = Form("Lead Systems Auditor"),
-    contact_email: str = Form(""),
+    company_name: Optional[str] = Form(""),
+    auditor_name: Optional[str] = Form("Ankita Pandey (Zoho Certified Lead)"),
+    contact_email: Optional[str] = Form(""),
     client_id: Optional[str] = Form(""),
     client_secret: Optional[str] = Form(""),
+    token: Optional[str] = Form(""),
     refresh_token: Optional[str] = Form(""),
     accounts_url: Optional[str] = Form("https://accounts.zoho.in"),
     target_suites: Optional[str] = Form("zoho_crm,zoho_desk,zoho_books"),
@@ -237,6 +238,23 @@ async def trigger_audit(
             status_code=503,
             detail="GROQ_API_KEY is not configured on the server. Please check .env configuration."
         )
+
+    # Determine credentials
+    cid = (client_id or "").strip() or os.environ.get("ZOHO_CLIENT_ID", "")
+    csec = (client_secret or "").strip() or os.environ.get("ZOHO_CLIENT_SECRET", "")
+    reftok = (token or refresh_token or "").strip() or os.environ.get("ZOHO_REFRESH_TOKEN", "")
+    acc_url = (accounts_url or "").strip() or os.environ.get("ZOHO_ACCOUNTS_URL", "https://accounts.zoho.in")
+
+    # Auto-detect company name if not provided
+    comp_name = (company_name or "").strip()
+    if not comp_name or comp_name == "Client Organization":
+        try:
+            disc = agent.discover_environment(cid, csec, reftok, acc_url)
+            comp_name = disc.get("organization_name") or "Client Organization"
+        except Exception:
+            comp_name = "Client Organization"
+    company_name = comp_name
+    auditor = (auditor_name or "Ankita Pandey (Zoho Certified Lead)").strip()
 
     # Parse target suites
     suites_list = []
