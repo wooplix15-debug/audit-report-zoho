@@ -218,12 +218,32 @@
     .app-checkbox-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 6px;
+      gap: 5px;
       margin-bottom: 10px;
       background: #ffffff;
       padding: 10px;
       border: 1px solid var(--border);
       border-radius: 6px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .app-category-label {
+      grid-column: 1 / -1;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 6px 0 2px 0;
+      border-top: 1px solid #f1f5f9;
+      margin-top: 2px;
+    }
+
+    .app-category-label:first-child {
+      border-top: none;
+      margin-top: 0;
+      padding-top: 0;
     }
 
     .app-checkbox-label {
@@ -838,10 +858,13 @@
         <div class="scope-selector-container">
           <div class="scope-quick-bar">
             <div class="scope-presets-pills">
-              <button type="button" class="scope-pill-btn active" id="preset_full" onclick="setAppPreset('full')">Full Ecosystem</button>
-              <button type="button" class="scope-pill-btn" id="preset_nodesk" onclick="setAppPreset('nodesk')">No Desk</button>
+              <button type="button" class="scope-pill-btn active" id="preset_full" onclick="setAppPreset('full')">All Apps</button>
+              <button type="button" class="scope-pill-btn" id="preset_sales" onclick="setAppPreset('sales')">Sales &amp; Support</button>
+              <button type="button" class="scope-pill-btn" id="preset_finance" onclick="setAppPreset('finance')">Finance Suite</button>
+              <button type="button" class="scope-pill-btn" id="preset_marketing" onclick="setAppPreset('marketing')">Marketing</button>
               <button type="button" class="scope-pill-btn" id="preset_crmonly" onclick="setAppPreset('crmonly')">CRM Only</button>
-              <button type="button" class="scope-pill-btn" id="preset_finance" onclick="setAppPreset('finance')">Books &amp; Inventory</button>
+              <button type="button" class="scope-pill-btn" id="preset_nodesk" onclick="setAppPreset('nodesk')">Standard (No Desk)</button>
+              <button type="button" class="scope-pill-btn" id="preset_none" onclick="setAppPreset('none')">Clear All</button>
             </div>
             <div class="perm-toggle-group">
               <label class="perm-radio-label">
@@ -856,39 +879,72 @@
           </div>
 
           <!-- Apps Checkbox Grid -->
-          <div class="app-checkbox-grid">
-            <label class="app-checkbox-label">
-              <input type="checkbox" class="app-chk" value="crm" checked onchange="updateScopeString()">
-              <span>Zoho CRM</span>
-            </label>
-            <label class="app-checkbox-label">
-              <input type="checkbox" class="app-chk" value="desk" checked onchange="updateScopeString()">
-              <span>Zoho Desk</span>
-            </label>
-            <label class="app-checkbox-label">
-              <input type="checkbox" class="app-chk" value="books" checked onchange="updateScopeString()">
-              <span>Zoho Books</span>
-            </label>
-            <label class="app-checkbox-label">
-              <input type="checkbox" class="app-chk" value="inventory" checked onchange="updateScopeString()">
-              <span>Zoho Inventory</span>
-            </label>
-            <label class="app-checkbox-label">
-              <input type="checkbox" class="app-chk" value="workdrive" checked onchange="updateScopeString()">
-              <span>Zoho WorkDrive</span>
-            </label>
-            <label class="app-checkbox-label">
-              <input type="checkbox" class="app-chk" value="projects" checked onchange="updateScopeString()">
-              <span>Zoho Projects</span>
-            </label>
-            <label class="app-checkbox-label">
-              <input type="checkbox" class="app-chk" value="analytics" checked onchange="updateScopeString()">
-              <span>Zoho Analytics</span>
-            </label>
-            <label class="app-checkbox-label">
-              <input type="checkbox" class="app-chk" value="flow" checked onchange="updateScopeString()">
-              <span>Zoho Flow</span>
-            </label>
+                    <div class="app-checkbox-grid">
+            <!-- CRM & Sales -->
+            <div class="app-category-label">CRM &amp; Sales</div>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="crm" checked onchange="updateScopeString()"><span>Zoho CRM</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="bigin" onchange="updateScopeString()"><span>Zoho Bigin</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="salesiq" onchange="updateScopeString()"><span>Zoho SalesIQ</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="backstage" onchange="updateScopeString()"><span>Zoho Backstage</span></label>
+            <!-- Help Desk & Support -->
+            <div class="app-category-label">Help Desk &amp; Support</div>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="desk" onchange="updateScopeString()"><span>Zoho Desk</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="assist" onchange="updateScopeString()"><span>Zoho Assist</span></label>
+            <!-- Finance -->
+            <div class="app-category-label">Finance &amp; Accounting</div>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="books" onchange="updateScopeString()"><span>Zoho Books</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="invoice" onchange="updateScopeString()"><span>Zoho Invoice</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="inventory" onchange="updateScopeString()"><span>Zoho Inventory</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="expense" onchange="updateScopeString()"><span>Zoho Expense</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="checkout" onchange="updateScopeString()"><span>Zoho Checkout</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="payroll" onchange="updateScopeString()"><span>Zoho Payroll</span></label>
+            <!-- HR & People -->
+            <div class="app-category-label">HR &amp; People</div>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="people" onchange="updateScopeString()"><span>Zoho People</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="recruit" onchange="updateScopeString()"><span>Zoho Recruit</span></label>
+            <!-- Collaboration & Communication -->
+            <div class="app-category-label">Collaboration &amp; Communication</div>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="cliq" onchange="updateScopeString()"><span>Zoho Cliq</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="mail" onchange="updateScopeString()"><span>Zoho Mail</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="meeting" onchange="updateScopeString()"><span>Zoho Meeting</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="connect" onchange="updateScopeString()"><span>Zoho Connect</span></label>
+            <!-- Projects & Work -->
+            <div class="app-category-label">Project &amp; Work Management</div>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="projects" onchange="updateScopeString()"><span>Zoho Projects</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="sprints" onchange="updateScopeString()"><span>Zoho Sprints</span></label>
+            <!-- Storage & Docs -->
+            <div class="app-category-label">Storage &amp; Docs</div>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="workdrive" onchange="updateScopeString()"><span>Zoho WorkDrive</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="writer" onchange="updateScopeString()"><span>Zoho Writer</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="sheet" onchange="updateScopeString()"><span>Zoho Sheet</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="show" onchange="updateScopeString()"><span>Zoho Show</span></label>
+            <!-- Marketing -->
+            <div class="app-category-label">Marketing</div>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="campaigns" onchange="updateScopeString()"><span>Zoho Campaigns</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="marketingplus" onchange="updateScopeString()"><span>Marketing Plus</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="social" onchange="updateScopeString()"><span>Zoho Social</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="sites" onchange="updateScopeString()"><span>Zoho Sites</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="forms" onchange="updateScopeString()"><span>Zoho Forms</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="survey" onchange="updateScopeString()"><span>Zoho Survey</span></label>
+            <!-- Analytics & BI -->
+            <div class="app-category-label">Analytics &amp; BI</div>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="analytics" onchange="updateScopeString()"><span>Zoho Analytics</span></label>
+            <!-- Automation & Integration -->
+            <div class="app-category-label">Automation &amp; Integration</div>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="flow" onchange="updateScopeString()"><span>Zoho Flow</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="creator" onchange="updateScopeString()"><span>Zoho Creator</span></label>
+            <!-- IT & Security -->
+            <div class="app-category-label">IT &amp; Security</div>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="directory" onchange="updateScopeString()"><span>Zoho Directory</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="vault" onchange="updateScopeString()"><span>Zoho Vault</span></label>
+            <!-- Developer -->
+            <div class="app-category-label">Developer &amp; Low-Code</div>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="catalyst" onchange="updateScopeString()"><span>Zoho Catalyst</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="qengine" onchange="updateScopeString()"><span>Zoho QEngine</span></label>
+            <!-- Field Service -->
+            <div class="app-category-label">Field Service &amp; Operations</div>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="fsm" onchange="updateScopeString()"><span>Zoho FSM</span></label>
+            <label class="app-checkbox-label"><input type="checkbox" class="app-chk" value="lens" onchange="updateScopeString()"><span>Zoho Lens</span></label>
           </div>
 
           <!-- Generated Scope Output & Copy Button -->
@@ -1069,38 +1125,58 @@
     let selectedFormat = 'pdf';
 
     const APP_SCOPES = {
-      crm: {
-        read: "ZohoCRM.modules.READ,ZohoCRM.settings.READ,ZohoCRM.users.READ,ZohoCRM.org.READ",
-        all: "ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ"
-      },
-      desk: {
-        read: "Desk.tickets.READ,Desk.contacts.READ,Desk.settings.READ,Desk.basic.READ",
-        all: "Desk.tickets.ALL,Desk.contacts.ALL,Desk.settings.ALL,Desk.basic.ALL"
-      },
-      books: {
-        read: "ZohoBooks.fullaccess.READ",
-        all: "ZohoBooks.fullaccess.ALL"
-      },
-      inventory: {
-        read: "ZohoInventory.fullaccess.READ",
-        all: "ZohoInventory.fullaccess.ALL"
-      },
-      workdrive: {
-        read: "WorkDrive.files.READ,WorkDrive.workspace.READ",
-        all: "WorkDrive.files.ALL"
-      },
-      projects: {
-        read: "ZohoProjects.projects.READ",
-        all: "ZohoProjects.projects.ALL"
-      },
-      analytics: {
-        read: "ZohoAnalytics.data.READ",
-        all: "ZohoAnalytics.data.ALL"
-      },
-      flow: {
-        read: "ZohoFlow.flows.READ",
-        all: "ZohoFlow.flows.ALL"
-      }
+      // === CRM & Sales ===
+      crm:         { read: "ZohoCRM.modules.READ,ZohoCRM.settings.READ,ZohoCRM.users.READ,ZohoCRM.org.READ", all: "ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.users.ALL,ZohoCRM.org.READ" },
+      bigin:       { read: "ZohoBigin.modules.READ,ZohoBigin.settings.READ", all: "ZohoBigin.modules.ALL,ZohoBigin.settings.ALL" },
+      salesiq:     { read: "SalesIQ.conversations.READ,SalesIQ.portals.READ", all: "SalesIQ.conversations.ALL,SalesIQ.portals.ALL" },
+      backstage:   { read: "ZohoBackstage.events.READ", all: "ZohoBackstage.events.ALL" },
+      // === Help Desk & Support ===
+      desk:        { read: "Desk.tickets.READ,Desk.contacts.READ,Desk.settings.READ,Desk.basic.READ", all: "Desk.tickets.ALL,Desk.contacts.ALL,Desk.settings.ALL,Desk.basic.ALL" },
+      assist:      { read: "ZohoAssist.sessions.READ", all: "ZohoAssist.sessions.ALL" },
+      // === Finance & Accounting ===
+      books:       { read: "ZohoBooks.fullaccess.READ", all: "ZohoBooks.fullaccess.ALL" },
+      invoice:     { read: "ZohoInvoice.fullaccess.READ", all: "ZohoInvoice.fullaccess.ALL" },
+      inventory:   { read: "ZohoInventory.fullaccess.READ", all: "ZohoInventory.fullaccess.ALL" },
+      expense:     { read: "ZohoExpense.fullaccess.READ", all: "ZohoExpense.fullaccess.ALL" },
+      checkout:    { read: "ZohoCheckout.fullaccess.READ", all: "ZohoCheckout.fullaccess.ALL" },
+      payroll:     { read: "ZohoPayroll.payrun.READ,ZohoPayroll.employees.READ", all: "ZohoPayroll.payrun.ALL,ZohoPayroll.employees.ALL" },
+      // === HR & People ===
+      people:      { read: "ZOHOPEOPLE.employee.READ,ZOHOPEOPLE.timetracker.READ,ZOHOPEOPLE.leave.READ", all: "ZOHOPEOPLE.employee.ALL,ZOHOPEOPLE.timetracker.ALL,ZOHOPEOPLE.leave.ALL" },
+      recruit:     { read: "ZohoRecruit.modules.READ", all: "ZohoRecruit.modules.ALL" },
+      // === Collaboration & Communication ===
+      cliq:        { read: "ZohoCliq.channels.READ,ZohoCliq.messages.READ", all: "ZohoCliq.channels.ALL,ZohoCliq.messages.ALL" },
+      mail:        { read: "ZohoMail.messages.READ,ZohoMail.folders.READ,ZohoMail.accounts.READ", all: "ZohoMail.messages.ALL,ZohoMail.folders.ALL,ZohoMail.accounts.ALL" },
+      meeting:     { read: "ZohoMeeting.meeting.READ,ZohoMeeting.webinar.READ", all: "ZohoMeeting.meeting.ALL,ZohoMeeting.webinar.ALL" },
+      connect:     { read: "ZohoConnect.groups.READ,ZohoConnect.feeds.READ", all: "ZohoConnect.groups.ALL,ZohoConnect.feeds.ALL" },
+      // === Project & Work Management ===
+      projects:    { read: "ZohoProjects.projects.READ", all: "ZohoProjects.projects.ALL" },
+      sprints:     { read: "ZohoSprints.sprints.READ,ZohoSprints.boards.READ", all: "ZohoSprints.sprints.ALL,ZohoSprints.boards.ALL" },
+      // === Storage & Docs ===
+      workdrive:   { read: "WorkDrive.files.READ,WorkDrive.workspace.READ", all: "WorkDrive.files.ALL" },
+      writer:      { read: "ZohoWriter.documents.READ", all: "ZohoWriter.documents.ALL" },
+      sheet:       { read: "ZohoSheet.spreadsheets.READ", all: "ZohoSheet.spreadsheets.ALL" },
+      show:        { read: "ZohoShow.presentations.READ", all: "ZohoShow.presentations.ALL" },
+      // === Marketing ===
+      campaigns:   { read: "ZohoCampaigns.contact.READ,ZohoCampaigns.campaign.READ", all: "ZohoCampaigns.contact.ALL,ZohoCampaigns.campaign.ALL" },
+      marketingplus: { read: "ZohoMarketingPlus.journey.READ", all: "ZohoMarketingPlus.journey.ALL" },
+      social:      { read: "ZohoSocial.pages.READ,ZohoSocial.feeds.READ", all: "ZohoSocial.pages.ALL,ZohoSocial.feeds.ALL" },
+      sites:       { read: "ZohoSites.websites.READ", all: "ZohoSites.websites.ALL" },
+      forms:       { read: "ZohoForms.form.READ", all: "ZohoForms.form.ALL" },
+      survey:      { read: "ZohoSurvey.survey.READ", all: "ZohoSurvey.survey.ALL" },
+      // === Analytics & BI ===
+      analytics:   { read: "ZohoAnalytics.data.READ,ZohoAnalytics.share.READ", all: "ZohoAnalytics.data.ALL,ZohoAnalytics.share.ALL" },
+      // === Automation & Integration ===
+      flow:        { read: "ZohoFlow.flows.READ", all: "ZohoFlow.flows.ALL" },
+      creator:     { read: "ZohoCreator.meta.READ,ZohoCreator.report.READ,ZohoCreator.form.READ", all: "ZohoCreator.meta.ALL,ZohoCreator.report.ALL,ZohoCreator.form.ALL" },
+      // === IT & Security ===
+      directory:   { read: "ZohoDirectory.users.READ,ZohoDirectory.groups.READ", all: "ZohoDirectory.users.ALL,ZohoDirectory.groups.ALL" },
+      vault:       { read: "ZohoVault.secrets.READ,ZohoVault.profiles.READ", all: "ZohoVault.secrets.ALL,ZohoVault.profiles.ALL" },
+      // === Developer / Low-code ===
+      catalyst:    { read: "ZohoCatalyst.projects.READ", all: "ZohoCatalyst.projects.ALL" },
+      qengine:     { read: "QEngine.testruns.READ", all: "QEngine.testruns.ALL" },
+      // === Field Service / Operations ===
+      fsm:         { read: "ZohoFSM.workorders.READ,ZohoFSM.appointments.READ", all: "ZohoFSM.workorders.ALL,ZohoFSM.appointments.ALL" },
+      lens:        { read: "ZohoLens.sessions.READ", all: "ZohoLens.sessions.ALL" },
     };
 
     function updateScopeString() {
@@ -1125,11 +1201,15 @@
       const activeBtn = document.getElementById(`preset_${presetKey}`);
       if (activeBtn) activeBtn.classList.add('active');
 
+      const allApps = ['crm','bigin','salesiq','backstage','desk','assist','books','invoice','inventory','expense','checkout','payroll','people','recruit','cliq','mail','meeting','connect','projects','sprints','workdrive','writer','sheet','show','campaigns','marketingplus','social','sites','forms','survey','analytics','flow','creator','directory','vault','catalyst','qengine','fsm','lens'];
       const appChecks = {
-        full: ['crm', 'desk', 'books', 'inventory', 'workdrive', 'projects', 'analytics', 'flow'],
-        nodesk: ['crm', 'books', 'inventory', 'workdrive', 'projects', 'analytics', 'flow'],
+        full: allApps,
+        sales: ['crm', 'bigin', 'salesiq', 'desk', 'assist'],
+        finance: ['books', 'invoice', 'inventory', 'expense', 'checkout', 'payroll'],
+        marketing: ['campaigns', 'marketingplus', 'social', 'sites', 'forms', 'survey'],
         crmonly: ['crm', 'workdrive'],
-        finance: ['books', 'inventory']
+        nodesk: ['crm', 'books', 'inventory', 'workdrive', 'projects', 'analytics', 'flow'],
+        none: []
       };
 
       const selected = appChecks[presetKey] || appChecks.full;
