@@ -278,6 +278,196 @@
       display: block;
     }
 
+    /* Token Action & Storage Styles */
+    .token-helper-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-token-action {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      color: #0f172a;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 6px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .btn-token-action:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+      color: var(--primary);
+    }
+
+    .btn-token-action:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .token-save-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #64748b;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .token-save-toggle input {
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .token-details-card {
+      margin-top: 12px;
+      padding: 12px 14px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .token-details-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .token-header-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #0f172a;
+    }
+
+    .pulse-indicator {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+    }
+
+    .clear-storage-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 11.5px;
+      font-family: inherit;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+    }
+
+    .clear-storage-btn:hover {
+      color: #ef4444;
+    }
+
+    .token-row {
+      margin-bottom: 8px;
+    }
+
+    .token-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+
+    .token-type-tag {
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    .token-type-tag.access-tag {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+
+    .token-type-tag.refresh-tag {
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+    }
+
+    .token-expiry-badge, .token-saved-badge {
+      color: #64748b;
+      font-size: 11px;
+    }
+
+    .token-field-group {
+      display: flex;
+      gap: 5px;
+    }
+
+    .token-mini-input {
+      flex: 1;
+      height: 30px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 0 8px;
+      color: #334155;
+    }
+
+    .token-mini-btn {
+      height: 30px;
+      padding: 0 9px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      border-radius: 4px;
+      font-size: 11.5px;
+      font-weight: 500;
+      font-family: inherit;
+      color: #475569;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+
+    .token-mini-btn:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .token-sync-status {
+      font-size: 11.5px;
+      color: #059669;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
     /* Segmented Format Switcher */
     .segmented {
       display: grid;
@@ -429,6 +619,14 @@
       color: #dc2626;
       background: #fef2f2;
       border: 1px solid #fecaca;
+      padding: 8px 12px;
+      border-radius: 5px;
+    }
+
+    .alert.success {
+      color: #15803d;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
       padding: 8px 12px;
       border-radius: 5px;
     }
@@ -627,6 +825,65 @@
             </button>
           </div>
           <span class="field-note">Accepts a temporary 10-minute code from Zoho Console or an existing refresh token.</span>
+
+          <div class="token-helper-bar">
+            <button type="button" class="btn-token-action" id="exchangeBtn" onclick="exchangeAndSaveToken()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              <span>Exchange to Access Token & Save</span>
+            </button>
+            <label class="token-save-toggle">
+              <input type="checkbox" id="saveCredentialsCheck" checked>
+              <span>Remember in browser storage</span>
+            </label>
+          </div>
+
+          <!-- Token Management Panel -->
+          <div id="tokenDetailsCard" class="token-details-card" style="display: none;">
+            <div class="token-details-header">
+              <div class="token-header-left">
+                <span class="pulse-indicator"></span>
+                <strong>Live Token Credentials</strong>
+              </div>
+              <button type="button" class="clear-storage-btn" onclick="clearSavedCredentials()" title="Wipe saved credentials from browser storage">
+                Clear Saved
+              </button>
+            </div>
+
+            <div class="token-row">
+              <div class="token-label-row">
+                <span class="token-type-tag access-tag">Active Access Token</span>
+                <span class="token-expiry-badge" id="tokenExpiryText">Expires in ~60m</span>
+              </div>
+              <div class="token-field-group">
+                <input type="password" id="displayAccessToken" class="token-mini-input" readonly placeholder="Access token will appear here">
+                <button type="button" class="token-mini-btn" onclick="toggleVisibility('displayAccessToken')" title="Show / Hide">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
+                <button type="button" class="token-mini-btn" id="copyAccessBtn" onclick="copyTokenValue('displayAccessToken', this)">
+                  Copy
+                </button>
+              </div>
+            </div>
+
+            <div class="token-row">
+              <div class="token-label-row">
+                <span class="token-type-tag refresh-tag">Permanent Refresh Token</span>
+                <span class="token-saved-badge">Saved for Future Audits</span>
+              </div>
+              <div class="token-field-group">
+                <input type="password" id="displayRefreshToken" class="token-mini-input" readonly placeholder="Permanent refresh token">
+                <button type="button" class="token-mini-btn" onclick="toggleVisibility('displayRefreshToken')" title="Show / Hide">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
+                <button type="button" class="token-mini-btn" id="copyRefreshBtn" onclick="copyTokenValue('displayRefreshToken', this)">
+                  Copy
+                </button>
+              </div>
+            </div>
+            <div class="token-sync-status" id="tokenSyncStatus">
+              Active access token is ready for live audit scanning.
+            </div>
+          </div>
         </div>
 
         <div class="field">
@@ -779,6 +1036,150 @@
         selectedFormat = btn.dataset.fmt;
       };
     });
+
+    // Token storage & copy helpers
+    const STORAGE_KEY = 'wooplix_zoho_credentials';
+
+    function copyTokenValue(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (!input || !input.value) return;
+      navigator.clipboard.writeText(input.value).then(() => {
+        const origText = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.style.color = '#059669';
+        btn.style.borderColor = '#86efac';
+        setTimeout(() => {
+          btn.textContent = origText;
+          btn.style.color = '';
+          btn.style.borderColor = '';
+        }, 2000);
+      }).catch(() => {
+        input.select();
+        document.execCommand('copy');
+      });
+    }
+
+    function saveCredentialsToStorage(creds) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(creds));
+      } catch (e) {
+        console.warn('LocalStorage save error', e);
+      }
+    }
+
+    function loadSavedCredentials() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const creds = JSON.parse(raw);
+        if (creds.accountsUrl) document.getElementById('accountsUrl').value = creds.accountsUrl;
+        if (creds.clientId) document.getElementById('clientId').value = creds.clientId;
+        if (creds.clientSecret) document.getElementById('clientSecret').value = creds.clientSecret;
+        if (creds.refreshToken) {
+          document.getElementById('token').value = creds.refreshToken;
+          document.getElementById('displayRefreshToken').value = creds.refreshToken;
+          if (creds.accessToken) {
+            document.getElementById('displayAccessToken').value = creds.accessToken;
+          }
+          document.getElementById('tokenDetailsCard').style.display = 'block';
+          document.getElementById('tokenSyncStatus').textContent = 'Saved permanent refresh token restored from browser storage.';
+        }
+      } catch (e) {
+        console.warn('LocalStorage load error', e);
+      }
+    }
+
+    function clearSavedCredentials() {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch (e) {}
+      document.getElementById('tokenDetailsCard').style.display = 'none';
+      const alert = document.getElementById('statusAlert');
+      alert.textContent = 'Saved credentials cleared from browser storage.';
+      alert.className = 'alert';
+      setTimeout(() => {
+        if (alert.textContent.includes('cleared')) alert.textContent = '';
+      }, 3000);
+    }
+
+    async function exchangeAndSaveToken() {
+      const accountsUrl = document.getElementById('accountsUrl').value;
+      const clientId = document.getElementById('clientId').value.trim();
+      const clientSecret = document.getElementById('clientSecret').value.trim();
+      const token = document.getElementById('token').value.trim();
+      const saveCheck = document.getElementById('saveCredentialsCheck').checked;
+      const alert = document.getElementById('statusAlert');
+      const exchangeBtn = document.getElementById('exchangeBtn');
+
+      if (!clientId || !clientSecret || !token) {
+        alert.textContent = 'Please enter your Client ID, Client Secret, and Grant Code or Refresh Token first.';
+        alert.className = 'alert error';
+        return;
+      }
+
+      alert.textContent = 'Exchanging token with Zoho Accounts server...';
+      alert.className = 'alert';
+      exchangeBtn.disabled = true;
+      exchangeBtn.innerHTML = '<span>Exchanging...</span>';
+
+      try {
+        const fd = new FormData();
+        fd.append('accounts_url', accountsUrl);
+        fd.append('client_id', clientId);
+        fd.append('client_secret', clientSecret);
+        fd.append('token', token);
+        fd.append('save_to_env', saveCheck ? 'true' : 'false');
+
+        const res = await fetch('/api/token/exchange', {
+          method: 'POST',
+          body: fd
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.detail || `Exchange failed with status ${res.status}`);
+        }
+
+        // Update token details card
+        document.getElementById('displayAccessToken').value = data.access_token || '';
+        document.getElementById('displayRefreshToken').value = data.refresh_token || token;
+        // Keep the permanent refresh token in the input form so audits never expire
+        document.getElementById('token').value = data.refresh_token || token;
+        document.getElementById('tokenDetailsCard').style.display = 'block';
+        document.getElementById('tokenSyncStatus').textContent = `Verified with ${data.api_domain || 'Zoho API'}. Refresh token saved for permanent reuse!`;
+        document.getElementById('tokenExpiryText').textContent = `Expires in ~${Math.round((data.expires_in || 3600) / 60)}m`;
+
+        if (saveCheck) {
+          saveCredentialsToStorage({
+            accountsUrl,
+            clientId,
+            clientSecret,
+            refreshToken: data.refresh_token || token,
+            accessToken: data.access_token || '',
+            savedAt: Date.now()
+          });
+        }
+
+        alert.textContent = 'Tokens successfully exchanged! Permanent refresh token is saved and active.';
+        alert.className = 'alert success';
+        setTimeout(() => {
+          if (alert.textContent.includes('exchanged')) alert.textContent = '';
+        }, 4000);
+
+      } catch (err) {
+        alert.textContent = `Token Exchange Error: ${err.message}`;
+        alert.className = 'alert error';
+      } finally {
+        exchangeBtn.disabled = false;
+        exchangeBtn.innerHTML = `
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          <span>Exchange to Access Token & Save</span>
+        `;
+      }
+    }
+
+    // Call loadSavedCredentials on document ready
+    document.addEventListener('DOMContentLoaded', loadSavedCredentials);
 
     // Test credentials
     function fillTestAccount() {

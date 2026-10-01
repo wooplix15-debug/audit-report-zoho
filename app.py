@@ -210,6 +210,115 @@ async def discover_environment_endpoint(
         }
 
 
+def _update_env_credentials(cid: str, csec: str, reftok: str, accounts_url: str):
+    """Safely persist credentials into local .env file and active environment."""
+    env_path = Path(".env")
+    lines = []
+    if env_path.exists():
+        lines = env_path.read_text(encoding="utf-8").splitlines()
+
+    keys_to_update = {
+        "ZOHO_CLIENT_ID": cid,
+        "ZOHO_CLIENT_SECRET": csec,
+        "ZOHO_REFRESH_TOKEN": reftok,
+        "ZOHO_ACCOUNTS_URL": accounts_url,
+    }
+
+    updated_keys = set()
+    new_lines = []
+    for line in lines:
+        matched = False
+        for k, v in keys_to_update.items():
+            if line.startswith(f"{k}=") or line.startswith(f"export {k}="):
+                new_lines.append(f"{k}={v}")
+                updated_keys.add(k)
+                matched = True
+                break
+        if not matched:
+            new_lines.append(line)
+
+    for k, v in keys_to_update.items():
+        if k not in updated_keys:
+            new_lines.append(f"{k}={v}")
+
+    try:
+        env_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+    except Exception as e:
+        print(f"Could not persist to .env: {e}")
+
+    for k, v in keys_to_update.items():
+        os.environ[k] = v
+
+
+@app.post("/api/token/exchange")
+@app.post("/api/token/save")
+async def exchange_and_save_token(
+    request: Request,
+    client_id: Optional[str] = Form(""),
+    client_secret: Optional[str] = Form(""),
+    token: Optional[str] = Form(""),
+    refresh_token: Optional[str] = Form(""),
+    accounts_url: Optional[str] = Form("https://accounts.zoho.in"),
+    save_to_env: Optional[bool] = Form(False),
+):
+    """Exchange 10-minute grant code or refresh token into an active access token with persistent saving option."""
+    cid = (client_id or "").strip()
+    csec = (client_secret or "").strip()
+    tok = (token or refresh_token or "").strip()
+    acc = (accounts_url or "https://accounts.zoho.in").strip()
+    persist = bool(save_to_env)
+
+    if not cid or not csec or not tok:
+        try:
+            body = await request.json()
+            if isinstance(body, dict):
+                cid = cid or body.get("client_id", "")
+                csec = csec or body.get("client_secret", "")
+                tok = tok or body.get("token", "") or body.get("refresh_token", "")
+                acc = acc or body.get("accounts_url", "https://accounts.zoho.in")
+                if "save_to_env" in body:
+                    persist = bool(body["save_to_env"])
+        except Exception:
+            pass
+
+    cid = cid or os.environ.get("ZOHO_CLIENT_ID", "")
+    csec = csec or os.environ.get("ZOHO_CLIENT_SECRET", "")
+    tok = tok or os.environ.get("ZOHO_REFRESH_TOKEN", "")
+
+    if not cid or not csec or not tok:
+        raise HTTPException(
+            status_code=400,
+            detail="Client ID, Client Secret, and Grant Code or Refresh Token are required."
+        )
+
+    try:
+        access_token, persistent_refresh_token, api_domain, scopes = agent.unified_zoho_auth(
+            cid, csec, tok, acc
+        )
+
+        saved_env = False
+        if persist:
+            _update_env_credentials(cid, csec, persistent_refresh_token, acc)
+            saved_env = True
+
+        return {
+            "status": "success",
+            "message": "Tokens successfully exchanged and verified with Zoho Accounts.",
+            "access_token": access_token,
+            "refresh_token": persistent_refresh_token,
+            "api_domain": api_domain,
+            "scopes": scopes,
+            "expires_in": 3600,
+            "saved_to_env": saved_env,
+            "token_type": "Bearer"
+        }
+    except Exception as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Token exchange failed: {str(exc)}"
+        ) from exc
+
+
 def _render_audit_pdf(audit_data: dict, target_pdf: Path, host: Optional[str] = None) -> bool:
     """Render PDF deliverable via Vercel PHP Dompdf function or local Dompdf."""
     if os.environ.get("VERCEL"):

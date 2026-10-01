@@ -134,6 +134,20 @@ def unified_zoho_auth(client_id: str, client_secret: str, token_or_code: str, ac
     if "access_token" in d2:
         return d2["access_token"], tok, (d2.get("api_domain") or "https://www.zohoapis.in").rstrip("/"), (d2.get("scope") or "").split()
 
+    # Attempt 3: Check if token is already an active Access Token
+    try:
+        tld = "in" if ".in" in accounts_url else ("eu" if ".eu" in accounts_url else ("com.au" if ".com.au" in accounts_url else "com"))
+        test_api_domain = f"https://www.zohoapis.{tld}"
+        t_resp = requests.get(f"{test_api_domain}/crm/v2/org", headers={"Authorization": f"Zoho-oauthtoken {tok}"}, timeout=10)
+        try:
+            t_json = t_resp.json()
+        except Exception:
+            t_json = {}
+        if t_resp.status_code == 200 or (t_resp.status_code in (401, 403) and t_json.get("code") != "INVALID_TOKEN"):
+            return tok, tok, test_api_domain, []
+    except Exception:
+        pass
+
     err = d2.get("error") or "Authentication failed"
     desc = d2.get("error_description") or "Check Client ID, Secret, and Code/Refresh Token."
     raise ValueError(f"Zoho Connection Error: {err} - {desc}")
