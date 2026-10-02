@@ -18,7 +18,6 @@ from typing import List, Optional
 from fastapi import FastAPI, Request, HTTPException, Form, Query
 from fastapi.responses import HTMLResponse, StreamingResponse, FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.middleware.cors import CORSMiddleware
 
 import zoho_audit_agent as agent
 
@@ -29,19 +28,6 @@ app = FastAPI(
     description="Automated diagnostic engine and audit deliverable generator for Zoho cloud suites.",
     version="2.0.0"
 )
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=[
-        "Content-Disposition", "X-Audit-Client", "X-Audit-Filename",
-        "X-Audit-Score", "X-Audit-Type", "X-Audit-Mode", "X-Audit-Telemetry"
-    ]
-)
-
 
 @app.middleware("http")
 async def vercel_path_rewrite(request: Request, call_next):
@@ -117,15 +103,15 @@ async def health_check():
 
 @app.post("/api/exchange-token")
 @app.post("/exchange-token")
-async def exchange_token(
+def exchange_token(
     code: str = Form(...),
     client_id: Optional[str] = Form(""),
     client_secret: Optional[str] = Form(""),
     accounts_url: Optional[str] = Form("https://accounts.zoho.in"),
 ):
     """Exchange 10-minute Zoho grant token (authorization code) for a permanent refresh token."""
-    cid = (client_id or "").strip() or os.environ.get("ZOHO_CLIENT_ID", "")
-    csec = (client_secret or "").strip() or os.environ.get("ZOHO_CLIENT_SECRET", "")
+    cid = (client_id or "").strip()
+    csec = (client_secret or "").strip()
     acc = (accounts_url or "").strip() or os.environ.get("ZOHO_ACCOUNTS_URL", "https://accounts.zoho.in")
 
     if not cid or not csec:
@@ -136,8 +122,6 @@ async def exchange_token(
         return {
             "status": "success",
             "refresh_token": data.get("refresh_token"),
-            "access_token": data.get("access_token"),
-            "api_domain": data.get("api_domain"),
             "scope": data.get("scope")
         }
     except Exception as exc:
@@ -146,7 +130,7 @@ async def exchange_token(
 
 @app.post("/api/discover")
 @app.post("/discover")
-async def discover_environment_endpoint(
+def discover_environment_endpoint(
     request: Request,
     client_id: Optional[str] = Form(""),
     client_secret: Optional[str] = Form(""),
@@ -161,169 +145,55 @@ async def discover_environment_endpoint(
     acc = (accounts_url or "").strip()
 
     if not cid or not csec or not reftok:
-        try:
-            body = await request.json()
-            if isinstance(body, dict):
-                cid = cid or body.get("client_id", "")
-                csec = csec or body.get("client_secret", "")
-                reftok = reftok or body.get("token", "") or body.get("refresh_token", "")
-                acc = acc or body.get("accounts_url", "")
-        except Exception:
-            pass
-
-    cid = cid or os.environ.get("ZOHO_CLIENT_ID", "")
-    csec = csec or os.environ.get("ZOHO_CLIENT_SECRET", "")
-    reftok = reftok or os.environ.get("ZOHO_REFRESH_TOKEN", "")
-    acc = acc or os.environ.get("ZOHO_ACCOUNTS_URL", "https://accounts.zoho.in")
-
-    if not cid or not csec or not reftok:
-        return {
-            "organization_name": "Wooplix Client Organization",
-            "contact_email": "enquiry@wooplix.com",
-            "auditor_default": "Rahul (Zoho Certified Lead)",
-            "api_domain": "https://www.zohoapis.in",
-            "discovered_apps": [
-                {"id": "zoho_crm", "name": "Zoho CRM", "description": "Core Sales, Deals, Pipeline stages, & data hygiene", "status": "active", "status_label": "Probed Baseline", "recommended": True},
-                {"id": "zoho_desk", "name": "Zoho Desk", "description": "Department queues, SLAs, & escalation triggers", "status": "active", "status_label": "Probed Baseline", "recommended": True},
-                {"id": "zoho_books", "name": "Zoho Books", "description": "Multi-currency, overdue receivables, & invoice flows", "status": "active", "status_label": "Probed Baseline", "recommended": True},
-                {"id": "zoho_flow", "name": "Cross-App Sync", "description": "CRM-to-Books/Desk bidirectional synchronization", "status": "recommended", "status_label": "Cross-App Governance", "recommended": True}
-            ]
-        }
+        raise HTTPException(status_code=400, detail="Client ID, Client Secret, and Refresh Token are required for discovery.")
+    acc = acc or "https://accounts.zoho.in"
 
     try:
         data = agent.discover_environment(cid, csec, reftok, acc)
         return data
-    except Exception as exc:
-        print(f"Discovery probe error: {exc}")
-        return {
-            "organization_name": "Connected Client Organization",
-            "contact_email": "",
-            "auditor_default": "Rahul (Zoho Certified Lead)",
-            "api_domain": acc,
-            "warning": str(exc),
-            "discovered_apps": [
-                {"id": "zoho_crm", "name": "Zoho CRM", "description": "Sales pipeline, lead routing, custom fields", "status": "active", "status_label": "Ready for Audit", "recommended": True},
-                {"id": "zoho_desk", "name": "Zoho Desk", "description": "Support tickets, queues, and SLAs", "status": "active", "status_label": "Ready for Audit", "recommended": True},
-                {"id": "zoho_books", "name": "Zoho Books", "description": "Invoicing, currencies, receivables", "status": "active", "status_label": "Ready for Audit", "recommended": True},
-                {"id": "zoho_flow", "name": "Cross-App Sync", "description": "Data synchronization and webhooks", "status": "recommended", "status_label": "Ready for Audit", "recommended": True}
-            ]
-        }
-
-
-def _update_env_credentials(cid: str, csec: str, reftok: str, accounts_url: str):
-    """Safely persist credentials into local .env file and active environment."""
-    env_path = Path(".env")
-    lines = []
-    if env_path.exists():
-        lines = env_path.read_text(encoding="utf-8").splitlines()
-
-    keys_to_update = {
-        "ZOHO_CLIENT_ID": cid,
-        "ZOHO_CLIENT_SECRET": csec,
-        "ZOHO_REFRESH_TOKEN": reftok,
-        "ZOHO_ACCOUNTS_URL": accounts_url,
-    }
-
-    updated_keys = set()
-    new_lines = []
-    for line in lines:
-        matched = False
-        for k, v in keys_to_update.items():
-            if line.startswith(f"{k}=") or line.startswith(f"export {k}="):
-                new_lines.append(f"{k}={v}")
-                updated_keys.add(k)
-                matched = True
-                break
-        if not matched:
-            new_lines.append(line)
-
-    for k, v in keys_to_update.items():
-        if k not in updated_keys:
-            new_lines.append(f"{k}={v}")
-
-    try:
-        env_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
-    except Exception as e:
-        print(f"Could not persist to .env: {e}")
-
-    for k, v in keys_to_update.items():
-        os.environ[k] = v
+    except Exception:
+        raise HTTPException(status_code=502, detail="Zoho discovery failed. Check the account region, refresh token, and granted scopes.") from None
 
 
 @app.post("/api/token/exchange")
-@app.post("/api/token/save")
-async def exchange_and_save_token(
-    request: Request,
+def exchange_and_save_token(
     client_id: Optional[str] = Form(""),
     client_secret: Optional[str] = Form(""),
     token: Optional[str] = Form(""),
-    refresh_token: Optional[str] = Form(""),
     accounts_url: Optional[str] = Form("https://accounts.zoho.in"),
-    save_to_env: Optional[bool] = Form(False),
 ):
-    """Exchange 10-minute grant code or refresh token into an active access token with persistent saving option."""
+    """Exchange a one-time Zoho authorization code and return its refresh token."""
     cid = (client_id or "").strip()
     csec = (client_secret or "").strip()
-    tok = (token or refresh_token or "").strip()
+    code = (token or "").strip()
     acc = (accounts_url or "https://accounts.zoho.in").strip()
-    persist = bool(save_to_env)
 
-    if not cid or not csec or not tok:
-        try:
-            body = await request.json()
-            if isinstance(body, dict):
-                cid = cid or body.get("client_id", "")
-                csec = csec or body.get("client_secret", "")
-                tok = tok or body.get("token", "") or body.get("refresh_token", "")
-                acc = acc or body.get("accounts_url", "https://accounts.zoho.in")
-                if "save_to_env" in body:
-                    persist = bool(body["save_to_env"])
-        except Exception:
-            pass
-
-    cid = cid or os.environ.get("ZOHO_CLIENT_ID", "")
-    csec = csec or os.environ.get("ZOHO_CLIENT_SECRET", "")
-    tok = tok or os.environ.get("ZOHO_REFRESH_TOKEN", "")
-
-    if not cid or not csec or not tok:
+    if not cid or not csec or not code:
         raise HTTPException(
             status_code=400,
-            detail="Client ID, Client Secret, and Grant Code or Refresh Token are required."
+            detail="Client ID, Client Secret, and a fresh Zoho authorization code are required."
         )
 
     try:
-        access_token, persistent_refresh_token, api_domain, scopes = agent.unified_zoho_auth(
-            cid, csec, tok, acc
-        )
-
-        saved_env = False
-        if persist:
-            _update_env_credentials(cid, csec, persistent_refresh_token, acc)
-            saved_env = True
+        data = agent.exchange_zoho_grant_code(cid, csec, code, acc)
 
         return {
             "status": "success",
-            "message": "Tokens successfully exchanged and verified with Zoho Accounts.",
-            "access_token": access_token,
-            "refresh_token": persistent_refresh_token,
-            "api_domain": api_domain,
-            "scopes": scopes,
-            "expires_in": 3600,
-            "saved_to_env": saved_env,
-            "token_type": "Bearer"
+            "message": "Zoho authorization code exchanged successfully.",
+            "refresh_token": data["refresh_token"],
         }
     except Exception as exc:
         raise HTTPException(
-            status_code=400,
-            detail=f"Token exchange failed: {str(exc)}"
-        ) from exc
+            status_code=400 if isinstance(exc, ValueError) else 502,
+            detail=str(exc) if isinstance(exc, ValueError) else "Zoho token exchange failed. Check the region, client credentials, and code, then try a newly generated code."
+        ) from None
 
 
 def _render_audit_pdf(audit_data: dict, target_pdf: Path, host: Optional[str] = None) -> bool:
     """Render PDF deliverable via Vercel PHP Dompdf function or local Dompdf."""
     if os.environ.get("VERCEL"):
         base = host or os.environ.get("VERCEL_PROJECT_PRODUCTION_URL") or os.environ.get("VERCEL_URL")
-        token = os.environ.get("PDF_RENDER_TOKEN") or "wooplix-zoho-audit-render-secret-2026"
+        token = os.environ.get("PDF_RENDER_TOKEN", "")
         if base:
             url = base if base.startswith("http") else f"https://{base}"
             url = f"{url.rstrip('/')}/api/pdf.php"
@@ -358,14 +228,11 @@ def _extract_telemetry_summary(telemetry: dict, company_name: str, suites_list: 
 
     op_metrics = crm.get("operational_metrics", {})
     deals_sampled = op_metrics.get("deals_sampled")
-    if deals_sampled is None:
-        deals_sampled = crm.get("data_hygiene", {}).get("dormant_deals_over_90_days", 48)
-
     leads_sampled = op_metrics.get("leads_sampled")
-    if leads_sampled is None:
-        leads_sampled = crm.get("data_hygiene", {}).get("total_leads_in_pipeline", 50)
-
-    modules = len(crm.get("modules_inventory", [])) or len(crm.get("installed_modules", [])) or 16
+    modules_inventory = crm.get("modules_inventory")
+    if modules_inventory is None:
+        modules_inventory = crm.get("installed_modules")
+    modules = len(modules_inventory) if isinstance(modules_inventory, list) else None
 
     clean_suites = [s.replace("Zoho ", "").strip() for s in suites_list]
     is_live = "Live" in mode
@@ -384,7 +251,7 @@ def _extract_telemetry_summary(telemetry: dict, company_name: str, suites_list: 
 
 @app.post("/api/audit")
 @app.post("/audit")
-async def trigger_audit(
+def trigger_audit(
     request: Request,
     company_name: Optional[str] = Form(""),
     auditor_name: Optional[str] = Form("Rahul (Zoho Certified Lead)"),
@@ -394,92 +261,54 @@ async def trigger_audit(
     token: Optional[str] = Form(""),
     refresh_token: Optional[str] = Form(""),
     accounts_url: Optional[str] = Form("https://accounts.zoho.in"),
-    target_suites: Optional[str] = Form("zoho_crm,zoho_desk,zoho_books"),
+    target_suites: Optional[str] = Form("zoho_crm"),
     use_demo: Optional[bool] = Form(False),
     format: Optional[str] = Query("pdf")
 ):
     """Run end-to-end Zoho environment audit and return requested deliverable."""
     host = request.headers.get("x-forwarded-host") or request.headers.get("host")
+    # Public requests only use credentials explicitly provided for this audit.
+    cid = (client_id or "").strip()
+    csec = (client_secret or "").strip()
+    reftok = (token or refresh_token or "").strip()
+    acc_url = (accounts_url or "").strip() or "https://accounts.zoho.in"
+    if not use_demo and not (cid and csec and reftok):
+        raise HTTPException(status_code=400, detail="Client ID, Client Secret, and a Zoho refresh token are required for a live audit.")
+
     groq_key = os.environ.get("GROQ_API_KEY") or agent.GROQ_API_KEY
     if not groq_key:
         raise HTTPException(
             status_code=503,
-            detail="GROQ_API_KEY is not configured on the server. Please check .env configuration."
+            detail="AI analysis is not configured on the server. Please check deployment configuration."
         )
 
-    # Determine credentials
-    cid = (client_id or "").strip() or os.environ.get("ZOHO_CLIENT_ID", "")
-    csec = (client_secret or "").strip() or os.environ.get("ZOHO_CLIENT_SECRET", "")
-    reftok = (token or refresh_token or "").strip() or os.environ.get("ZOHO_REFRESH_TOKEN", "")
-    acc_url = (accounts_url or "").strip() or os.environ.get("ZOHO_ACCOUNTS_URL", "https://accounts.zoho.in")
-
-    # Auto-detect company name if not provided
     comp_name = (company_name or "").strip()
     if not comp_name or comp_name == "Client Organization":
-        try:
-            disc = agent.discover_environment(cid, csec, reftok, acc_url)
-            comp_name = disc.get("organization_name") or "Client Organization"
-        except Exception:
-            comp_name = "Client Organization"
+        comp_name = "Client Organization"
     company_name = comp_name
     auditor = (auditor_name or "Rahul (Zoho Certified Lead)").strip()
 
     # Parse target suites or auto-discover all active tools
     suites_list = []
+    supported_suites = {
+        "crm": "Zoho CRM", "zoho_crm": "Zoho CRM",
+        "desk": "Zoho Desk", "zoho_desk": "Zoho Desk",
+        "books": "Zoho Books", "zoho_books": "Zoho Books",
+        "inventory": "Zoho Inventory", "zoho_inventory": "Zoho Inventory",
+        "projects": "Zoho Projects", "zoho_projects": "Zoho Projects",
+        "workdrive": "Zoho WorkDrive", "zoho_workdrive": "Zoho WorkDrive",
+        "flow": "Zoho Flow", "zoho_flow": "Zoho Flow",
+        "analytics": "Zoho Analytics", "zoho_analytics": "Zoho Analytics",
+    }
     if target_suites:
         raw_items = [s.strip().lower() for s in target_suites.split(",") if s.strip()]
-        for s in raw_items:
-            if "crm" in s:
-                suites_list.append("Zoho CRM")
-            elif "desk" in s:
-                suites_list.append("Zoho Desk")
-            elif "book" in s or "billing" in s:
-                suites_list.append("Zoho Books")
-            elif "inventory" in s:
-                suites_list.append("Zoho Inventory")
-            elif "project" in s:
-                suites_list.append("Zoho Projects")
-            elif "workdrive" in s or "drive" in s:
-                suites_list.append("Zoho WorkDrive")
-            elif "flow" in s:
-                suites_list.append("Zoho Flow")
-            elif "analytic" in s:
-                suites_list.append("Zoho Analytics")
-            elif "campaign" in s:
-                suites_list.append("Zoho Campaigns")
-            elif "salesiq" in s:
-                suites_list.append("Zoho SalesIQ")
-            elif "creator" in s:
-                suites_list.append("Zoho Creator")
-            else:
-                suites_list.append(s.title())
+        unsupported = [s for s in raw_items if s not in supported_suites]
+        if unsupported:
+            raise HTTPException(status_code=400, detail="One or more selected applications are not supported for live auditing yet.")
+        suites_list = list(dict.fromkeys(supported_suites[s] for s in raw_items))
 
-    # Auto-detect tools only if user did not specify target_suites
-    has_explicit_selection = bool(suites_list)
-    if cid and csec and reftok:
-        try:
-            disc = agent.discover_environment(cid, csec, reftok, acc_url)
-            active_from_zoho = []
-            for d in disc.get("discovered_apps", []):
-                if d.get("status") == "active":
-                    name = d.get("name")
-                    if name and name not in active_from_zoho:
-                        active_from_zoho.append(name)
-            if not has_explicit_selection:
-                suites_list = active_from_zoho if active_from_zoho else ["Zoho CRM"]
-            else:
-                # User provided specific target suites; respect their explicit choices without expanding
-                if active_from_zoho:
-                    filtered = [s for s in suites_list if s in active_from_zoho]
-                    if filtered:
-                        suites_list = filtered
-                    # If none matched active_from_zoho, retain user's requested suite(s) rather than expanding to all apps
-        except Exception as e:
-            print(f"Ecosystem discovery note: {e}")
-
-    # If still empty or not specified, audit Zoho CRM
     if not suites_list:
-        suites_list = ["Zoho CRM"]
+        raise HTTPException(status_code=400, detail="Select at least one supported application to audit.")
 
     # Ensure live credentials dictionary is built from user-provided token
     creds = None
@@ -506,6 +335,19 @@ async def trigger_audit(
                 force_sample=(use_demo or creds is None)
             )
 
+            if not company_name or company_name == "Client Organization":
+                company_name = (telemetry.get("zoho_crm", {}).get("org_settings", {}).get("company_name")
+                                or telemetry.get("client_metadata", {}).get("company_name")
+                                or "Client Organization")
+
+            if creds:
+                suite_keys = ["zoho_" + s.removeprefix("Zoho ").lower().replace(" ", "_") for s in suites_list]
+                accessible = [key for key in suite_keys if telemetry.get(key, {}).get("status") in ("connected", "partial_access")]
+                if not accessible:
+                    raise HTTPException(status_code=502, detail="Zoho authentication succeeded, but none of the selected apps returned auditable telemetry. Check the granted read scopes and app availability.")
+
+            stem = agent._safe_stem(company_name)
+
             # Extract live verification telemetry for the web app UI
             tel_summary = _extract_telemetry_summary(telemetry, company_name, suites_list)
             tel_b64 = base64.b64encode(json.dumps(tel_summary, ensure_ascii=False).encode("utf-8")).decode("ascii")
@@ -515,9 +357,11 @@ async def trigger_audit(
                 telemetry_data=telemetry,
                 auditor_name=auditor_name
             )
+            if not audit_data.get("app_audits"):
+                raise HTTPException(status_code=502, detail="AI analysis returned no evidence-backed assessments for the selected applications. No report was generated.")
             audit_data["telemetry_provenance"] = tel_summary
 
-            health_score = audit_data.get("overall_health_score", 65)
+            health_score = audit_data.get("overall_health_score", 0)
 
             # Step 3: Compile Deliverables
             docx_file = work_path / f"Wooplix_Audit_{stem}.docx"
@@ -592,11 +436,15 @@ async def trigger_audit(
 
     except HTTPException:
         raise
+    except agent.ZohoTelemetryError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from None
+    except RuntimeError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from None
     except Exception as exc:
-        print(f"Audit generation failed: {type(exc).__name__}: {exc}")
+        print(f"Audit generation failed: {type(exc).__name__}")
         raise HTTPException(
             status_code=500,
-            detail=f"Audit generation failed ({type(exc).__name__}: {str(exc)[:180]})"
+            detail="Audit generation failed before a report was produced. Check server configuration and retry."
         ) from exc
 
 

@@ -1,0 +1,121 @@
+import unittest
+from unittest.mock import Mock, patch
+
+import zoho_audit_agent as agent
+
+
+class AccountsRegionTests(unittest.TestCase):
+    def test_supported_accounts_hosts_are_normalized(self):
+        self.assertEqual(agent._zoho_accounts_url("https://accounts.zoho.in/"), "https://accounts.zoho.in")
+
+    def test_rejects_non_zoho_or_non_https_hosts(self):
+        for url in (
+            "http://accounts.zoho.in",
+            "https://attacker.example",
+            "https://accounts.zoho.in.attacker.example",
+            "https://user:pass@accounts.zoho.in",
+        ):
+            with self.subTest(url=url), self.assertRaises(ValueError):
+                agent._zoho_accounts_url(url)
+
+
+class OAuthFlowTests(unittest.TestCase):
+    @patch("requests.post")
+    def test_grant_exchange_sends_form_data_and_requires_refresh_token(self, post):
+        response = Mock()
+        response.json.return_value = {"access_token": "short-lived", "refresh_token": "reusable"}
+        post.return_value = response
+
+        result = agent.exchange_zoho_grant_code("client", "secret", "one-time-code")
+
+        self.assertEqual(result["refresh_token"], "reusable")
+        self.assertIn("data", post.call_args.kwargs)
+        self.assertNotIn("params", post.call_args.kwargs)
+        self.assertEqual(post.call_args.kwargs["data"]["grant_type"], "authorization_code")
+
+    @patch("requests.post")
+    def test_access_token_response_is_not_accepted_as_refresh_token(self, post):
+        response = Mock()
+        response.json.return_value = {"access_token": "short-lived"}
+        post.return_value = response
+
+        with self.assertRaisesRegex(ValueError, "did not return both"):
+            agent.exchange_zoho_grant_code("client", "secret", "one-time-code")
+
+    @patch("requests.post")
+    def test_refresh_auth_uses_refresh_grant_only(self, post):
+        response = Mock()
+        response.json.return_value = {"access_token": "short-lived", "api_domain": "https://www.zohoapis.in", "scope": "ZohoCRM.modules.READ"}
+        post.return_value = response
+
+        access, refresh, _, _ = agent.unified_zoho_auth("client", "secret", "reusable")
+
+        self.assertEqual((access, refresh), ("short-lived", "reusable"))
+        self.assertEqual(post.call_args.kwargs["data"]["grant_type"], "refresh_token")
+
+    @patch.object(agent, "unified_zoho_auth", side_effect=ValueError("invalid refresh token"))
+    def test_live_collection_failure_does_not_return_demo_data(self, _auth):
+        credentials = {"client_id": "client", "client_secret": "secret", "refresh_token": "expired"}
+        with self.assertRaises(agent.ZohoTelemetryError):
+            agent.collect_environment_telemetry(credentials, ["Zoho CRM"], force_sample=False)
+
+
+class ReportScopeTests(unittest.TestCase):
+    def test_unavailable_app_is_not_reported_or_scored(self):
+        telemetry = {"client_metadata": {"company_name": "Example", "probed_suites": ["Zoho CRM"]},
+                     "zoho_crm": {"status": "unauthorized"}}
+        report = {"app_audits": [{"app_name": "Zoho CRM", "health_score": 80, "findings": []}],
+                  "cross_app_integration_gaps": [{"source": "Zoho CRM", "target": "Zoho Books"}]}
+
+        result = agent.validate_and_normalize_audit_schema(report, telemetry, "Tester")
+
+        self.assertEqual(result["client"]["audited_apps"], [])
+        self.assertEqual(result["app_audits"], [])
+        self.assertEqual(result["overall_health_score"], 0)
+        self.assertEqual(result["cross_app_integration_gaps"], [])
+
+    def test_unset_status_is_not_reported_as_missing_outreach(self):
+        telemetry = {
+            "client_metadata": {"company_name": "Example", "audit_mode": "Live Zoho API Telemetry"},
+            "zoho_crm": {"status": "connected", "operational_metrics": {
+                "leads_status_null_count": 4, "leads_sampled": 13,
+            }},
+        }
+        report = {
+            "executive_summary": "Uncontacted inbound leads need attention.",
+            "app_audits": [{"app_name": "Zoho CRM", "health_score": 50, "findings": [{
+                "severity": "CRITICAL", "issue": "Uncontacted inbound leads",
+                "root_cause": "No outreach happened", "recommended_fix": "Add a response alert",
+            }]}],
+            "revenue_and_sales_scaling": {"origination_and_inflow_assessment": {
+                "speed_to_lead_latency": "18 hours", "origination_risks": "Missed outreach",
+            }},
+        }
+
+        result = agent.validate_and_normalize_audit_schema(report, telemetry, "Tester")
+
+        finding = result["app_audits"][0]["findings"][0]
+        self.assertEqual(finding["issue"], "Unset Lead Status in sampled records")
+        self.assertIn("contact activity was not measured", finding["root_cause"])
+        self.assertNotIn("Uncontacted", result["executive_summary"])
+        self.assertEqual(result["revenue_and_sales_scaling"]["origination_and_inflow_assessment"]["speed_to_lead_latency"], "Not assessed")
+
+    def test_failed_rule_endpoint_is_an_inspection_limit(self):
+        telemetry = {
+            "client_metadata": {"company_name": "Example", "audit_mode": "Live Zoho API Telemetry"},
+            "zoho_crm": {"status": "partial_access", "lead_assignment_rules": [
+                {"note": "Lead assignment rules returned HTTP 400"}
+            ]},
+        }
+        report = {"app_audits": [{"app_name": "Zoho CRM", "health_score": 50,
+                                  "findings": [{"severity": "CRITICAL", "issue": "Assignment rule endpoint unavailable",
+                                                "root_cause": "HTTP 400", "recommended_fix": "Add scopes"}]}]}
+
+        result = agent.validate_and_normalize_audit_schema(report, telemetry, "Tester")
+
+        self.assertEqual(result["app_audits"][0]["findings"], [])
+        self.assertIn("lead assignment rules", result["evidence_provenance"]["inspection_limits"])
+
+
+if __name__ == "__main__":
+    unittest.main()

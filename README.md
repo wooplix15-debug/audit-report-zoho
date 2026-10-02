@@ -7,7 +7,7 @@
 
 ## Overview
 
-The **Zoho System Audit Agent** is a full-stack, enterprise-grade diagnostic platform that inspects a client's Zoho environment, collects configuration and operational telemetry (CRM, Desk, Books, and Cross-App Integrations), analyzes vulnerabilities and misconfigurations using Groq LLM under strict **Wooplix House Style**, and generates authoritative, branded deliverables (**PDF** via Dompdf and **DOCX** via `python-docx`).
+The **Zoho System Audit Agent** is a full-stack, enterprise-grade diagnostic platform that inspects a client's Zoho environment, collects requested read-only telemetry from currently supported Zoho suites, analyzes vulnerabilities and misconfigurations using Groq LLM under strict **Wooplix House Style**, and generates authoritative, branded deliverables (**PDF** via Dompdf and **DOCX** via `python-docx`).
 
 ---
 
@@ -18,12 +18,13 @@ The **Zoho System Audit Agent** is a full-stack, enterprise-grade diagnostic pla
    - Read-only telemetry collectors for:
      - **Zoho CRM**: Org settings, installed modules, custom fields, pipeline stages, lead assignment rules, dormant deal analysis, uncontacted leads, and permission governance.
      - **Zoho Desk**: Departments, active queues, response/resolution SLA policies, and supervisory escalation triggers.
-     - **Zoho Books / Billing**: Currency setup, foreign exchange automation, overdue receivables, and invoice workflows.
-     - **Cross-App Sync**: Data synchronization health, entity mapping gaps, and webhook status between CRM, Desk, and Books.
-   - Built-in enriched baseline simulation mode for instant evaluations and testing without live production tokens.
+     - **Zoho Books**: Organization, currency, and invoice telemetry.
+     - **Inventory, Projects, WorkDrive, Flow, and Analytics**: Limited live connectivity probes.
+     - Cross-app sync findings are withheld until the app can inspect integration settings directly.
+   - Demo telemetry is explicitly marked as simulated and is never substituted for a failed live connection.
 
 2. **Groq LLM Diagnostic Analyzer**:
-   - Leverages `openai/gpt-oss-120b` (with automated fallback to `llama-3.3-70b-versatile`, `openai/gpt-oss-20b`, `qwen/qwen3.8-27b`).
+   - Leverages `openai/gpt-oss-120b` (with one bounded fallback model).
    - Runs with strict temperature (`0.1`) and structured JSON mode.
    - Strictly enforces **Wooplix House Style**: concrete, technical, and objective without marketing fluff or forbidden buzzwords (`seamless`, `cutting-edge`, `robust`, `holistic`, `synergy`, `delve`, `leverage`).
 
@@ -83,6 +84,14 @@ Open your browser at **`http://localhost:8000`**.
 
 ---
 
+## Local Checks
+
+Run the safety and OAuth unit tests with:
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
 ## Standalone CLI Usage
 
 You can also run audits directly from the command line:
@@ -130,10 +139,8 @@ Content-Type: multipart/form-data
 - `auditor_name` *(string)*: Lead auditor name.
 - `contact_email` *(string, optional)*: Client notification email.
 - `accounts_url` *(string)*: Zoho accounts URL (e.g. `https://accounts.zoho.in`).
-- `client_id` *(string, optional)*: Zoho OAuth Client ID.
-- `client_secret` *(string, optional)*: Zoho OAuth Client Secret.
-- `refresh_token` *(string, optional)*: Zoho OAuth Refresh Token.
-- `target_suites` *(string)*: Comma-separated list (`zoho_crm,zoho_desk,zoho_books`).
+- `client_id`, `client_secret`, `token` *(required for live audits)*: Per-request Zoho OAuth credentials and refresh token.
+- `target_suites` *(string)*: Comma-separated supported suites (`zoho_crm`, `zoho_desk`, `zoho_books`, `zoho_inventory`, `zoho_projects`, `zoho_workdrive`, `zoho_flow`, `zoho_analytics`).
 - `use_demo` *(boolean, optional)*: If `true`, runs simulation telemetry.
 
 **Format options**: `?format=pdf`, `?format=docx`, or `?format=zip`.
@@ -154,13 +161,9 @@ The repository is already configured with `vercel.json`, serverless Python entry
 In the **Configure Project** screen under **Environment Variables**, add:
 - `GROQ_API_KEY`: *(Your Groq API Key, e.g. `gsk_...`)*
 - `GROQ_MODEL`: `openai/gpt-oss-120b` *(optional)*
-- `PDF_RENDER_TOKEN`: `wooplix-zoho-audit-render-secret-2026` *(optional)*
+- `PDF_RENDER_TOKEN`: Set a long random value shared only by the Python and PHP renderer functions.
 
-*(Optional Server Defaults for Zoho if you want pre-configured fallback)*:
-- `ZOHO_CLIENT_ID`: `1000.YOUR_CLIENT_ID`
-- `ZOHO_CLIENT_SECRET`: `your_client_secret`
-- `ZOHO_REFRESH_TOKEN`: `1000.your_refresh_token`
-- `ZOHO_ACCOUNTS_URL`: `https://accounts.zoho.in`
+Public audit routes require each user's credentials in the current request; do not add client secrets or refresh tokens as Vercel environment variables.
 
 ### Step 3: Deploy
 1. Click **Deploy**.
@@ -192,4 +195,3 @@ If auditing a new client or organization:
 5. Set Time Duration to **10 minutes** and enter a Scope Description (e.g. `Wooplix Zoho Full Audit`).
 6. Click **Create** and copy the generated **Code** (starts with `1000.xxxx...`).
 7. Paste the Client ID, Client Secret, and Code directly into the audit portal. The tool automatically converts the 10-minute code into a persistent token behind the scenes and inspects all connected tools!
-

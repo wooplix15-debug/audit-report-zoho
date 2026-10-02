@@ -8,10 +8,17 @@ use Dompdf\Options;
 
 header('Content-Type: application/pdf');
 
-$token = getenv('PDF_RENDER_TOKEN') ?: 'wooplix-zoho-audit-render-secret-2026';
+$token = getenv('PDF_RENDER_TOKEN') ?: '';
 $provided = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
 
-if ($token !== '' && !hash_equals('Bearer ' . $token, $provided)) {
+if ($token === '') {
+    http_response_code(503);
+    header('Content-Type: application/json');
+    echo json_encode(['detail' => 'PDF renderer is not configured']);
+    exit;
+}
+
+if (!hash_equals('Bearer ' . $token, $provided)) {
     http_response_code(401);
     header('Content-Type: application/json');
     echo json_encode(['detail' => 'Unauthorized']);
