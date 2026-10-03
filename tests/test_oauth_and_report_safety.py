@@ -67,6 +67,32 @@ class OAuthFlowTests(unittest.TestCase):
 
 
 class ReportScopeTests(unittest.TestCase):
+    @patch("requests.get")
+    def test_closed_deals_do_not_inflate_active_pipeline(self, get):
+        def response(url, **_kwargs):
+            payload = Mock(status_code=403)
+            payload.json.return_value = {}
+            if "/Deals?" in url:
+                payload.status_code = 200
+                payload.json.return_value = {"data": [
+                    {"id": "closed", "Stage": "Closed Won", "Amount": 100,
+                     "Closing_Date": "2020-01-01", "Modified_Time": "2020-01-01T00:00:00+00:00"},
+                    {"id": "open", "Stage": "Qualification", "Amount": 200,
+                     "Closing_Date": "2020-01-01", "Modified_Time": "2020-01-01T00:00:00+00:00"},
+                ]}
+            return payload
+        get.side_effect = response
+
+        metrics = agent.collect_crm_telemetry("test-token", "https://www.zohoapis.in", [])["operational_metrics"]
+
+        self.assertEqual(metrics["deals_sampled"], 2)
+        self.assertEqual(metrics["open_deals_sampled"], 1)
+        self.assertEqual(metrics["closed_deals_excluded_from_pipeline"], 1)
+        self.assertEqual(metrics["total_pipeline_value_sampled"], 200)
+        self.assertEqual(metrics["stagnant_pipeline_value_over_60d"], 200)
+        self.assertEqual(metrics["stale_deals_over_60d"], 1)
+        self.assertEqual(metrics["slipped_deals_count"], 1)
+
     def test_unavailable_app_is_not_reported_or_scored(self):
         telemetry = {"client_metadata": {"company_name": "Example", "probed_suites": ["Zoho CRM"]},
                      "zoho_crm": {"status": "unauthorized"}}
@@ -105,6 +131,22 @@ class ReportScopeTests(unittest.TestCase):
         self.assertIn("contact activity was not measured", finding["root_cause"])
         self.assertNotIn("Uncontacted", result["executive_summary"])
         self.assertEqual(result["revenue_and_sales_scaling"]["origination_and_inflow_assessment"]["speed_to_lead_latency"], "Not assessed")
+
+    def test_uninspected_automation_is_not_named_as_root_cause(self):
+        telemetry = {"client_metadata": {"company_name": "Example", "audit_mode": "Live Zoho API Telemetry"},
+                     "zoho_crm": {"status": "partial_access", "workflow_automation": {"note": "HTTP 403"},
+                                  "operational_metrics": {"deals_sampled": 13, "open_deals_sampled": 11,
+                                                          "stale_deals_over_60d": 11, "slipped_deals_count": 11}}}
+        report = {"app_audits": [{"app_name": "Zoho CRM", "health_score": 50,
+                                  "findings": [{"severity": "CRITICAL", "issue": "Stagnant pipeline value",
+                                                "root_cause": "Missing deal aging alerts", "recommended_fix": "Review alerts"}]}]}
+
+        result = agent.validate_and_normalize_audit_schema(report, telemetry, "Tester")
+
+        cause = result["app_audits"][0]["findings"][0]["root_cause"]
+        self.assertIn("11 of 11 sampled open deals", cause)
+        self.assertIn("automation was not assessed", cause)
+        self.assertNotIn("Missing deal aging alerts", cause)
 
     def test_failed_rule_endpoint_is_an_inspection_limit(self):
         telemetry = {
