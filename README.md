@@ -163,6 +163,7 @@ In the **Configure Project** screen under **Environment Variables**, add:
 - `GROQ_API_KEY`: *(Your Groq API Key, e.g. `gsk_...`)*
 - `GROQ_MODEL`: `openai/gpt-oss-120b` *(optional)*
 - `PDF_RENDER_TOKEN`: Set a long random value shared only by the Python and PHP renderer functions.
+- `PDF_RENDER_ORIGIN`: Optional override for the public renderer origin if the production domain changes.
 
 Public audit routes require each user's credentials in the current request; do not add client secrets or refresh tokens as Vercel environment variables.
 

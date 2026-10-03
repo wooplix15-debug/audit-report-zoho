@@ -144,7 +144,8 @@ class DeliverySafetyTests(unittest.TestCase):
     def test_pdf_callback_uses_platform_url_without_redirects(self):
         pdf_response = Mock(status_code=200, content=b"%PDF-1.4\nexample")
         with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ, {
-            "VERCEL": "1", "VERCEL_URL": "trusted.vercel.app", "PDF_RENDER_TOKEN": "test-token"
+            "VERCEL": "1", "VERCEL_URL": "untrusted-preview.vercel.app",
+            "PDF_RENDER_ORIGIN": "trusted.vercel.app", "PDF_RENDER_TOKEN": "test-token"
         }), patch("requests.post", return_value=pdf_response) as post:
             output = Path(folder) / "audit.pdf"
             self.assertTrue(web_app._render_audit_pdf({}, output))

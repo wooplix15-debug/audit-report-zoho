@@ -194,9 +194,11 @@ def exchange_and_save_token(
 def _render_audit_pdf(audit_data: dict, target_pdf: Path) -> bool:
     """Render PDF deliverable via Vercel PHP Dompdf function or local Dompdf."""
     if os.environ.get("VERCEL"):
-        # Use Vercel's deployment URL. Request Host headers are user controlled
-        # and must never receive the renderer token or report contents.
-        base = os.environ.get("VERCEL_URL") or os.environ.get("VERCEL_PROJECT_PRODUCTION_URL")
+        # Use the public production origin. Individual Vercel deployment URLs
+        # may be protected, and request Host headers are user controlled.
+        base = (os.environ.get("PDF_RENDER_ORIGIN")
+                or os.environ.get("VERCEL_PROJECT_PRODUCTION_URL")
+                or "audit-report-zoho.vercel.app")
         token = os.environ.get("PDF_RENDER_TOKEN", "")
         if base and token:
             url = base if base.startswith("http") else f"https://{base}"
