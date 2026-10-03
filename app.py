@@ -9,7 +9,6 @@ import io
 import os
 import re
 import json
-import base64
 import zipfile
 import tempfile
 from pathlib import Path
@@ -42,7 +41,10 @@ async def vercel_path_rewrite(request: Request, call_next):
         matched = request.headers.get("x-matched-path")
         if matched and matched != "/api/index.py":
             request.scope["path"] = matched
-    return await call_next(request)
+    response = await call_next(request)
+    if request.scope["path"].startswith("/api/") or request.scope["path"] in ("/audit", "/exchange-token", "/discover"):
+        response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -189,12 +191,14 @@ def exchange_and_save_token(
         ) from None
 
 
-def _render_audit_pdf(audit_data: dict, target_pdf: Path, host: Optional[str] = None) -> bool:
+def _render_audit_pdf(audit_data: dict, target_pdf: Path) -> bool:
     """Render PDF deliverable via Vercel PHP Dompdf function or local Dompdf."""
     if os.environ.get("VERCEL"):
-        base = host or os.environ.get("VERCEL_PROJECT_PRODUCTION_URL") or os.environ.get("VERCEL_URL")
+        # Use Vercel's deployment URL. Request Host headers are user controlled
+        # and must never receive the renderer token or report contents.
+        base = os.environ.get("VERCEL_URL") or os.environ.get("VERCEL_PROJECT_PRODUCTION_URL")
         token = os.environ.get("PDF_RENDER_TOKEN", "")
-        if base:
+        if base and token:
             url = base if base.startswith("http") else f"https://{base}"
             url = f"{url.rstrip('/')}/api/pdf.php"
             try:
@@ -204,8 +208,9 @@ def _render_audit_pdf(audit_data: dict, target_pdf: Path, host: Optional[str] = 
                     json={"html": agent.build_html(audit_data)},
                     headers={"Authorization": f"Bearer {token}"},
                     timeout=240,
+                    allow_redirects=False,
                 )
-                if r.status_code == 200 and len(r.content) > 100:
+                if r.status_code == 200 and r.content.startswith(b"%PDF"):
                     target_pdf.write_bytes(r.content)
                     return True
             except Exception as e:
@@ -232,7 +237,10 @@ def _extract_telemetry_summary(telemetry: dict, company_name: str, suites_list: 
     modules_inventory = crm.get("modules_inventory")
     if modules_inventory is None:
         modules_inventory = crm.get("installed_modules")
-    modules = len(modules_inventory) if isinstance(modules_inventory, list) else None
+    modules = (sum(1 for item in modules_inventory if (isinstance(item, dict) and item.get("api_name")) or isinstance(item, str))
+               if isinstance(modules_inventory, list) else None)
+    if modules == 0:
+        modules = None
 
     clean_suites = [s.replace("Zoho ", "").strip() for s in suites_list]
     is_live = "Live" in mode
@@ -252,7 +260,6 @@ def _extract_telemetry_summary(telemetry: dict, company_name: str, suites_list: 
 @app.post("/api/audit")
 @app.post("/audit")
 def trigger_audit(
-    request: Request,
     company_name: Optional[str] = Form(""),
     auditor_name: Optional[str] = Form("Rahul (Zoho Certified Lead)"),
     contact_email: Optional[str] = Form(""),
@@ -266,7 +273,11 @@ def trigger_audit(
     format: Optional[str] = Query("pdf")
 ):
     """Run end-to-end Zoho environment audit and return requested deliverable."""
-    host = request.headers.get("x-forwarded-host") or request.headers.get("host")
+    req_format = (format or "pdf").strip().lower()
+    if req_format not in {"pdf", "docx", "zip"}:
+        raise HTTPException(status_code=400, detail="Choose PDF, Word, or ZIP as the report format.")
+    if use_demo and os.environ.get("VERCEL") and os.environ.get("ENABLE_DEMO_AUDIT") != "1":
+        raise HTTPException(status_code=403, detail="Sample audits are disabled on this deployment.")
     # Public requests only use credentials explicitly provided for this audit.
     cid = (client_id or "").strip()
     csec = (client_secret or "").strip()
@@ -350,7 +361,6 @@ def trigger_audit(
 
             # Extract live verification telemetry for the web app UI
             tel_summary = _extract_telemetry_summary(telemetry, company_name, suites_list)
-            tel_b64 = base64.b64encode(json.dumps(tel_summary, ensure_ascii=False).encode("utf-8")).decode("ascii")
 
             # Step 2: Diagnostic Analysis via Groq LLM
             audit_data = agent.analyze_telemetry_with_groq(
@@ -361,33 +371,28 @@ def trigger_audit(
                 raise HTTPException(status_code=502, detail="AI analysis returned no evidence-backed assessments for the selected applications. No report was generated.")
             audit_data["telemetry_provenance"] = tel_summary
 
-            health_score = audit_data.get("overall_health_score", 0)
-
             # Step 3: Compile Deliverables
             docx_file = work_path / f"Wooplix_Audit_{stem}.docx"
             pdf_file  = work_path / f"Wooplix_Audit_{stem}.pdf"
             json_file = work_path / f"Wooplix_Audit_Report_{stem}.json"
             raw_tel_file = work_path / f"Wooplix_Raw_Telemetry_{stem}.json"
 
-            json_file.write_text(json.dumps(audit_data, indent=2, ensure_ascii=False), encoding="utf-8")
-            raw_tel_file.write_text(json.dumps(telemetry, indent=2, ensure_ascii=False), encoding="utf-8")
-            agent.build_docx(audit_data, str(docx_file))
-
-            pdf_generated = _render_audit_pdf(audit_data, pdf_file, host=host)
-
-            req_format = (format or "pdf").lower()
+            if req_format == "zip":
+                json_file.write_text(json.dumps(audit_data, indent=2, ensure_ascii=False), encoding="utf-8")
+                raw_tel_file.write_text(json.dumps(telemetry, indent=2, ensure_ascii=False), encoding="utf-8")
+            if req_format in {"docx", "zip"}:
+                agent.build_docx(audit_data, str(docx_file))
+            if req_format in {"pdf", "zip"} and not _render_audit_pdf(audit_data, pdf_file):
+                raise HTTPException(status_code=502, detail="PDF rendering is unavailable. Please retry the audit.")
 
             common_headers = {
-                "X-Audit-Client": company_name,
                 "X-Audit-Filename": f"Wooplix_Audit_{stem}.pdf" if req_format == "pdf" else f"Wooplix_Audit_{stem}.docx",
-                "X-Audit-Score": str(health_score),
                 "X-Audit-Type": req_format,
                 "X-Audit-Mode": tel_summary["mode"],
-                "X-Audit-Telemetry": tel_b64,
             }
 
             # Stream direct PDF
-            if req_format == "pdf" and pdf_generated:
+            if req_format == "pdf":
                 pdf_bytes = pdf_file.read_bytes()
                 out_name = f"Wooplix_Audit_{stem}.pdf"
                 common_headers["Content-Disposition"] = f'attachment; filename="{out_name}"'
@@ -399,7 +404,7 @@ def trigger_audit(
                 )
 
             # Stream direct DOCX
-            if req_format == "docx" or (req_format == "pdf" and not pdf_generated):
+            if req_format == "docx":
                 docx_bytes = docx_file.read_bytes()
                 out_name = f"Wooplix_Audit_{stem}.docx"
                 common_headers["Content-Disposition"] = f'attachment; filename="{out_name}"'

@@ -1,6 +1,12 @@
 import unittest
+import os
+import tempfile
+from pathlib import Path
 from unittest.mock import Mock, patch
 
+from fastapi.testclient import TestClient
+
+import app as web_app
 import zoho_audit_agent as agent
 
 
@@ -115,6 +121,74 @@ class ReportScopeTests(unittest.TestCase):
 
         self.assertEqual(result["app_audits"][0]["findings"], [])
         self.assertIn("lead assignment rules", result["evidence_provenance"]["inspection_limits"])
+
+
+class DeliverySafetyTests(unittest.TestCase):
+    def setUp(self):
+        self.client = TestClient(web_app.app)
+
+    def test_invalid_format_is_rejected_before_analysis(self):
+        with patch.object(agent, "collect_environment_telemetry") as collect:
+            response = self.client.post("/api/audit?format=txt", data={"use_demo": "true"})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.headers["cache-control"], "no-store")
+        collect.assert_not_called()
+
+    def test_public_deployment_disables_sample_audits(self):
+        with patch.dict(os.environ, {"VERCEL": "1"}, clear=False), patch.object(agent, "collect_environment_telemetry") as collect:
+            os.environ.pop("ENABLE_DEMO_AUDIT", None)
+            response = self.client.post("/api/audit", data={"use_demo": "true"})
+        self.assertEqual(response.status_code, 403)
+        collect.assert_not_called()
+
+    def test_pdf_callback_uses_platform_url_without_redirects(self):
+        pdf_response = Mock(status_code=200, content=b"%PDF-1.4\nexample")
+        with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ, {
+            "VERCEL": "1", "VERCEL_URL": "trusted.vercel.app", "PDF_RENDER_TOKEN": "test-token"
+        }), patch("requests.post", return_value=pdf_response) as post:
+            output = Path(folder) / "audit.pdf"
+            self.assertTrue(web_app._render_audit_pdf({}, output))
+            self.assertEqual(output.read_bytes(), pdf_response.content)
+        self.assertEqual(post.call_args.args[0], "https://trusted.vercel.app/api/pdf.php")
+        self.assertFalse(post.call_args.kwargs["allow_redirects"])
+
+    def test_failed_module_probe_does_not_count_as_module(self):
+        summary = web_app._extract_telemetry_summary({"zoho_crm": {
+            "modules_inventory": [{"note": "Modules endpoint returned HTTP 404"}]
+        }}, "Example", ["Zoho CRM"])
+        self.assertIsNone(summary["modules_detected"])
+
+    def test_word_download_does_not_invoke_pdf_renderer(self):
+        telemetry = {"client_metadata": {"audit_mode": "Sample Diagnostic Baseline"},
+                     "zoho_crm": {"status": "connected"}}
+        report = {"app_audits": [{"app_name": "Zoho CRM", "findings": []}]}
+        def write_word(_report, path):
+            Path(path).write_bytes(b"word-test")
+
+        with patch.dict(os.environ, {"GROQ_API_KEY": "test-key"}), \
+             patch.object(agent, "collect_environment_telemetry", return_value=telemetry), \
+             patch.object(agent, "analyze_telemetry_with_groq", return_value=report), \
+             patch.object(agent, "build_docx", side_effect=write_word), \
+             patch.object(web_app, "_render_audit_pdf") as render:
+            response = self.client.post("/api/audit?format=docx", data={"use_demo": "true", "company_name": "Example"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"word-test")
+        self.assertEqual(response.headers["cache-control"], "no-store")
+        render.assert_not_called()
+
+    def test_pdf_failure_returns_error_instead_of_word(self):
+        telemetry = {"client_metadata": {"audit_mode": "Sample Diagnostic Baseline"},
+                     "zoho_crm": {"status": "connected"}}
+        report = {"app_audits": [{"app_name": "Zoho CRM", "findings": []}]}
+        with patch.dict(os.environ, {"GROQ_API_KEY": "test-key"}), \
+             patch.object(agent, "collect_environment_telemetry", return_value=telemetry), \
+             patch.object(agent, "analyze_telemetry_with_groq", return_value=report), \
+             patch.object(agent, "build_docx") as build_word, \
+             patch.object(web_app, "_render_audit_pdf", return_value=False):
+            response = self.client.post("/api/audit?format=pdf", data={"use_demo": "true", "company_name": "Example"})
+        self.assertEqual(response.status_code, 502)
+        self.assertIn("PDF rendering is unavailable", response.json()["detail"])
+        build_word.assert_not_called()
 
 
 if __name__ == "__main__":

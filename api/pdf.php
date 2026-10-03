@@ -1,6 +1,6 @@
 <?php
 // Wooplix Zoho System Audit Agent — Vercel Dompdf Renderer
-// Protected by shared token or default token for serverless execution.
+// Protected by the shared PDF_RENDER_TOKEN.
 require __DIR__ . '/../vendor/autoload.php';
 
 use Dompdf\Dompdf;

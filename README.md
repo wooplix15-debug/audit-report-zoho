@@ -141,9 +141,10 @@ Content-Type: multipart/form-data
 - `accounts_url` *(string)*: Zoho accounts URL (e.g. `https://accounts.zoho.in`).
 - `client_id`, `client_secret`, `token` *(required for live audits)*: Per-request Zoho OAuth credentials and refresh token.
 - `target_suites` *(string)*: Comma-separated supported suites (`zoho_crm`, `zoho_desk`, `zoho_books`, `zoho_inventory`, `zoho_projects`, `zoho_workdrive`, `zoho_flow`, `zoho_analytics`).
-- `use_demo` *(boolean, optional)*: If `true`, runs simulation telemetry.
+- `use_demo` *(boolean, optional)*: If `true`, runs simulation telemetry locally. Disabled on Vercel unless `ENABLE_DEMO_AUDIT=1`.
 
 **Format options**: `?format=pdf`, `?format=docx`, or `?format=zip`.
+If PDF rendering fails, the request returns an error instead of downloading a different format.
 
 ---
 
