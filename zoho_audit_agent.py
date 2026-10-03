@@ -1707,9 +1707,13 @@ def validate_and_normalize_audit_schema(audit_data: Dict[str, Any], telemetry: D
     # Attach Evidence Provenance (Item 9)
     crm = telemetry.get("zoho_crm", {})
     op = crm.get("operational_metrics", {})
+    currency_symbol = crm.get("org_settings", {}).get("currency_symbol")
+    if not isinstance(currency_symbol, str) or not currency_symbol.strip():
+        currency_symbol = None
     audit_data["evidence_provenance"] = {
         "deals_sampled_count": op.get("deals_sampled", 0),
         "deal_sampling_method": op.get("deal_sampling_method"),
+        "currency_symbol": currency_symbol,
         "open_deals_sampled_count": op.get("open_deals_sampled"),
         "closed_deals_excluded_from_pipeline": op.get("closed_deals_excluded_from_pipeline"),
         "leads_sampled_count": op.get("leads_sampled", 0),
@@ -1730,6 +1734,19 @@ def validate_and_normalize_audit_schema(audit_data: Dict[str, Any], telemetry: D
                         "Non-intrusive OAuth 2.0 read-only telemetry sampling directly from official Zoho Cloud endpoints."),
         "inspection_limits": inspection_limits,
     }
+
+    if is_live:
+        # The CRM amount fields use the account base currency, but the org
+        # endpoint can be inaccessible. Never let the model invent USD.
+        def normalize_currency(value):
+            if isinstance(value, dict):
+                return {key: normalize_currency(item) for key, item in value.items()}
+            if isinstance(value, list):
+                return [normalize_currency(item) for item in value]
+            if isinstance(value, str):
+                return re.sub(r"(?<!\w)\$(?=\s*\d)", currency_symbol or "", value)
+            return value
+        audit_data = normalize_currency(audit_data)
 
     return audit_data
 
@@ -2135,6 +2152,8 @@ def build_docx(audit_data: Dict[str, Any], output_path: str) -> str:
             deal_scope += "\nOldest + recently modified sample (max 50)"
         _add_row(tbl_ev, w_ev, ["Zoho CRM Deals", f"{ev.get('deals_sampled_count', 0)} Deals Sampled{deal_scope}\nIDs: {deal_ids_str}", f"Inspected: {ts_str} UTC"], zebra=False)
         _add_row(tbl_ev, w_ev, ["Zoho CRM Leads", f"{ev.get('leads_sampled_count', 0)} Leads Sampled\n{st_str}", f"IDs: {lead_ids_str}"], zebra=True)
+        _add_row(tbl_ev, w_ev, ["Pipeline currency", ev.get("currency_symbol") or "Not verified",
+                                "Amounts shown without a currency symbol when org settings are inaccessible."], zebra=False)
     if tel.get("is_live", True) and any("desk" in a.lower() or "book" in a.lower() for a in suites_list):
         _add_row(tbl_ev, w_ev, ["Desk & Books Access", f"Desk: {str(ev.get('desk_status', 'not_connected')).upper()} | Books: {str(ev.get('books_status', 'not_connected')).upper()}", ev.get("methodology", "OAuth read-only probe")], zebra=False)
     if ev.get("inspection_limits"):
@@ -2736,6 +2755,7 @@ table.dt tr:nth-child(even) td {{
                 deal_scope += '<br><small>Oldest + recently modified sample (max 50)</small>'
             out.append(f'<tr><td><strong>Zoho CRM Deals</strong></td><td>{ev.get("deals_sampled_count", 0)} Deals Sampled{deal_scope}<br><small style="color:#64748b;">Sample IDs: <code style="font-size:7pt; background:#f1f5f9; padding:1px 3px;">{esc(deal_ids_str)}</code></small></td><td>Inspected: {esc(ts_str)} UTC</td></tr>')
             out.append(f'<tr><td><strong>Zoho CRM Leads</strong></td><td>{ev.get("leads_sampled_count", 0)} Leads Sampled<br><small style="color:#64748b;">{esc(st_str)}</small></td><td>Sample IDs: <code style="font-size:7pt; background:#f1f5f9; padding:1px 3px;">{esc(lead_ids_str)}</code></td></tr>')
+            out.append(f'<tr><td><strong>Pipeline currency</strong></td><td>{esc(ev.get("currency_symbol") or "Not verified")}</td><td>Amounts shown without a currency symbol when org settings are inaccessible.</td></tr>')
         if tel.get("is_live", True) and any("desk" in str(a).lower() or "book" in str(a).lower() for a in suites_list):
             out.append(f'<tr><td><strong>Desk &amp; Books Access</strong></td><td>Desk: {str(ev.get("desk_status","not_connected")).upper()} | Books: {str(ev.get("books_status","not_connected")).upper()}</td><td>{esc(ev.get("methodology","OAuth read-only probe"))}</td></tr>')
         if ev.get("inspection_limits"):

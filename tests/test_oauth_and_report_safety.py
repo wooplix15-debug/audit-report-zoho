@@ -148,6 +148,17 @@ class ReportScopeTests(unittest.TestCase):
         self.assertIn("automation was not assessed", cause)
         self.assertNotIn("Missing deal aging alerts", cause)
 
+    def test_unverified_currency_symbol_is_removed_from_live_report(self):
+        telemetry = {"client_metadata": {"company_name": "Example", "audit_mode": "Live Zoho API Telemetry"},
+                     "zoho_crm": {"status": "partial_access", "org_settings": {"note": "HTTP 403"}}}
+        report = {"executive_summary": "$620,000 sampled pipeline value",
+                  "app_audits": [{"app_name": "Zoho CRM", "health_score": 50, "findings": []}]}
+
+        result = agent.validate_and_normalize_audit_schema(report, telemetry, "Tester")
+
+        self.assertEqual(result["executive_summary"], "620,000 sampled pipeline value")
+        self.assertIsNone(result["evidence_provenance"]["currency_symbol"])
+
     def test_failed_rule_endpoint_is_an_inspection_limit(self):
         telemetry = {
             "client_metadata": {"company_name": "Example", "audit_mode": "Live Zoho API Telemetry"},
